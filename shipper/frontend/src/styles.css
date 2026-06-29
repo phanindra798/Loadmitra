@@ -1,0 +1,284 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-navy: var(--navy);
+  --color-cyan-accent: var(--cyan-accent);
+  --color-savings: var(--savings);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --shadow-soft: 0 4px 20px -8px rgb(15 42 92 / 0.18);
+  --shadow-card: 0 10px 30px -12px rgb(15 42 92 / 0.20);
+  --shadow-glow: 0 0 40px rgb(34 211 238 / 0.35);
+}
+
+/* ===== LIGHT MODE (blue) ===== */
+:root {
+  --radius: 0.875rem;
+
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+
+  --primary: #2563EB;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #EFF4FB;
+  --secondary-foreground: #0F2A5C;
+
+  --muted: #F1F5F9;
+  --muted-foreground: #475569;
+
+  --accent: #06B6D4;            /* cyan accent */
+  --accent-foreground: #FFFFFF;
+
+  --navy: #0F2A5C;
+  --cyan-accent: #06B6D4;
+  --savings: #F59E0B;
+
+  --success: #10B981;
+  --warning: #F59E0B;
+
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #2563EB;
+
+  /* Hero scene (day) */
+  --sky-top: #DCEBFB;
+  --sky-bottom: #F8FAFC;
+  --hill-far: #BFD6F1;
+  --hill-near: #93B7E2;
+  --road: #1E293B;
+  --road-edge: #334155;
+  --lane: #F8FAFC;
+
+  /* App map canvas (day) */
+  --map-bg: #E6EDF6;
+  --map-street: #FFFFFF;
+  --map-block: #D7E2F0;
+  --map-green: #CFE8D4;
+  --map-water: #BFE0EF;
+  --map-route: #2563EB;
+  --map-route-soft: rgba(37, 99, 235, 0.16);
+}
+
+/* ===== DARK MODE (deep navy) ===== */
+.dark {
+  --background: #0B1220;
+  --foreground: #E2E8F0;
+
+  --card: #161F33;
+  --card-foreground: #E2E8F0;
+  --popover: #161F33;
+  --popover-foreground: #E2E8F0;
+
+  --primary: #3B82F6;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #1A2438;
+  --secondary-foreground: #E2E8F0;
+
+  --muted: #1A2438;
+  --muted-foreground: #94A3B8;
+
+  --accent: #22D3EE;
+  --accent-foreground: #0B1220;
+
+  --navy: #0B1220;
+  --cyan-accent: #22D3EE;
+  --savings: #FBBF24;
+
+  --success: #34D399;
+  --warning: #FBBF24;
+
+  --destructive: #F87171;
+  --destructive-foreground: #0B1220;
+
+  --border: #1E293B;
+  --input: #1E293B;
+  --ring: #3B82F6;
+
+  /* Hero scene (night) */
+  --sky-top: #0A0F1E;
+  --sky-bottom: #0B1220;
+  --hill-far: #142142;
+  --hill-near: #1B2A52;
+  --road: #050913;
+  --road-edge: #0F172A;
+  --lane: #FBBF24;
+
+  /* App map canvas (night) */
+  --map-bg: #0E1626;
+  --map-street: #1C2842;
+  --map-block: #16213A;
+  --map-green: #123021;
+  --map-water: #0F2A3A;
+  --map-route: #22D3EE;
+  --map-route-soft: rgba(34, 211, 238, 0.20);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    box-sizing: border-box;
+  }
+  html, body { overflow-x: hidden; }
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  img, svg, video { max-width: 100%; height: auto; display: block; }
+  button, a { transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease; }
+}
+
+@utility text-balance { text-wrap: balance; }
+
+@utility hero-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  font-size: clamp(2rem, 5.5vw, 4.5rem);
+}
+
+/* ============ ANIMATIONS ============ */
+@keyframes lm-road-dash {
+  from { background-position-x: 0; }
+  to   { background-position-x: -240px; }
+}
+@keyframes lm-parallax-far {
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(-50%,0,0); }
+}
+@keyframes lm-parallax-near {
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(-50%,0,0); }
+}
+@keyframes lm-truck-bob {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  25%     { transform: translateY(-2px) rotate(-0.4deg); }
+  50%     { transform: translateY(0) rotate(0deg); }
+  75%     { transform: translateY(-1px) rotate(0.3deg); }
+}
+@keyframes lm-wheel-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes lm-trail {
+  0%   { opacity: 0; transform: translateX(0) scaleX(0.6); }
+  40%  { opacity: 0.9; }
+  100% { opacity: 0; transform: translateX(-60px) scaleX(1.2); }
+}
+@keyframes lm-pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.6); opacity: 0.35; }
+}
+@keyframes lm-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes lm-star-twinkle {
+  0%,100% { opacity: 0.3; }
+  50%     { opacity: 1; }
+}
+
+.lm-anim-fade-up { animation: lm-fade-up 700ms ease-out both; }
+
+/* ============ APP (shipper portal) ANIMATIONS ============ */
+@keyframes lm-radar-sweep {
+  to { transform: rotate(360deg); }
+}
+@keyframes lm-ping-ring {
+  0%   { transform: scale(0.4); opacity: 0.65; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+@keyframes lm-marker-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+@keyframes lm-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes lm-bar-stripe {
+  to { background-position-x: 22px; }
+}
+@keyframes lm-dash-flow {
+  to { stroke-dashoffset: -24; }
+}
+
+.lm-anim-fade-in { animation: lm-fade-in 420ms ease-out both; }
+
+/* Hide scrollbars on horizontal scroll strips (chips / carousels) */
+.lm-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.lm-no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Hide scrollbars app-wide — scrolling still works, the bar is just invisible. */
+* { scrollbar-width: none; -ms-overflow-style: none; }
+*::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lm-parallax-far,
+  .lm-parallax-near,
+  .lm-truck,
+  .lm-trail,
+  .lm-pulse,
+  .lm-anim-fade-up,
+  .lm-anim-fade-in { animation: none !important; }
+  .lm-radar,
+  .lm-ping,
+  .lm-marker,
+  .lm-route-dash { animation: none !important; }
+  /* Keep a slow road + wheel spin so the hero still reads as "moving" even
+     when the OS requests reduced motion. */
+  .lm-road { animation-duration: 2.4s !important; }
+  .lm-wheel { animation-duration: 1.6s !important; }
+}

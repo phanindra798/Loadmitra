@@ -1,0 +1,12 @@
+{
+  "name": "loadmitra-captain",
+  "private": true,
+  "description": "Captain portal — runs the frontend in captain/frontend. Lets `cd captain && npm run dev` start THIS app (port 8081) instead of climbing to the repo root (which runs shipper).",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "lint": "npm --prefix frontend run lint",
+    "install:all": "npm --prefix frontend install"
+  }
+}

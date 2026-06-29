@@ -1,0 +1,23 @@
+{
+  "name": "loadmitra",
+  "private": true,
+  "version": "0.1.0",
+  "description": "LoadMitra — India-first freight marketplace. Two frontends — shipper/ (book trucks) and captain/ (drive & earn) — backed by one shared API in server/.",
+  "scripts": {
+    "dev": "npm --prefix shipper/frontend run dev",
+    "dev:shipper": "npm --prefix shipper/frontend run dev",
+    "dev:captain": "npm --prefix captain/frontend run dev",
+    "dev:api": "npm --prefix server run dev",
+    "dev:server": "npm --prefix server run dev",
+
+    "build": "npm run build:shipper && npm run build:captain && npm run build:server",
+    "build:shipper": "npm --prefix shipper/frontend run build",
+    "build:captain": "npm --prefix captain/frontend run build",
+    "build:server": "npm --prefix server run build",
+
+    "install:shipper": "npm --prefix shipper/frontend install",
+    "install:captain": "npm --prefix captain/frontend install",
+    "install:server": "npm --prefix server install",
+    "install:all": "npm run install:shipper && npm run install:captain && npm run install:server"
+  }
+}

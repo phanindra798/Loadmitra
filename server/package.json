@@ -1,0 +1,35 @@
+{
+  "name": "loadmitra-server",
+  "private": true,
+  "version": "0.1.0",
+  "description": "LoadMitra shared API — Express + TypeScript + MongoDB (serves both the shipper and captain portals)",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "loadmitra": "file:..",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.16.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3"
+  }
+}

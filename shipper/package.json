@@ -1,0 +1,12 @@
+{
+  "name": "loadmitra-shipper",
+  "private": true,
+  "description": "Shipper portal — runs the frontend in shipper/frontend. Lets `cd shipper && npm run dev` start THIS app (port 8080) instead of climbing to the repo root.",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "lint": "npm --prefix frontend run lint",
+    "install:all": "npm --prefix frontend install"
+  }
+}
