@@ -16,6 +16,14 @@ npm run dev                   # http://localhost:4000  (tsx watch)
 ### MongoDB Atlas
 Atlas → **Database → Connect → Drivers** → copy the `mongodb+srv://…` string into `MONGODB_URI` (add a DB name, e.g. `…mongodb.net/loadmitra?…`). Allow your IP under **Network Access**.
 
+## Authentication changes — 25 October 2026
+
+Local development now generates a six-digit challenge, stores only its HMAC, and returns `devOtp` for display on the login screen. Arbitrary codes no longer work. Codes expire after `OTP_TTL_SECONDS` (default 300), allow five verification attempts, and are consumed atomically before issuing a session. Resending invalidates the previous challenge. Existing legacy OTP records cannot authenticate; request a new code.
+
+Production OTP send and verify return HTTP 503 until an SMS delivery adapter is implemented. Do not deploy with `NODE_ENV=development` to bypass this restriction. Production SMS, country-code identity normalization, booking ownership, and browser session hardening remain outstanding.
+
+Run `npm test` for the backend regression suite. Tests use synthetic persistence stubs and a local HTTP server; they do not connect to Atlas. Real MongoDB concurrency and browser end-to-end checks are still required.
+
 ## Auth API (Phase 1)
 
 | Method | Path | Body | Notes |
@@ -58,3 +66,11 @@ The customer fare uses the **same** market-range formula on both sides (shared `
 - **Phase 2 (in progress)** — catalogue, pricing, captain read endpoints **done** (above), served from seed. Remaining: shipper `bookings` create/list, captain `online` toggle, **persist** Load/Booking/Trip/CaptainProfile to Mongo, frontends swap mock data → React Query.
 - **Phase 3** — Socket.IO (matching/tracking/chat), real geocoding, SMS OTP.
 - **Phase 4** — auth hardening, indexes, rate-limit, tests, deploy (Atlas + Render/Railway).
+
+## Booking changes — 25 October 2026
+
+`POST /api/bookings` and `GET /api/bookings/:id` now require a shipper session. Creation stores the authenticated owner, calculates the fare and validates truck capacity. Booking IDs must match `LM-` followed by 6–64 letters, digits or hyphens; the frontend uses a UUID. A retry with the same owner, ID and load details preserves the existing record. A conflicting ID returns 409.
+
+`POST /api/bookings/:id/cancel` cancels an owned booking before pickup. Captain acceptance claims only an open, owned booking atomically; unavailable loads return 409. Trip status changes require the assigned captain and a valid transition. `GET /api/captain/trips` now returns that captain's stored trips. Ownerless legacy demo bookings are intentionally excluded; no migration or deletion is performed.
+
+The earlier seed-data roadmap above is historical. The job board now contains only persisted loads. Captain vehicle onboarding and pickup/drop OTP verification remain unfinished; trip OTPs still only enforce four-digit format. Do not treat these changes as production readiness.

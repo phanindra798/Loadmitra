@@ -1,5 +1,7 @@
+import { toast } from "sonner";
+import { isAuthed } from "@/lib/account";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin, Minus, Plus, Star, Clock, ChevronDown, ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
@@ -24,6 +26,9 @@ export const Route = createFileRoute("/app/quote")({
 
 function QuotePage() {
   const navigate = useNavigate();
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
+  const requestRef = useRef<{ key: string; id: string } | null>(null);
   const t = useT();
   const { draft, setMode, setTruck, setWeight, setGoods, createBooking } = useBooking();
 
@@ -78,8 +83,13 @@ function QuotePage() {
     );
   }
 
-  function book() {
-    const id = newBookingId();
+  async function book() {
+    if (savingRef.current) return;
+    if (!isAuthed()) { toast.error("Please sign in before booking"); navigate({ to: "/login" }); return; }
+    const key = JSON.stringify(draft);
+    if (requestRef.current?.key !== key) requestRef.current = { key, id: newBookingId() };
+    const id = requestRef.current.id;
+    savingRef.current = true; setSaving(true);
     const agreed = price.estimate;
     const booking: Booking = {
       id,
@@ -95,10 +105,8 @@ function QuotePage() {
       status: "requested",
       createdLabel: nowLabel(),
     };
-    createBooking(booking);
-    // Persist to the shared API so the captain job board can see this load.
-    // Fire-and-forget: the local booking flow continues even if the API is down.
-    void shipperApi.createBooking({
+    try {
+    const saved = await shipperApi.createBooking({
       bookingId: id,
       mode: draft.mode,
       pickup: draft.pickup!,
@@ -110,8 +118,11 @@ function QuotePage() {
       goodsType: draft.goodsType,
       agreedPrice: agreed,
       createdLabel: booking.createdLabel,
-    }).catch(() => {});
+    });
+    createBooking({ ...booking, agreedPrice: saved.agreedPrice });
     navigate({ to: "/app/matching", search: { id } });
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Booking failed"); }
+    finally { savingRef.current = false; setSaving(false); }
   }
 
   const existingSharedKg = Math.round(selectedTruck.capacityKg * 0.4);
@@ -266,7 +277,7 @@ function QuotePage() {
             </p>
             <p className="truncate text-base font-extrabold text-foreground">{priceRangeLabel(price)}</p>
           </div>
-          <Button onClick={book} className="ml-auto h-12 rounded-xl px-6 text-base">
+          <Button disabled={saving} onClick={book} className="ml-auto h-12 rounded-xl px-6 text-base">
             {t("quote.bookNow")} <ArrowRight className="h-4 w-4" />
           </Button>
         </div>

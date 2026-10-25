@@ -144,7 +144,7 @@ export function useBooking() {
 
 /** Generate a human booking id. Call only from event handlers (client-side). */
 export function newBookingId(): string {
-  return "LM-" + Date.now().toString(36).slice(-6).toUpperCase();
+  return "LM-" + crypto.randomUUID().toUpperCase();
 }
 
 /** Format a "now" timestamp for booking creation. Event-handler use only. */

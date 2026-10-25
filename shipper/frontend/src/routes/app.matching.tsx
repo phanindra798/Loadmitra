@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Radar, X, CheckCircle2, ArrowRight, Truck } from "lucide-react";
@@ -5,7 +6,6 @@ import { PageHeader } from "@/components/app/page-header";
 import { CaptainCard } from "@/components/app/captain-card";
 import { Button } from "@/components/ui/button";
 import { useBooking } from "@/features/shipper/booking-context";
-import { captainForTruck } from "@/features/shipper/mock-data";
 import { shipperApi } from "@/lib/api";
 import { inr } from "@/features/shipper/pricing";
 import { MODE_I18N } from "@/features/shipper/mode-meta";
@@ -22,17 +22,13 @@ function MatchingPage() {
   const t = useT();
   const { getBooking, assignCaptain, updateStatus } = useBooking();
   const booking = getBooking(id);
+  const [pollError, setPollError] = useState<string | null>(null);
   const [phase, setPhase] = useState<"searching" | "found">("searching");
 
-  // Wait for a real captain to accept on the server, then show that captain.
-  // Polls GET /api/bookings/:id. If the API is unreachable (standalone/offline
-  // demo), fall back to a placeholder match after a few failed polls so the flow
-  // never dead-ends.
+  // Only a persisted captain acceptance can complete matching.
   useEffect(() => {
     if (!booking || phase === "found") return;
     let cancelled = false;
-    let fails = 0;
-    let ticks = 0;
     let timer: ReturnType<typeof setTimeout>;
 
     const found = (captain: Parameters<typeof assignCaptain>[1]) => {
@@ -43,29 +39,23 @@ function MatchingPage() {
     };
 
     const tick = async () => {
-      ticks += 1;
       try {
         const r = await shipperApi.getBooking(booking.id);
         if (cancelled) return;
-        fails = 0;
-        // Accepted on the server → show the real captain (placeholder only if the
-        // captain snapshot somehow didn't persist).
-        if (r.status === "accepted") {
-          found(r.captain ?? captainForTruck(booking.truckTypeId));
+        setPollError(null);
+        if (r.status === "cancelled") {
+          updateStatus(booking.id, "cancelled");
+          navigate({ to: "/app/bookings" });
           return;
         }
-      } catch {
-        fails += 1;
-        if (fails >= 3) {
-          found(captainForTruck(booking.truckTypeId)); // API unreachable — placeholder
+        // Use the authenticated captain snapshot returned by the API.
+        if (r.status === "accepted" && r.captain) {
+          found(r.captain);
           return;
         }
-      }
-      // Safety net: if no captain accepts *this* load in ~20s, match a
-      // placeholder so the shipper is never stranded on the searching screen.
-      if (ticks >= 8) {
-        found(captainForTruck(booking.truckTypeId));
-        return;
+      } catch (error) {
+        if (cancelled) return;
+        setPollError(error instanceof Error ? error.message : "Unable to refresh booking");
       }
       if (!cancelled) timer = setTimeout(tick, 2500);
     };
@@ -93,13 +83,15 @@ function MatchingPage() {
     );
   }
 
-  function cancel() {
-    updateStatus(booking!.id, "cancelled");
-    navigate({ to: "/app" });
+  async function cancel() {
+    try {
+      await shipperApi.cancelBooking(booking!.id);
+      updateStatus(booking!.id, "cancelled");
+      navigate({ to: "/app" });
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Cancellation failed"); }
   }
 
   function confirm() {
-    updateStatus(booking!.id, "enroute_pickup");
     navigate({ to: "/app/track/$id", params: { id: booking!.id } });
   }
 
@@ -108,6 +100,7 @@ function MatchingPage() {
       <PageHeader title={phase === "searching" ? t("matching.findingTitle") : t("matching.foundTitle")} />
 
       <div className="px-4 pt-6 sm:px-6">
+        {pollError && <p role="alert" className="mb-3 text-sm text-destructive">{pollError}. Retrying…</p>}
         {/* Route summary */}
         <div className="mb-6 rounded-2xl border border-border bg-card p-4 shadow-sm">
           <div className="flex items-center gap-2 text-sm">

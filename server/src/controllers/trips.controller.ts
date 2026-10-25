@@ -1,73 +1,28 @@
+import type { AuthedRequest } from "../middleware/auth";
+import { User } from "../models/user.model";
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { LOAD_REQUESTS, SAMPLE_TRIPS } from "../data/captain";
 import { Booking, bookingToTrip } from "../models/booking.model";
-import type { Trip } from "../types";
 
 /** GET /api/captain/trips — the captain's trip history. */
-export function listTrips(_req: Request, res: Response): void {
-  res.json({ data: SAMPLE_TRIPS });
+export async function listTrips(req: AuthedRequest, res: Response): Promise<void> {
+  const bookings = await Booking.find({ acceptedByCaptainId: req.auth!.userId }).sort({ createdAt: -1 }).limit(100);
+  res.json({ data: bookings.map(b => bookingToTrip(b, b.tripStatus ?? "accepted")) });
 }
 
-const acceptCaptainSchema = z
-  .object({
-    id: z.string().optional(),
-    name: z.string().optional(),
-    vehicleNumber: z.string().optional(),
-    truckTypeId: z.string().optional(),
-    rating: z.number().optional(),
-    trips: z.number().optional(),
-    phoneMasked: z.string().optional(),
-    etaMins: z.number().optional(),
-    hue: z.number().optional(),
-    badges: z.array(z.string()).optional(),
-  })
-  .optional();
-
-/** POST /api/captain/requests/:id/accept — accept an offer, returns the started trip. */
-export async function acceptRequest(req: Request, res: Response): Promise<void> {
-  const id = req.params.id;
-  // The captain portal sends a snapshot of itself so the shipper can show who accepted.
-  const captain = acceptCaptainSchema.safeParse((req.body as { captain?: unknown })?.captain).data;
-
-  // A real shipper booking? Mark it accepted so it leaves the open job board.
-  const booking = await Booking.findOne({ bookingId: id });
-  if (booking) {
-    if (booking.status === "open") {
-      booking.status = "accepted";
-      if (captain) {
-        booking.set("captain", captain);
-        if (captain.id) booking.acceptedByCaptainId = captain.id;
-      }
-      await booking.save();
-    }
-    res.status(201).json({ data: bookingToTrip(booking, "accepted") });
-    return;
-  }
-
-  // Fall back to the demo seed.
-  const request = LOAD_REQUESTS.find((r) => r.id === id);
-  if (!request) {
-    res.status(404).json({ error: `Unknown request: ${id}` });
-    return;
-  }
-  const trip: Trip = {
-    id: request.id,
-    mode: request.mode,
-    pickup: request.pickup,
-    drop: request.drop,
-    distanceKm: request.distanceKm,
-    truckTypeId: request.truckTypeId,
-    truckTypeName: request.truckTypeName,
-    loadWeightKg: request.loadWeightKg,
-    goodsType: request.goodsType,
-    payout: request.payout,
-    customerName: request.customerName,
-    customerRating: request.customerRating,
-    status: "accepted",
-    createdLabel: request.createdLabel,
-  };
-  res.status(201).json({ data: trip });
+/** Claim an open booking atomically; client-supplied captain identity is ignored. */
+export async function acceptRequest(req: AuthedRequest, res: Response): Promise<void> {
+  const user = await User.findById(req.auth!.userId);
+  if (!user) { res.status(401).json({ error: "Account not found" }); return; }
+  const booking = await Booking.findOneAndUpdate(
+    { bookingId: req.params.id, status: "open", shipperId: { $exists: true } },
+    { $set: { status: "accepted", tripStatus: "accepted", acceptedByCaptainId: req.auth!.userId,
+      captain: { id: req.auth!.userId, name: user.name, rating: 0, trips: 0, badges: [],
+        vehicleNumber: "Not registered", truckTypeId: "", phoneMasked: "", etaMins: 0 } } },
+    { new: true, runValidators: true },
+  );
+  if (!booking) { res.status(409).json({ error: "This load is no longer available" }); return; }
+  res.status(201).json({ data: bookingToTrip(booking, "accepted") });
 }
 
 const StatusSchema = z.object({
@@ -84,7 +39,7 @@ const StatusSchema = z.object({
 });
 
 /** POST /api/captain/trips/:id/status — advance a trip through its lifecycle. */
-export async function updateTripStatus(req: Request, res: Response): Promise<void> {
+export async function updateTripStatus(req: AuthedRequest, res: Response): Promise<void> {
   const parsed = StatusSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid request", details: parsed.error.flatten() });
@@ -100,11 +55,20 @@ export async function updateTripStatus(req: Request, res: Response): Promise<voi
 
   // Persist the lifecycle onto the shipper's booking so their track screen can
   // mirror it — the shipper only sees "delivered" once the captain delivers.
-  const booking = await Booking.findOne({ bookingId: req.params.id });
-  if (booking) {
-    booking.tripStatus = parsed.data.status;
-    if (parsed.data.status === "cancelled") booking.status = "cancelled";
-    await booking.save();
+  const booking = await Booking.findOne({ bookingId: req.params.id, acceptedByCaptainId: req.auth!.userId });
+  if (!booking) { res.status(404).json({ error: "Trip not found" }); return; }
+  const current = booking.tripStatus ?? "accepted";
+  const transitions: Record<string, string[]> = {
+    accepted: ["enroute_pickup", "cancelled"], enroute_pickup: ["at_pickup", "cancelled"],
+    at_pickup: ["picked", "cancelled"], picked: ["enroute_drop"], enroute_drop: ["delivered"],
+  };
+  if (booking.status !== "accepted" || !transitions[current]?.includes(parsed.data.status)) {
+    res.status(409).json({ error: "Invalid trip transition" }); return;
   }
+  const updated = await Booking.findOneAndUpdate({
+    bookingId: booking.bookingId, acceptedByCaptainId: req.auth!.userId,
+    status: "accepted", tripStatus: booking.tripStatus,
+  }, { $set: { tripStatus: parsed.data.status, ...(parsed.data.status === "cancelled" ? { status: "cancelled" } : {}) } }, { new: true });
+  if (!updated) { res.status(409).json({ error: "Trip changed; refresh and retry" }); return; }
   res.json({ data: { id: req.params.id, status: parsed.data.status } });
 }

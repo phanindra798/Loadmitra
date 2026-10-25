@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import {
   createContext,
   useCallback,
@@ -47,10 +48,10 @@ interface State {
 const initialState: State = {
   online: false,
   profile: CAPTAIN,
-  requestPool: LOAD_REQUESTS,
+  requestPool: [],
   requests: [],
   activeTrip: null,
-  trips: SAMPLE_TRIPS,
+  trips: [],
   earningsBase: EARNINGS,
   sessionEarned: 0,
   sessionTrips: 0,
@@ -63,7 +64,7 @@ type Action =
   | { type: "setRequests"; requests: LoadRequest[] }
   | { type: "addRequest"; request: LoadRequest }
   | { type: "declineRequest"; id: string }
-  | { type: "acceptRequest"; id: string }
+  | { type: "acceptRequest"; trip: Trip }
   | { type: "updateStatus"; status: TripStatus }
   | { type: "completeTrip"; ratingGiven?: number }
   | { type: "cancelTrip" };
@@ -77,7 +78,8 @@ function reducer(state: State, action: Action): State {
         ...state,
         profile: action.profile,
         requestPool: action.requestPool,
-        trips: action.trips,
+        trips: action.trips.filter(t => ["delivered", "cancelled"].includes(t.status)),
+        activeTrip: action.trips.find(t => !["delivered", "cancelled"].includes(t.status)) ?? null,
         earningsBase: action.earnings,
       };
     case "setRequestPool":
@@ -95,26 +97,7 @@ function reducer(state: State, action: Action): State {
     case "declineRequest":
       return { ...state, requests: state.requests.filter((r) => r.id !== action.id) };
     case "acceptRequest": {
-      const req = state.requests.find((r) => r.id === action.id);
-      if (!req || state.activeTrip) return state;
-      const trip: Trip = {
-        id: req.id,
-        mode: req.mode,
-        pickup: req.pickup,
-        drop: req.drop,
-        distanceKm: req.distanceKm,
-        truckTypeId: req.truckTypeId,
-        truckTypeName: req.truckTypeName,
-        loadWeightKg: req.loadWeightKg,
-        goodsType: req.goodsType,
-        payout: req.payout,
-        customerName: req.customerName,
-        customerRating: req.customerRating,
-        status: "accepted",
-        createdLabel: req.createdLabel,
-      };
-      // Accepting one job declines all other pending offers.
-      return { ...state, activeTrip: trip, requests: [] };
+      return { ...state, activeTrip: action.trip, requests: [] };
     }
     case "updateStatus": {
       if (!state.activeTrip) return state;
@@ -152,7 +135,7 @@ interface CaptainContextValue extends State {
   setRequests: (requests: LoadRequest[]) => void;
   addRequest: (request: LoadRequest) => void;
   declineRequest: (id: string) => void;
-  acceptRequest: (id: string) => void;
+  acceptRequest: (id: string) => Promise<boolean>;
   updateStatus: (status: TripStatus, otp?: string) => void;
   completeTrip: (ratingGiven?: number, otp?: string) => void;
   cancelTrip: () => void;
@@ -252,39 +235,34 @@ export function CaptainProvider({ children }: { children: ReactNode }) {
       setRequests: (requests) => dispatch({ type: "setRequests", requests }),
       addRequest: (request) => dispatch({ type: "addRequest", request }),
       declineRequest: (id) => dispatch({ type: "declineRequest", id }),
-      // Mutations mirror to the server best-effort; the optimistic reducer drives
-      // the UI so the demo never stalls if the API is down.
-      acceptRequest: (id) => {
-        // Send this captain's snapshot so the shipper's screen shows who accepted.
-        captainApi
-          .accept(id, {
-            id: profile.id,
-            name: profile.name,
-            vehicleNumber: profile.vehicleNumber,
-            truckTypeId: profile.truckTypeId,
-            rating: profile.rating,
-            trips: profile.trips,
-            phoneMasked: profile.phoneMasked,
-            etaMins: 6,
-            hue: profile.hue,
-            badges: profile.kycVerified ? ["verified"] : [],
-          })
-          .catch(() => {});
-        dispatch({ type: "acceptRequest", id });
+      acceptRequest: async (id) => {
+        if (state.activeTrip) return false;
+        try {
+          const trip = await captainApi.accept(id);
+          dispatch({ type: "acceptRequest", trip });
+          return true;
+        } catch (error) { toast.error(error instanceof Error ? error.message : "Acceptance failed"); return false; }
       },
-      updateStatus: (status, otp) => {
-        if (state.activeTrip) captainApi.updateStatus(state.activeTrip.id, status, otp).catch(() => {});
-        dispatch({ type: "updateStatus", status });
+      updateStatus: async (status, otp) => {
+        if (!state.activeTrip) return;
+        try {
+          await captainApi.updateStatus(state.activeTrip.id, status, otp);
+          dispatch({ type: "updateStatus", status });
+        } catch (error) { toast.error(error instanceof Error ? error.message : "Status update failed"); }
       },
-      completeTrip: (ratingGiven, otp) => {
-        if (state.activeTrip)
-          captainApi.updateStatus(state.activeTrip.id, "delivered", otp).catch(() => {});
-        dispatch({ type: "completeTrip", ratingGiven });
+      completeTrip: async (ratingGiven, otp) => {
+        if (!state.activeTrip) return;
+        try {
+          await captainApi.updateStatus(state.activeTrip.id, "delivered", otp);
+          dispatch({ type: "completeTrip", ratingGiven });
+        } catch (error) { toast.error(error instanceof Error ? error.message : "Delivery failed"); }
       },
-      cancelTrip: () => {
-        if (state.activeTrip)
-          captainApi.updateStatus(state.activeTrip.id, "cancelled").catch(() => {});
-        dispatch({ type: "cancelTrip" });
+      cancelTrip: async () => {
+        if (!state.activeTrip) return;
+        try {
+          await captainApi.updateStatus(state.activeTrip.id, "cancelled");
+          dispatch({ type: "cancelTrip" });
+        } catch (error) { toast.error(error instanceof Error ? error.message : "Cancellation failed"); }
       },
       getTrip,
     }),

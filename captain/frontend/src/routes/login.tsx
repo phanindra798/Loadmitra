@@ -39,6 +39,7 @@ function LoginPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
+  const [devOtp, setDevOtp] = useState<string>();
   const [resendIn, setResendIn] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,8 +62,9 @@ function LoginPage() {
     setBusy(true);
     setError(null);
     try {
-      await api.sendOtp(phone, "captain");
-      // Demo mode: no real OTP is sent — the user types any 6 digits to continue.
+      const result = await api.sendOtp(phone, "captain");
+      setDevOtp(result.devOtp);
+      // The development API displays a real expiring challenge for local testing.
       setOtp("");
       setStep("otp");
       setResendIn(30);
@@ -182,6 +184,7 @@ function LoginPage() {
 
           <h1 className="text-2xl font-bold tracking-tight text-foreground">{heading}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{subheading}</p>
+          {devOtp && step !== "form" && <p role="status" className="mt-3 text-sm font-semibold">Development verification code: {devOtp}</p>}
 
           {/* Login / Register toggle */}
           {step === "form" && (
@@ -317,7 +320,7 @@ function LoginPage() {
                 </button>
               </div>
               <p className="text-center text-xs text-muted-foreground">
-                Demo: enter any 6 digits to continue.
+                Enter the code shown above for local testing.
               </p>
             </div>
           ) : (

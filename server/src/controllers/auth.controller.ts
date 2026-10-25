@@ -1,3 +1,5 @@
+import { createHmac, randomInt } from "node:crypto";
+import { Otp } from "../models/otp.model";
 import type { Request, Response } from "express";
 import { z } from "zod";
 import { env } from "../config/env";
@@ -33,28 +35,37 @@ function setAuthCookie(res: Response, token: string): void {
   });
 }
 
-/**
- * POST /api/auth/send-otp — demo mode. No SMS provider is wired, so we neither
- * generate nor store a code; verify-otp accepts any 6-digit value. We still
- * validate the request and return success so the login UI advances to the OTP
- * step. (Swap this for a real SMS send when you wire a provider.)
- */
-export function sendOtp(req: Request, res: Response): void {
+/** Codes are exposed only in local development until an SMS adapter is configured. */
+export function hashOtp(phone: string, role: string, code: string): string {
+  return createHmac("sha256", env.JWT_SECRET).update(`${phone}:${role}:${code}`).digest("hex");
+}
+
+function deliveryAvailable(res: Response): boolean {
+  if (!env.isProd) return true;
+  res.status(503).json({ error: "SMS delivery is not configured" });
+  return false;
+}
+
+export async function sendOtp(req: Request, res: Response): Promise<void> {
+  if (!deliveryAvailable(res)) return;
   const parsed = sendOtpSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid request", details: parsed.error.flatten().fieldErrors });
     return;
   }
-  res.json({ sent: true });
+  const { phone, role } = parsed.data;
+  const code = String(randomInt(100000, 1000000));
+  await Otp.findOneAndUpdate({ phone, role }, {
+    $set: { codeHash: hashOtp(phone, role, code), attempts: 0,
+      expiresAt: new Date(Date.now() + env.OTP_TTL_SECONDS * 1000) },
+    $unset: { code: 1 },
+  }, { upsert: true, new: true });
+  res.json({ sent: true, devOtp: code });
 }
 
-/**
- * POST /api/auth/verify-otp — demo mode. Any 6-digit code is accepted (the Zod
- * schema guarantees the format); there is no real code to check against. We
- * find-or-create the user and issue a JWT. A brand-new number with no name
- * returns 409 `registration_required` so the client can collect a profile.
- */
+/** Verify a bounded, unexpired challenge and consume it before issuing a session. */
 export async function verifyOtp(req: Request, res: Response): Promise<void> {
+  if (!deliveryAvailable(res)) return;
   const parsed = verifyOtpSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid request", details: parsed.error.flatten().fieldErrors });
@@ -62,13 +73,29 @@ export async function verifyOtp(req: Request, res: Response): Promise<void> {
   }
   const { phone, role, name, email, dialCode } = parsed.data;
 
+  const challenge = await Otp.findOneAndUpdate(
+    { phone, role, expiresAt: { $gt: new Date() }, attempts: { $lt: 5 } },
+    { $inc: { attempts: 1 } }, { new: true },
+  );
+  const codeHash = hashOtp(phone, role, parsed.data.otp);
+  if (!challenge || challenge.codeHash !== codeHash) {
+    res.status(401).json({ error: "Invalid or expired OTP. Request a new code if needed." });
+    return;
+  }
   let user = await User.findOne({ phone, role });
+  if (!user && !name) {
+    res.status(409).json({ error: "registration_required" });
+    return;
+  }
+  // Atomic consumption prevents simultaneous successful replays and resend races.
+  const consumed = await Otp.findOneAndDelete({
+    _id: challenge._id, codeHash, expiresAt: { $gt: new Date() }, attempts: { $lte: 5 },
+  });
+  if (!consumed) {
+    res.status(401).json({ error: "Invalid or expired OTP" });
+    return;
+  }
   if (!user) {
-    if (!name) {
-      // New number — the client must collect a name before we can create the account.
-      res.status(409).json({ error: "registration_required" });
-      return;
-    }
     user = await User.create({ phone, role, name, email: email || "", dialCode: dialCode || "+91" });
   } else if (name || email) {
     // Returning user who supplied fresh details (e.g. completing a profile).
@@ -112,6 +139,6 @@ export async function updateMe(req: AuthedRequest, res: Response): Promise<void>
 
 /** POST /api/auth/logout — clear the cookie. */
 export function logout(_req: Request, res: Response): void {
-  res.clearCookie(AUTH_COOKIE);
+  res.clearCookie(AUTH_COOKIE, { sameSite: env.isProd ? "none" : "lax", secure: env.isProd });
   res.json({ ok: true });
 }

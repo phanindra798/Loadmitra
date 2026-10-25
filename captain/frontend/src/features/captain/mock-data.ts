@@ -17,11 +17,11 @@ import type {
  */
 
 export const TRUCK_TYPES: TruckType[] = [
-  { id: "ace", name: "Tata Ace", desc: "Up to 750 kg • 7 ft open", capacityKg: 750, capacityCFT: 180, vehicleFactor: 1.0, baseFare: 250, emoji: "🛻" },
-  { id: "pickup8", name: "Pickup 8 ft", desc: "Up to 1,200 kg • 8 ft", capacityKg: 1200, capacityCFT: 260, vehicleFactor: 1.25, baseFare: 320, emoji: "🚐" },
-  { id: "tata407", name: "Tata 407", desc: "Up to 2,500 kg • 9 ft", capacityKg: 2500, capacityCFT: 420, vehicleFactor: 1.7, baseFare: 480, emoji: "🚚" },
-  { id: "truck14", name: "14 ft Truck", desc: "Up to 3,500 kg • 14 ft", capacityKg: 3500, capacityCFT: 720, vehicleFactor: 2.1, baseFare: 650, emoji: "🚛" },
-  { id: "truck17", name: "17 ft Truck", desc: "Up to 5,000 kg • 17 ft", capacityKg: 5000, capacityCFT: 980, vehicleFactor: 2.6, baseFare: 850, emoji: "🚛" },
+  { id: "ace", name: "Tata Ace", desc: "Up to 750 kg • 7 ft open", capacityKg: 750, capacityCFT: 180, vehicleFactor: 1.0, ratePerKm: 18, baseFare: 250, emoji: "🛻" },
+  { id: "pickup8", name: "Pickup 8 ft", desc: "Up to 1,200 kg • 8 ft", capacityKg: 1200, capacityCFT: 260, vehicleFactor: 1.25, ratePerKm: 24, baseFare: 320, emoji: "🚐" },
+  { id: "tata407", name: "Tata 407", desc: "Up to 2,500 kg • 9 ft", capacityKg: 2500, capacityCFT: 420, vehicleFactor: 1.7, ratePerKm: 30, baseFare: 480, emoji: "🚚" },
+  { id: "truck14", name: "14 ft Truck", desc: "Up to 3,500 kg • 14 ft", capacityKg: 3500, capacityCFT: 720, vehicleFactor: 2.1, ratePerKm: 36, baseFare: 650, emoji: "🚛" },
+  { id: "truck17", name: "17 ft Truck", desc: "Up to 5,000 kg • 17 ft", capacityKg: 5000, capacityCFT: 980, vehicleFactor: 2.6, ratePerKm: 44, baseFare: 850, emoji: "🚛" },
 ];
 
 export function truckById(id?: string): TruckType | undefined {

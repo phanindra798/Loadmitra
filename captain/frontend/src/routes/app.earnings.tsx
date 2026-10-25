@@ -49,17 +49,8 @@ function EarningsPage() {
   const { earnings, profile } = useCaptain();
   const [period, setPeriod] = useState<Period>("today");
 
-  // Simulate live earnings: "today" keeps ticking up while the screen is open.
-  const [liveBump, setLiveBump] = useState(0);
-  useEffect(() => {
-    const BUMPS = [60, 35, 80, 45, 25, 55];
-    let i = 0;
-    const id = setInterval(() => setLiveBump((b) => b + BUMPS[i++ % BUMPS.length]), 5000);
-    return () => clearInterval(id);
-  }, []);
-
   const isToday = period === "today";
-  const rawAmount = earnings[period] + (isToday ? liveBump : 0);
+  const rawAmount = earnings[period];
   const amount = useCountUp(rawAmount);
   const maxBar = Math.max(...WEEK_BARS.map((b) => b.v));
 

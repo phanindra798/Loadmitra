@@ -78,8 +78,8 @@ function CaptainDashboard() {
     return () => clearInterval(t);
   }, [firstId, declineRequest]);
 
-  function accept(id: string) {
-    acceptRequest(id);
+  async function accept(id: string) {
+    if (!await acceptRequest(id)) return;
     navigate({ to: "/app/trip/$id", params: { id } });
   }
 

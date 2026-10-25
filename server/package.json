@@ -2,13 +2,14 @@
   "name": "loadmitra-server",
   "private": true,
   "version": "0.1.0",
-  "description": "LoadMitra shared API — Express + TypeScript + MongoDB (serves both the shipper and captain portals)",
+  "description": "LoadMitra shared API \u2014 Express + TypeScript + MongoDB (serves both the shipper and captain portals)",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test tests/*.test.cjs"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",

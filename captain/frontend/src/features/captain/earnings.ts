@@ -5,7 +5,7 @@ import type { LoadMode, Payout, TruckType } from "./types";
  * market-range formula as the shipper app and backend (so both sides agree),
  * then the captain payout is fare − platform commission + any incentive.
  *
- *   fare       = baseFare + distanceKm × ratePerKm × vehicleFactor   (× mode)
+ *   fare       = baseFare + distanceKm × truck.ratePerKm   (× mode)
  *   commission = fare × commissionPct
  *   incentive  = return/shared bonus (we reward filling empty trips)
  *   net        = fare − commission + incentive
@@ -14,7 +14,6 @@ import type { LoadMode, Payout, TruckType } from "./types";
  * never changes when a dynamic-earnings layer is added later.
  */
 export const EARNINGS_CONFIG = {
-  ratePerKm: 13, // ₹/km regional baseline (matches shipper pricing)
   returnDiscount: 0.25,
   shareDiscount: 0.2,
   commissionPct: 0.15, // platform take on a standard load
@@ -33,15 +32,15 @@ export interface FareInput {
 /** Customer-facing fare estimate for a load (point estimate, ₹). */
 export function estimateFare({ truck, distanceKm, mode, loadWeightKg }: FareInput): number {
   const cfg = EARNINGS_CONFIG;
-  const subtotal = (truck.baseFare + distanceKm * cfg.ratePerKm * truck.vehicleFactor) * cfg.surgeMultiplier;
+  const subtotal = (truck.baseFare + distanceKm * truck.ratePerKm) * cfg.surgeMultiplier;
 
-  if (mode === "return") return subtotal * (1 - cfg.returnDiscount);
+  if (mode === "return") return Math.round(subtotal * (1 - cfg.returnDiscount));
   if (mode === "shared") {
     const weight = loadWeightKg ?? Math.round(truck.capacityKg * 0.4);
     const sharePct = Math.min(1, Math.max(0.1, weight / truck.capacityKg));
-    return sharePct * subtotal * (1 - cfg.shareDiscount);
+    return Math.round(sharePct * subtotal * (1 - cfg.shareDiscount));
   }
-  return subtotal;
+  return Math.round(subtotal);
 }
 
 /** Break a fare down into what the captain actually keeps. */

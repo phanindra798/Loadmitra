@@ -1,5 +1,5 @@
 import { Schema, model, type InferSchemaType } from "mongoose";
-import { captainPayout, estimateFare, truckById } from "../services/earnings.service";
+import { captainPayout } from "../services/earnings.service";
 import type { LoadRequest, Payout, Trip, TripStatus } from "../types";
 
 /**
@@ -33,7 +33,8 @@ const acceptedCaptainSchema = new Schema(
 const bookingSchema = new Schema(
   {
     bookingId: { type: String, required: true, unique: true }, // human id from the shipper, e.g. LM-AB12CD
-    shipperId: { type: String },
+    shipperId: { type: String, index: true },
+    requestFingerprint: { type: String },
     customerName: { type: String, default: "LoadMitra Shipper" },
     customerRating: { type: Number, default: 4.8 },
     mode: { type: String, enum: ["full", "shared", "return"], required: true },
@@ -63,14 +64,7 @@ export const Booking = model("Booking", bookingSchema);
 
 /** Captain payout for a booking — same economics as the seed (earnings.service). */
 function payoutFor(b: BookingDoc): Payout {
-  const truck = truckById(b.truckTypeId);
-  if (truck) {
-    const fare = estimateFare({ truck, distanceKm: b.distanceKm, mode: b.mode, loadWeightKg: b.loadWeightKg });
-    return captainPayout(fare, b.mode, b.distanceKm);
-  }
-  // Unknown truck id — derive a sane payout from the agreed fare so the card still renders.
-  const fare = b.agreedPrice || 0;
-  return captainPayout(fare, b.mode, b.distanceKm);
+  return captainPayout(b.agreedPrice || 0, b.mode, b.distanceKm);
 }
 
 /** Map a stored booking to the captain job-board `LoadRequest` shape. */

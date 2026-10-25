@@ -13,7 +13,7 @@ export interface TruckType {
   desc: string;
   capacityKg: number;
   capacityCFT: number;
-  vehicleFactor: number; // legacy multiplier — captain payouts (earnings.service) still use it
+  vehicleFactor: number; // retained for catalogue compatibility
   ratePerKm: number; // ₹/km for this vehicle — drives shipper pricing
   baseFare: number;
   etaMins: number;

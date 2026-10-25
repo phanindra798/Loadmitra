@@ -30,15 +30,6 @@ export const Route = createFileRoute("/app/track/$id")({
   component: TrackPage,
 });
 
-const NEXT: Partial<Record<BookingStatus, BookingStatus>> = {
-  requested: "enroute_pickup",
-  accepted: "enroute_pickup",
-  enroute_pickup: "at_pickup",
-  at_pickup: "picked",
-  picked: "enroute_drop",
-  enroute_drop: "delivered",
-};
-
 // Lifecycle order — used so the shipper only ever advances forward when it
 // mirrors the captain's status (never jumps backward on a slow poll).
 const ORDER: BookingStatus[] = [
@@ -81,6 +72,7 @@ function TrackPage() {
   const t = useT();
   const { getBooking, updateStatus } = useBooking();
   const booking = getBooking(id);
+  const [pollError, setPollError] = useState<string | null>(null);
   const [sos, setSos] = useState(false);
   const [deliveredPopup, setDeliveredPopup] = useState(false);
 
@@ -92,13 +84,11 @@ function TrackPage() {
 
   // Mirror the captain's live status from the server. Forward-only, so the
   // shipper sees each step (incl. "delivered") exactly when the captain does it.
-  // If the API is unreachable for a few polls (standalone demo), fall back to a
-  // local simulation so the trip still progresses.
+  // Preserve the last known state on connection failures and display an error.
   const bid = booking?.id;
   useEffect(() => {
     if (!bid) return;
     let cancelled = false;
-    let fails = 0;
     let timer: ReturnType<typeof setTimeout>;
 
     const loop = async () => {
@@ -107,16 +97,13 @@ function TrackPage() {
       try {
         const r = await shipperApi.getBooking(bid);
         if (cancelled) return;
-        fails = 0;
+        setPollError(null);
         const next = r.tripStatus as BookingStatus | null;
         if (next === "cancelled") updateStatus(bid, "cancelled");
         else if (next && rank(next) > rank(cur)) updateStatus(bid, next); // advance to captain's step
-      } catch {
-        fails += 1;
-        if (fails >= 3) {
-          const next = NEXT[statusRef.current ?? "accepted"];
-          if (next) updateStatus(bid, next); // API down — simulate locally
-        }
+      } catch (error) {
+        if (cancelled) return;
+        setPollError(error instanceof Error ? error.message : "Tracking temporarily unavailable");
       }
       if (!cancelled) timer = setTimeout(loop, 3000);
     };
@@ -197,6 +184,7 @@ function TrackPage() {
       {/* Tracking sheet */}
       <div className="absolute inset-x-0 bottom-16 z-20 px-2 sm:px-4 lg:inset-auto lg:bottom-6 lg:right-6 lg:top-6 lg:w-[400px] lg:px-0">
         <div className="mx-auto max-h-[78vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl lm-no-scrollbar lg:max-h-[calc(100vh-3rem)]">
+          {pollError && <p role="alert" className="mb-3 text-sm text-destructive">{pollError}. Retrying…</p>}
           {/* Headline */}
           <div className="flex items-center gap-3">
             <span

@@ -27,6 +27,7 @@ export interface TruckType {
   capacityKg: number;
   capacityCFT: number;
   vehicleFactor: number;
+  ratePerKm: number;
   baseFare: number;
   emoji: string;
 }

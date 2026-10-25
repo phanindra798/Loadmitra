@@ -7,7 +7,6 @@ import type { TruckType } from "../types";
  */
 export const PRICING_CONFIG = {
   region: "default",
-  ratePerKm: 13, // ₹/km regional baseline — captain payouts (earnings.service) scale this by vehicleFactor
   returnDiscount: 0.25,
   shareDiscount: 0.2,
   rangeSpread: 0.08,
@@ -15,9 +14,7 @@ export const PRICING_CONFIG = {
   co2PerKm: 0.85,
 };
 
-// Shipper pricing uses each truck's ratePerKm (market rate per vehicle class);
-// captain payouts use vehicleFactor × PRICING_CONFIG.ratePerKm. Both kept in sync
-// with the respective frontends (shipper pricing.ts / captain earnings.ts).
+// Both shipper quotes and captain fares use these per-vehicle rates.
 export const TRUCK_TYPES: TruckType[] = [
   { id: "ace", name: "Tata Ace", desc: "Up to 750 kg • 7 ft open", capacityKg: 750, capacityCFT: 180, vehicleFactor: 1.0, ratePerKm: 18, baseFare: 250, etaMins: 6, rating: 4.8, trips: 1240, emoji: "🛻" },
   { id: "pickup8", name: "Pickup 8 ft", desc: "Up to 1,200 kg • 8 ft", capacityKg: 1200, capacityCFT: 260, vehicleFactor: 1.25, ratePerKm: 24, baseFare: 320, etaMins: 9, rating: 4.7, trips: 980, emoji: "🚐" },

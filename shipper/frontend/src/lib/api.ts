@@ -115,17 +115,16 @@ export interface CreateBookingBody {
 }
 
 export const shipperApi = {
+  cancelBooking: (id: string) => request(`/api/bookings/${id}/cancel`, { method: "POST" }),
   trucks: () => request<{ data: TruckType[] }>("/api/trucks").then((r) => r.data),
   estimate: (body: EstimateBody) =>
     request<{ data: PriceBreakdown }>("/api/pricing/estimate", {
       method: "POST",
       body: JSON.stringify(body),
     }).then((r) => r.data),
-  // Persist a booking so the captain job board can see it (read on the captain's
-  // next load). Fire-and-forget at the call site — the local booking still works
-  // if the API is unreachable.
+  // Persist a booking before continuing to matching.
   createBooking: (body: CreateBookingBody) =>
-    request<{ data: { id: string } }>("/api/bookings", {
+    request<{ data: { id: string; agreedPrice: number } }>("/api/bookings", {
       method: "POST",
       body: JSON.stringify(body),
     }).then((r) => r.data),

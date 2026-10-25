@@ -1,4 +1,4 @@
-import { PRICING_CONFIG } from "../data/trucks";
+import { estimatePrice } from "./pricing.service";
 import { estimateDistanceKm, truckById } from "../data/trucks";
 import type { LoadMode, Payout, TruckType } from "../types";
 
@@ -20,18 +20,7 @@ export function estimateFare(opts: {
   mode: LoadMode;
   loadWeightKg?: number;
 }): number {
-  const { truck, distanceKm, mode, loadWeightKg } = opts;
-  const cfg = PRICING_CONFIG;
-  const subtotal =
-    (truck.baseFare + distanceKm * cfg.ratePerKm * truck.vehicleFactor) * cfg.surgeMultiplier;
-
-  if (mode === "return") return subtotal * (1 - cfg.returnDiscount);
-  if (mode === "shared") {
-    const weight = loadWeightKg ?? Math.round(truck.capacityKg * 0.4);
-    const sharePct = Math.min(1, Math.max(0.1, weight / truck.capacityKg));
-    return sharePct * subtotal * (1 - cfg.shareDiscount);
-  }
-  return subtotal;
+  return estimatePrice(opts).estimate;
 }
 
 export function captainPayout(fare: number, mode: LoadMode, distanceKm: number): Payout {

@@ -7,7 +7,8 @@ import { Schema, model, type InferSchemaType } from "mongoose";
 const otpSchema = new Schema({
   phone: { type: String, required: true },
   role: { type: String, enum: ["shipper", "captain"], required: true },
-  code: { type: String, required: true }, // 6-digit; plaintext is fine for this demo
+  codeHash: { type: String, required: true },
+  attempts: { type: Number, default: 0 },
   expiresAt: { type: Date, required: true },
 });
 

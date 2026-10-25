@@ -1,3 +1,4 @@
+import { asyncHandler } from "../middleware/async-handler";
 import { Router, type Request, type Response } from "express";
 import { sendOtp, verifyOtp, me, updateMe, logout } from "../controllers/auth.controller";
 import { requireAuth, requireRole } from "../middleware/auth";
@@ -8,7 +9,7 @@ import { getMe } from "../controllers/captain.controller";
 import { listRequests } from "../controllers/requests.controller";
 import { acceptRequest, listTrips, updateTripStatus } from "../controllers/trips.controller";
 import { getEarnings, postQuote } from "../controllers/earnings.controller";
-import { createBooking, getBooking } from "../controllers/bookings.controller";
+import { createBooking, getBooking, cancelBooking } from "../controllers/bookings.controller";
 
 const router = Router();
 
@@ -22,10 +23,10 @@ const otpKey = (req: Request) => `${req.ip}:${(req.body as { phone?: string })?.
 const sendOtpLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, key: otpKey });
 const verifyOtpLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 10, key: otpKey });
 
-router.post("/api/auth/send-otp", sendOtpLimiter, sendOtp);
-router.post("/api/auth/verify-otp", verifyOtpLimiter, verifyOtp);
-router.get("/api/auth/me", requireAuth, me);
-router.patch("/api/auth/me", requireAuth, updateMe);
+router.post("/api/auth/send-otp", sendOtpLimiter, asyncHandler(sendOtp));
+router.post("/api/auth/verify-otp", verifyOtpLimiter, asyncHandler(verifyOtp));
+router.get("/api/auth/me", requireAuth, asyncHandler(me));
+router.patch("/api/auth/me", requireAuth, asyncHandler(updateMe));
 router.post("/api/auth/logout", logout);
 
 // Shared truck catalogue + shipper pricing
@@ -33,13 +34,13 @@ router.get("/api/trucks", listTrucks);
 router.post("/api/pricing/estimate", postEstimate);
 
 // Shipper bookings — persisted so the captain job board can read them back.
-// No login is required to book in this demo, so these stay open — but they
-// WRITE/READ the database, so rate-limit per IP to stop a flood of bogus
-// bookings (or ID-guessing polls) from exhausting the cluster.
+// Require shipper identity and bound request rates for database operations.
 const bookingWriteLimiter = rateLimit({ windowMs: 60 * 1000, max: 20 });
 const bookingReadLimiter = rateLimit({ windowMs: 60 * 1000, max: 120 });
-router.post("/api/bookings", bookingWriteLimiter, createBooking);
-router.get("/api/bookings/:id", bookingReadLimiter, getBooking);
+router.post("/api/bookings", requireAuth, requireRole("shipper"), bookingWriteLimiter, asyncHandler(createBooking));
+router.get("/api/bookings/:id", requireAuth, requireRole("shipper"), bookingReadLimiter, asyncHandler(getBooking));
+
+router.post("/api/bookings/:id/cancel", requireAuth, requireRole("shipper"), bookingWriteLimiter, asyncHandler(cancelBooking));
 
 // Captain endpoints — captain-only. The captain always signs in before reaching
 // the app, so gating these is safe. Closes the hole where anyone could read the
@@ -50,12 +51,12 @@ const captainOnly = [requireAuth, requireRole("captain")] as const;
 router.get("/api/captain/me", ...captainOnly, getMe);
 
 // Load requests (job board) + accept
-router.get("/api/captain/requests", ...captainOnly, listRequests);
-router.post("/api/captain/requests/:id/accept", ...captainOnly, acceptRequest);
+router.get("/api/captain/requests", ...captainOnly, asyncHandler(listRequests));
+router.post("/api/captain/requests/:id/accept", ...captainOnly, asyncHandler(acceptRequest));
 
 // Trips: history + status transitions
-router.get("/api/captain/trips", ...captainOnly, listTrips);
-router.post("/api/captain/trips/:id/status", ...captainOnly, updateTripStatus);
+router.get("/api/captain/trips", ...captainOnly, asyncHandler(listTrips));
+router.post("/api/captain/trips/:id/status", ...captainOnly, asyncHandler(updateTripStatus));
 
 // Earnings: summary + per-load quote
 router.get("/api/captain/earnings", ...captainOnly, getEarnings);
