@@ -73,7 +73,7 @@ The customer fare uses the **same** market-range formula on both sides (shared `
 
 `POST /api/bookings/:id/cancel` cancels an owned booking before pickup. Captain acceptance claims only an open, owned booking atomically; unavailable loads return 409. Trip status changes require the assigned captain and a valid transition. `GET /api/captain/trips` now returns that captain's stored trips. Ownerless legacy demo bookings are intentionally excluded; no migration or deletion is performed.
 
-The earlier seed-data roadmap above is historical. The job board now contains only persisted loads. Captain vehicle onboarding, one-active-trip enforcement and shipper history restoration remain unfinished. Do not treat these changes as production readiness.
+The earlier seed-data roadmap above is historical. The job board now contains only persisted loads. Captain vehicle onboarding and one-active-trip enforcement remain unfinished. Shipper history restoration is described below. Do not treat these changes as production readiness.
 
 ## Shipment handover verification — 26 October 2026
 
@@ -86,3 +86,12 @@ The shipper generates a code from the tracking screen and shares it only at the 
 The captain screen accepts six digits and waits for successful verification before clearing the input or advancing. Cancellation also awaits confirmation and is unavailable after pickup. Existing accepted bookings can obtain a challenge at the appropriate stage without a migration; old four-digit demo codes no longer work. Roll out the API and both portals together.
 
 Validation: 52 backend tests pass, including 17 new handover cases covering ownership, expiry, lockout, replay, concurrency, stage isolation and HTTP authentication. Persistence is mocked; real MongoDB concurrency and browser end-to-end validation remain outstanding. Both frontend type checks and production builds pass.
+
+## Shipper booking recovery — 26 October 2026
+
+- `GET /api/bookings?limit=50&before=<cursor>` returns `{ data, nextCursor }`. It requires a shipper session, always filters by the authenticated owner, and sorts by descending MongoDB `_id`. Limits are 1–100 (default 50); cursors must be 24-character hexadecimal IDs. The compound `{ shipperId: 1, _id: -1 }` index supports these reads. Each page is bounded; the UI offers older pages explicitly.
+- `GET /api/bookings/:id` now returns the full owned booking: route, shipment, agreed fare, saved price breakdown if available, lifecycle, captain snapshot and timestamps. Direct links work independently of the currently loaded history page. Creation and cancellation return the same public representation. Private owner/fingerprint fields and handover challenges are excluded; responses use `Cache-Control: no-store`.
+- New bookings save a server-calculated price snapshot on insert. Retries preserve it and the agreed fare. Legacy bookings retain their original agreed fare without recalculation; the UI identifies unavailable itemized breakdowns. No legacy records are rewritten.
+- The shipper app starts with empty history and loads stored bookings. Tracking and matching URLs fetch their own record and poll while active. Sample history is no longer shown. Loading, empty, authentication and network-error states are distinct, with retry and pagination controls. Slow responses merge without undoing newer trip progress.
+- Booking state is cleared and outstanding reads aborted when the session changes or is removed, including storage/focus notifications from another tab. Booking records are not persisted in browser cookies or localStorage. The unfinished booking draft still lives only in memory.
+- Verification: 63 backend tests (11 new history cases), nine frontend record-recovery tests, and the shipper TypeScript/production build. Database calls are stubbed in tests; browser refresh/account-switch flows against a real MongoDB instance still need live validation. Deploy the API before or together with this frontend because it requires the expanded booking responses.

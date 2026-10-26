@@ -97,6 +97,9 @@ export interface Booking {
   captain?: Captain;
   createdLabel: string;
   scheduledLabel?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  priceBreakdownAvailable?: boolean;
 }
 
 /** The in-progress booking the user is assembling across the flow. */

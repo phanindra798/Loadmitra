@@ -1,6 +1,6 @@
 import { Schema, model, type InferSchemaType } from "mongoose";
 import { captainPayout } from "../services/earnings.service";
-import type { LoadRequest, Payout, Trip, TripStatus } from "../types";
+import type { LoadRequest, Payout, PriceBreakdown, Trip, TripStatus } from "../types";
 
 /**
  * A shipper-created load. This is the bridge between the two portals: the
@@ -30,6 +30,14 @@ const acceptedCaptainSchema = new Schema(
   { _id: false },
 );
 
+const priceSnapshotSchema = new Schema<PriceBreakdown>({
+  mode: { type: String, enum: ["full", "shared", "return"], required: true },
+  distanceKm: Number, ratePerKm: Number, base: Number, distanceCharge: Number,
+  surgeMultiplier: Number, subtotal: Number, discountPct: Number, discount: Number,
+  sharePct: Number, estimate: Number, low: Number, high: Number, loadTons: Number,
+  perTon: Number, perTonLow: Number, perTonHigh: Number, savings: Number, co2SavedKg: Number,
+}, { _id: false });
+
 const bookingSchema = new Schema(
   {
     bookingId: { type: String, required: true, unique: true }, // human id from the shipper, e.g. LM-AB12CD
@@ -46,6 +54,7 @@ const bookingSchema = new Schema(
     loadWeightKg: { type: Number, required: true },
     goodsType: { type: String, default: "General goods" },
     agreedPrice: { type: Number, default: 0 },
+    priceSnapshot: { type: priceSnapshotSchema, default: undefined },
     createdLabel: { type: String, default: "Just now" },
     status: { type: String, enum: ["open", "accepted", "cancelled"], default: "open", index: true },
     acceptedByCaptainId: { type: String },
@@ -71,6 +80,7 @@ const bookingSchema = new Schema(
 );
 
 export type BookingDoc = InferSchemaType<typeof bookingSchema>;
+bookingSchema.index({ shipperId: 1, _id: -1 });
 export const Booking = model("Booking", bookingSchema);
 
 /** Captain payout for a booking — same economics as the seed (earnings.service). */

@@ -1,11 +1,11 @@
 import { toast } from "sonner";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Radar, X, CheckCircle2, ArrowRight, Truck } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { CaptainCard } from "@/components/app/captain-card";
 import { Button } from "@/components/ui/button";
-import { useBooking } from "@/features/shipper/booking-context";
+import { useBooking, useStoredBooking } from "@/features/shipper/booking-context";
 import { shipperApi } from "@/lib/api";
 import { inr } from "@/features/shipper/pricing";
 import { MODE_I18N } from "@/features/shipper/mode-meta";
@@ -20,53 +20,18 @@ function MatchingPage() {
   const { id } = Route.useSearch();
   const navigate = useNavigate();
   const t = useT();
-  const { getBooking, assignCaptain, updateStatus } = useBooking();
-  const booking = getBooking(id);
-  const [pollError, setPollError] = useState<string | null>(null);
-  const [phase, setPhase] = useState<"searching" | "found">("searching");
-
-  // Only a persisted captain acceptance can complete matching.
+  const { storeBooking } = useBooking();
+  const { booking, loading, error: pollError, retry } = useStoredBooking(id);
+  const [cancelling, setCancelling] = useState(false);
+  const cancelRef = useRef(false);
+  const phase = !booking || booking.status === "requested" ? "searching" : "found";
+  const status = booking?.status;
   useEffect(() => {
-    if (!booking || phase === "found") return;
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout>;
-
-    const found = (captain: Parameters<typeof assignCaptain>[1]) => {
-      if (cancelled) return;
-      assignCaptain(booking.id, captain);
-      updateStatus(booking.id, "accepted");
-      setPhase("found");
-    };
-
-    const tick = async () => {
-      try {
-        const r = await shipperApi.getBooking(booking.id);
-        if (cancelled) return;
-        setPollError(null);
-        if (r.status === "cancelled") {
-          updateStatus(booking.id, "cancelled");
-          navigate({ to: "/app/bookings" });
-          return;
-        }
-        // Use the authenticated captain snapshot returned by the API.
-        if (r.status === "accepted" && r.captain) {
-          found(r.captain);
-          return;
-        }
-      } catch (error) {
-        if (cancelled) return;
-        setPollError(error instanceof Error ? error.message : "Unable to refresh booking");
-      }
-      if (!cancelled) timer = setTimeout(tick, 2500);
-    };
-
-    timer = setTimeout(tick, 1500);
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [booking?.id, phase]);
+    if (status === "cancelled") void navigate({ to: "/app/bookings", replace: true });
+    else if (status && status !== "requested" && status !== "accepted") {
+      void navigate({ to: "/app/track/$id", params: { id }, replace: true });
+    }
+  }, [status, id, navigate]);
 
   if (!booking) {
     return (
@@ -74,7 +39,11 @@ function MatchingPage() {
         <PageHeader title={t("matching.findingTitle")} />
         <div className="flex flex-col items-center gap-3 px-6 py-20 text-center">
           <Truck className="h-8 w-8 text-muted-foreground" />
-          <p className="font-semibold text-foreground">{t("matching.noBooking")}</p>
+          <p role={pollError ? "alert" : "status"} className="font-semibold text-foreground">
+            {loading ? "Loading your booking…" : pollError ?? t("matching.noBooking")}
+          </p>
+          {pollError && <Button variant="outline" onClick={retry}>Try again</Button>}
+          <Link to="/login">Sign in</Link>
           <Link to="/app">
             <Button className="rounded-xl">{t("common.goHome")}</Button>
           </Link>
@@ -84,11 +53,13 @@ function MatchingPage() {
   }
 
   async function cancel() {
+    if (cancelRef.current) return;
+    cancelRef.current = true; setCancelling(true);
     try {
-      await shipperApi.cancelBooking(booking!.id);
-      updateStatus(booking!.id, "cancelled");
+      storeBooking(await shipperApi.cancelBooking(booking!.id));
       navigate({ to: "/app" });
     } catch (error) { toast.error(error instanceof Error ? error.message : "Cancellation failed"); }
+    finally { cancelRef.current = false; setCancelling(false); }
   }
 
   function confirm() {
@@ -146,6 +117,7 @@ function MatchingPage() {
             <p className="mt-1 max-w-xs text-sm text-muted-foreground">{t("matching.searchingHint")}</p>
             <button
               onClick={cancel}
+              disabled={cancelling}
               className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-destructive"
             >
               <X className="h-4 w-4" /> {t("matching.cancelRequest")}
@@ -162,6 +134,7 @@ function MatchingPage() {
             </Button>
             <button
               onClick={cancel}
+              disabled={cancelling}
               className="block w-full text-center text-sm font-semibold text-muted-foreground hover:text-destructive"
             >
               {t("matching.cancelBooking")}

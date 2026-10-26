@@ -40,7 +40,7 @@ function ShipperHome() {
   const navigate = useNavigate();
   const t = useT();
   const { firstName, initials } = useProfile();
-  const { setMode, setDrop, setPickup, bookings } = useBooking();
+  const { setMode, setDrop, setPickup, bookings, historyLoading, historyError } = useBooking();
   const { status: geoStatus, place: geoPlace, locate } = useGeolocation();
 
   const activeTrip = bookings.find((b) => ACTIVE_STATUSES.has(b.status));
@@ -126,6 +126,10 @@ function ShipperHome() {
       <div className="absolute inset-x-0 bottom-16 z-20 px-2 sm:px-4 lg:inset-auto lg:bottom-auto lg:left-6 lg:top-20 lg:w-[400px] lg:px-0">
         <div className="mx-auto max-h-[74vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl lm-no-scrollbar lg:max-h-[calc(100vh-7rem)]">
           {/* Active trip banner */}
+          {historyLoading && <p role="status" className="mb-3 text-sm text-muted-foreground">Loading your recent bookings…</p>}
+          {historyError && <p role="alert" className="mb-3 text-sm text-destructive">
+            Could not refresh your bookings. <Link to="/app/bookings" className="underline">Open bookings to retry.</Link>
+          </p>}
           {activeTrip && (
             <Link
               to="/app/track/$id"

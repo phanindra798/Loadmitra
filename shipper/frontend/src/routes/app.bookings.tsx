@@ -36,9 +36,10 @@ function statusMeta(s: BookingStatus, t: Translate): { label: string; cls: strin
 function BookingsPage() {
   const navigate = useNavigate();
   const t = useT();
-  const { bookings } = useBooking();
+  const { bookings, authenticated, historyLoading, historyError, refreshBookings, hasMoreBookings, loadMoreBookings, getBooking } = useBooking();
   const [filter, setFilter] = useState<Filter>("all");
-  const [detail, setDetail] = useState<Booking | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detail = detailId ? getBooking(detailId) ?? null : null;
 
   const filtered = bookings.filter((b) => {
     if (filter === "active") return ACTIVE.has(b.status);
@@ -59,6 +60,10 @@ function BookingsPage() {
       <PageHeader title={t("bookings.title")} subtitle={t("bookings.count", { n: bookings.length })} back={false} />
 
       <div className="px-4 pt-4 sm:px-6">
+        {!authenticated && <p className="mb-4">Please <Link className="text-primary underline" to="/login">sign in</Link> to see your bookings.</p>}
+        {authenticated && <Button variant="outline" className="mb-4" onClick={() => void refreshBookings()} disabled={historyLoading}>Refresh bookings</Button>}
+        {historyLoading && <p role="status" className="mb-4 text-sm">Loading your bookings…</p>}
+        {historyError && <p role="alert" className="mb-4 text-sm text-destructive">{historyError}. Use Refresh bookings to retry.</p>}
         {/* Filter tabs */}
         <div className="mb-4 flex gap-2 overflow-x-auto pb-1 lm-no-scrollbar">
           {tabs.map((t) => (
@@ -78,13 +83,15 @@ function BookingsPage() {
         </div>
 
         {filtered.length === 0 ? (
-          <EmptyState />
+          authenticated && !historyLoading && !historyError && (hasMoreBookings
+            ? <p className="py-8 text-center text-muted-foreground">No matching bookings loaded. Check older bookings below.</p>
+            : <EmptyState />)
         ) : (
           <>
             {/* Mobile: cards */}
             <div className="space-y-3 lg:hidden">
               {filtered.map((b) => (
-                <BookingCard key={b.id} booking={b} onOpen={() => setDetail(b)} />
+                <BookingCard key={b.id} booking={b} onOpen={() => setDetailId(b.id)} />
               ))}
             </div>
 
@@ -124,7 +131,7 @@ function BookingsPage() {
                         </td>
                         <td className="px-4 py-3 text-right">
                           <button
-                            onClick={() => setDetail(b)}
+                            onClick={() => setDetailId(b.id)}
                             className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
                           >
                             {t("bookings.viewDetails")} <ArrowRight className="h-3.5 w-3.5" />
@@ -138,13 +145,14 @@ function BookingsPage() {
             </div>
           </>
         )}
+        {hasMoreBookings && <Button variant="outline" className="mt-4 w-full" disabled={historyLoading} onClick={() => void loadMoreBookings()}>Load older bookings</Button>}
       </div>
 
       <BookingDetailsDialog
         booking={detail}
         open={!!detail}
         onOpenChange={(v) => {
-          if (!v) setDetail(null);
+          if (!v) setDetailId(null);
         }}
         onTrack={(id) => navigate({ to: "/app/track/$id", params: { id } })}
       />

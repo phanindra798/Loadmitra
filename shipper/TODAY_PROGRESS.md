@@ -50,3 +50,14 @@ Advisory: https://github.com/TanStack/router/security/advisories/GHSA-qx66-fv34-
 - Deploy the API and both frontends together because the old four-digit handover flow is no longer accepted. Production login still needs an SMS provider. No changes from this batch have been committed or pushed.
 
 Next priorities: restore shipper bookings after refresh, enforce one active trip per captain atomically, replace demo vehicle/KYC and earnings data, harden sessions, review remaining dependency advisories, and complete real database/browser validation.
+
+## 26 October 2026 — Shipper history and refresh recovery
+
+- Added authenticated, owner-scoped booking history with bounded cursor pagination and full detail responses. Direct tracking/matching links load their booking even outside the current history page. Public responses exclude private ownership/fingerprint/challenge fields and disable caching.
+- Replaced sample shipper history with saved records. Added loading, error, retry and older-history controls. Matching/tracking share one recovery/polling hook; reopening an advanced trip no longer resets it to accepted or fabricates a new delivery celebration.
+- New bookings persist their server-calculated fare breakdown. Existing records retain their original agreed fare, with a clear unavailable-breakdown message when no snapshot was recorded. Idempotent retries cannot overwrite the snapshot.
+- Merged history/detail updates are deduplicated and cannot roll back later lifecycle progress. Session changes remount the booking store and abort old reads. No booking history is saved in cookies or localStorage.
+- Validation: 63 backend tests and nine frontend recovery tests pass; shipper type checks and production build pass. Focused lint has no errors (existing Fast Refresh export warnings remain). Real MongoDB/browser refresh and account-switch checks remain outstanding.
+- This batch is local only: no commit, push or deployment. The API must be updated with the frontend. Unfinished drafts still reset on a page refresh; history loads 50 records initially, with older records available through pagination.
+
+Next priorities: one active trip per captain, production SMS login, real vehicle/KYC and earnings persistence, session hardening, remaining dependency findings, and full live-flow validation before AWS deployment.

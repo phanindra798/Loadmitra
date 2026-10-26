@@ -9,7 +9,7 @@ const {createApp}=require('../dist/app');
 let row;
 const payload={bookingId:'LM-TEST-123456',mode:'full',pickup:{label:'A'},drop:{label:'B'},distanceKm:100,truckTypeId:'ace',truckTypeName:'Spoofed',loadWeightKg:500,agreedPrice:1};
 const req=(userId='owner',body=payload)=>({auth:{userId,role:'shipper'},body,params:{id:payload.bookingId}});
-function res(){return {code:200,status(n){this.code=n;return this},json(v){this.body=v;return this}}}
+function res(){return {code:200,setHeader(){},status(n){this.code=n;return this},json(v){this.body=v;return this}}}
 function matches(q){return row && Object.entries(q).every(([k,v])=>{
  if(k==='$or')return v.some(matches);
  if(typeof v==='object'&&v!==null){if('$exists' in v)return (row[k]!==undefined)===v.$exists;if('$in' in v)return v.$in.includes(row[k]);throw new Error('unsupported test query')}
@@ -30,9 +30,10 @@ async function create(user='owner',body=payload){const r=res();await createBooki
 async function accept(user){const r=res();await acceptRequest(req(user,{captain:{id:'forged',name:'Forged',badges:['verified']}}),r);return r}
 test('booking ownership and fare derive from authenticated account and catalogue',async()=>{
  row=null;const r=await create();assert.equal(r.code,201);assert.equal(row.shipperId,'owner');assert.equal(row.customerName,'Registered owner');assert.equal(row.truckTypeName,'Tata Ace');assert.equal(row.agreedPrice,2050);
+ assert.equal(row.priceSnapshot.estimate,2050);assert.equal(row.priceSnapshot.ratePerKm,18);assert.equal(r.body.data.pickup.label,'A');
 });
 test('retry cannot reopen or reprice an accepted booking',async()=>{
- row=null;await create();await accept('captain-a');await create('owner',{...payload,agreedPrice:999999});assert.equal(row.status,'accepted');assert.equal(row.acceptedByCaptainId,'captain-a');assert.equal(row.agreedPrice,2050);
+ row=null;await create();const snapshot=structuredClone(row.priceSnapshot);await accept('captain-a');await create('owner',{...payload,agreedPrice:999999,priceSnapshot:{estimate:1}});assert.equal(row.status,'accepted');assert.equal(row.acceptedByCaptainId,'captain-a');assert.equal(row.agreedPrice,2050);assert.deepEqual(row.priceSnapshot,snapshot);
 });
 test('same ID with another owner or different load returns conflict',async()=>{
  row=null;await create();assert.equal((await create('intruder')).code,409);assert.equal((await create('owner',{...payload,loadWeightKg:600})).code,409);

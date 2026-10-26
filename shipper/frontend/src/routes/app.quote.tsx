@@ -18,7 +18,6 @@ import { useT } from "@/features/shipper/i18n";
 import { GOODS_TYPES, TRUCK_TYPES, truckById } from "@/features/shipper/mock-data";
 import { estimateDistanceKm, estimatePrice, inr, priceRangeLabel } from "@/features/shipper/pricing";
 import { shipperApi } from "@/lib/api";
-import type { Booking } from "@/features/shipper/types";
 
 export const Route = createFileRoute("/app/quote")({
   component: QuotePage,
@@ -91,20 +90,6 @@ function QuotePage() {
     const id = requestRef.current.id;
     savingRef.current = true; setSaving(true);
     const agreed = price.estimate;
-    const booking: Booking = {
-      id,
-      mode: draft.mode,
-      pickup: draft.pickup!,
-      drop: draft.drop!,
-      truckTypeId: selectedId,
-      truckTypeName: selectedTruck.name,
-      loadWeightKg: weight,
-      goodsType: draft.goodsType,
-      price,
-      agreedPrice: agreed,
-      status: "requested",
-      createdLabel: nowLabel(),
-    };
     try {
     const saved = await shipperApi.createBooking({
       bookingId: id,
@@ -117,9 +102,9 @@ function QuotePage() {
       loadWeightKg: weight,
       goodsType: draft.goodsType,
       agreedPrice: agreed,
-      createdLabel: booking.createdLabel,
+      createdLabel: nowLabel(),
     });
-    createBooking({ ...booking, agreedPrice: saved.agreedPrice });
+    createBooking(saved);
     navigate({ to: "/app/matching", search: { id } });
     } catch (error) { toast.error(error instanceof Error ? error.message : "Booking failed"); }
     finally { savingRef.current = false; setSaving(false); }

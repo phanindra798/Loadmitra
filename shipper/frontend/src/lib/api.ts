@@ -4,14 +4,30 @@
  * httpOnly cookie). Override the base URL per environment with VITE_API_URL.
  */
 import { readStored, writeStored, removeStored } from "./storage";
-import type { BookingMode, Captain, PriceBreakdown, TruckType } from "@/features/shipper/types";
+import type { BookingMode, PriceBreakdown, TruckType } from "@/features/shipper/types";
+import { restoreBooking, type BookingRecord } from "@/features/shipper/booking-record";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
 const TOKEN_KEY = "lm-token";
 
 export const getToken = () => readStored(TOKEN_KEY);
-export const setToken = (t: string) => writeStored(TOKEN_KEY, t);
-export const clearToken = () => removeStored(TOKEN_KEY);
+const sessionEvent = "loadmitra:session-changed";
+const notifySession = () => { if (typeof window !== "undefined") window.dispatchEvent(new Event(sessionEvent)); };
+export const setToken = (t: string) => { writeStored(TOKEN_KEY, t); notifySession(); };
+export const clearToken = () => { removeStored(TOKEN_KEY); notifySession(); };
+export function subscribeSession(onChange: () => void) {
+  const storageChanged = (event: StorageEvent) => {
+    if (event.key === TOKEN_KEY || event.key === null) onChange();
+  };
+  window.addEventListener(sessionEvent, onChange);
+  window.addEventListener("storage", storageChanged);
+  window.addEventListener("focus", onChange);
+  return () => {
+    window.removeEventListener(sessionEvent, onChange);
+    window.removeEventListener("storage", storageChanged);
+    window.removeEventListener("focus", onChange);
+  };
+}
 
 export interface ApiUser {
   id: string;
@@ -115,11 +131,15 @@ export interface CreateBookingBody {
 }
 
 export const shipperApi = {
+  listBookings: (before?: string, signal?: AbortSignal) =>
+    request<{ data: BookingRecord[]; nextCursor: string | null }>(
+      `/api/bookings${before ? `?before=${encodeURIComponent(before)}` : ""}`, { signal, cache: "no-store" },
+    ).then(r => ({ bookings: r.data.map(restoreBooking), nextCursor: r.nextCursor })),
   issueHandoverOtp: (id: string) =>
     request<{ data: { code: string; stage: "picked" | "delivered"; expiresAt: string } }>(
       `/api/bookings/${encodeURIComponent(id)}/handover-otp`, { method: "POST" },
     ).then((r) => r.data),
-  cancelBooking: (id: string) => request(`/api/bookings/${id}/cancel`, { method: "POST" }),
+  cancelBooking: (id: string) => request<{ data: BookingRecord }>(`/api/bookings/${encodeURIComponent(id)}/cancel`, { method: "POST" }).then(r => restoreBooking(r.data)),
   trucks: () => request<{ data: TruckType[] }>("/api/trucks").then((r) => r.data),
   estimate: (body: EstimateBody) =>
     request<{ data: PriceBreakdown }>("/api/pricing/estimate", {
@@ -128,14 +148,13 @@ export const shipperApi = {
     }).then((r) => r.data),
   // Persist a booking before continuing to matching.
   createBooking: (body: CreateBookingBody) =>
-    request<{ data: { id: string; agreedPrice: number } }>("/api/bookings", {
+    request<{ data: BookingRecord }>("/api/bookings", {
       method: "POST",
       body: JSON.stringify(body),
-    }).then((r) => r.data),
+    }).then((r) => restoreBooking(r.data)),
   // Poll a booking to learn when a captain accepted, and who. Drives the
   // shipper matching screen — the real captain replaces the local placeholder.
-  getBooking: (id: string) =>
-    request<{
-      data: { id: string; status: string; tripStatus: string | null; captain: Captain | null };
-    }>(`/api/bookings/${id}`).then((r) => r.data),
+  getBooking: (id: string, signal?: AbortSignal) =>
+    request<{ data: BookingRecord }>(`/api/bookings/${encodeURIComponent(id)}`, { signal, cache: "no-store" })
+      .then(r => restoreBooking(r.data)),
 };

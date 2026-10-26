@@ -20,8 +20,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { useBooking } from "@/features/shipper/booking-context";
-import { shipperApi } from "@/lib/api";
+import { useStoredBooking } from "@/features/shipper/booking-context";
 import { inr } from "@/features/shipper/pricing";
 import { useT, type Translate } from "@/features/shipper/i18n";
 import type { BookingStatus } from "@/features/shipper/types";
@@ -29,19 +28,6 @@ import type { BookingStatus } from "@/features/shipper/types";
 export const Route = createFileRoute("/app/track/$id")({
   component: TrackPage,
 });
-
-// Lifecycle order — used so the shipper only ever advances forward when it
-// mirrors the captain's status (never jumps backward on a slow poll).
-const ORDER: BookingStatus[] = [
-  "requested",
-  "accepted",
-  "enroute_pickup",
-  "at_pickup",
-  "picked",
-  "enroute_drop",
-  "delivered",
-];
-const rank = (s: BookingStatus) => ORDER.indexOf(s);
 
 function headline(status: BookingStatus, etaMins: number, t: Translate) {
   switch (status) {
@@ -64,56 +50,21 @@ function TrackPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const t = useT();
-  const { getBooking, updateStatus } = useBooking();
-  const booking = getBooking(id);
-  const [pollError, setPollError] = useState<string | null>(null);
+  const { booking, loading, error: pollError, retry } = useStoredBooking(id);
   const [sos, setSos] = useState(false);
   const [deliveredPopup, setDeliveredPopup] = useState(false);
 
   const status = booking?.status;
 
-  // Latest status without re-arming the poll loop on every change.
-  const statusRef = useRef(status);
-  statusRef.current = status;
-
-  // Mirror the captain's live status from the server. Forward-only, so the
-  // shipper sees each step (incl. "delivered") exactly when the captain does it.
-  // Preserve the last known state on connection failures and display an error.
-  const bid = booking?.id;
   useEffect(() => {
-    if (!bid) return;
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout>;
-
-    const loop = async () => {
-      const cur = statusRef.current;
-      if (cancelled || !cur || cur === "delivered" || cur === "cancelled") return;
-      try {
-        const r = await shipperApi.getBooking(bid);
-        if (cancelled) return;
-        setPollError(null);
-        const next = r.tripStatus as BookingStatus | null;
-        if (next === "cancelled") updateStatus(bid, "cancelled");
-        else if (next && rank(next) > rank(cur)) updateStatus(bid, next); // advance to captain's step
-      } catch (error) {
-        if (cancelled) return;
-        setPollError(error instanceof Error ? error.message : "Tracking temporarily unavailable");
-      }
-      if (!cancelled) timer = setTimeout(loop, 3000);
-    };
-
-    timer = setTimeout(loop, 2000);
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [bid, updateStatus]);
+    if (status === "requested") void navigate({ to: "/app/matching", search: { id }, replace: true });
+  }, [status, id, navigate]);
 
   // Pop a celebratory dialog the moment the trip *becomes* delivered while the
   // user is watching (not when reopening a trip that was already delivered).
   const prevStatus = useRef(status);
   useEffect(() => {
-    if (prevStatus.current !== "delivered" && status === "delivered") {
+    if (prevStatus.current && prevStatus.current !== "delivered" && status === "delivered") {
       setDeliveredPopup(true);
     }
     prevStatus.current = status;
@@ -124,7 +75,11 @@ function TrackPage() {
       <div className="mx-auto min-h-[100dvh] w-full max-w-2xl">
         <div className="flex flex-col items-center gap-3 px-6 py-24 text-center">
           <Truck className="h-8 w-8 text-muted-foreground" />
-          <p className="font-semibold text-foreground">{t("track.tripNotFound")}</p>
+          <p role={pollError ? "alert" : "status"} className="font-semibold text-foreground">
+            {loading ? "Loading your booking…" : pollError ?? t("track.tripNotFound")}
+          </p>
+          {pollError && <Button variant="outline" onClick={retry}>Try again</Button>}
+          <Link to="/login">Sign in</Link>
           <Link to="/app">
             <Button className="rounded-xl">{t("common.goHome")}</Button>
           </Link>

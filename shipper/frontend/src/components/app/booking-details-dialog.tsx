@@ -108,6 +108,7 @@ export function BookingDetailsDialog({
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {t("details.priceBreakdown")}
               </p>
+              {b.priceBreakdownAvailable !== false ? <>
               <Row label={t("details.baseFare")} value={inr(p.base)} />
               <Row label={t("details.distanceRow", { km: p.distanceKm })} value={inr(p.distanceCharge)} />
               {p.discountPct > 0 && (
@@ -117,16 +118,17 @@ export function BookingDetailsDialog({
                   tone="savings"
                 />
               )}
+              </> : <p className="text-sm text-muted-foreground">The agreed fare was saved, but an itemized breakdown is unavailable for this older booking.</p>}
               <div className="my-2 border-t border-dashed border-border" />
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-foreground">
-                  {b.agreedPrice ? t("details.agreedPrice") : t("details.estimatedTotal")}
+                  {b.agreedPrice !== undefined ? t("details.agreedPrice") : t("details.estimatedTotal")}
                 </span>
                 <span className="text-lg font-extrabold text-foreground">{inr(total)}</span>
               </div>
-              <p className="mt-0.5 text-right text-[11px] text-muted-foreground">
+              {b.priceBreakdownAvailable !== false && <p className="mt-0.5 text-right text-[11px] text-muted-foreground">
                 {t("details.perTonne", { price: inr(p.ratePerKm) })}
-              </p>
+              </p>}
 
               {(p.savings > 0 || p.co2SavedKg > 0) && (
                 <div className="mt-3 flex flex-wrap gap-2 border-t border-dashed border-border pt-3">

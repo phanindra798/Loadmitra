@@ -9,7 +9,7 @@ import { getMe } from "../controllers/captain.controller";
 import { listRequests } from "../controllers/requests.controller";
 import { acceptRequest, listTrips, updateTripStatus } from "../controllers/trips.controller";
 import { getEarnings, postQuote } from "../controllers/earnings.controller";
-import { createBooking, getBooking, cancelBooking, issueHandoverOtp } from "../controllers/bookings.controller";
+import { createBooking, getBooking, listBookings, cancelBooking, issueHandoverOtp } from "../controllers/bookings.controller";
 
 const router = Router();
 
@@ -38,6 +38,7 @@ router.post("/api/pricing/estimate", postEstimate);
 const bookingWriteLimiter = rateLimit({ windowMs: 60 * 1000, max: 20 });
 const bookingReadLimiter = rateLimit({ windowMs: 60 * 1000, max: 120 });
 router.post("/api/bookings", requireAuth, requireRole("shipper"), bookingWriteLimiter, asyncHandler(createBooking));
+router.get("/api/bookings", requireAuth, requireRole("shipper"), bookingReadLimiter, asyncHandler(listBookings));
 router.get("/api/bookings/:id", requireAuth, requireRole("shipper"), bookingReadLimiter, asyncHandler(getBooking));
 
 router.post("/api/bookings/:id/cancel", requireAuth, requireRole("shipper"), bookingWriteLimiter, asyncHandler(cancelBooking));
