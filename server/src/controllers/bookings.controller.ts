@@ -5,6 +5,7 @@ import { estimatePrice, truckById } from "../services/pricing.service";
 import type { Response } from "express";
 import { z } from "zod";
 import { Booking } from "../models/booking.model";
+import { createHandoverOtp, HANDOVER_OTP_COOLDOWN_MS } from "../services/handover-otp.service";
 
 const placeSchema = z.object({
   label: z.string().min(1),
@@ -91,7 +92,32 @@ export async function cancelBooking(req: AuthedRequest, res: Response): Promise<
     bookingId: req.params.id, shipperId: req.auth!.userId,
     status: { $in: ["open", "accepted"] },
     $or: [{ tripStatus: { $exists: false } }, { tripStatus: { $in: ["accepted", "enroute_pickup", "at_pickup"] } }],
-  }, { $set: { status: "cancelled", tripStatus: "cancelled" } }, { new: true });
+  }, { $set: { status: "cancelled", tripStatus: "cancelled" }, $unset: { handoverOtp: 1 } }, { new: true });
   if (!booking) { res.status(409).json({ error: "Booking cannot be cancelled" }); return; }
   res.json({ data: { id: booking.bookingId, status: "cancelled" } });
+}
+
+/** Generate a short-lived handover code only for the booking's owner and current stage. */
+export async function issueHandoverOtp(req: AuthedRequest, res: Response): Promise<void> {
+  res.setHeader("Cache-Control", "no-store");
+  const booking = await Booking.findOne({ bookingId: req.params.id, shipperId: req.auth!.userId });
+  if (!booking) { res.status(404).json({ error: "Booking not found" }); return; }
+  const stage = booking.tripStatus === "at_pickup" ? "picked"
+    : booking.tripStatus === "enroute_drop" ? "delivered" : null;
+  if (booking.status !== "accepted" || !stage) {
+    res.status(409).json({ error: "A handover code is not available at this trip stage" }); return;
+  }
+  const { code, challenge } = createHandoverOtp(booking.bookingId, stage);
+  const updated = await Booking.findOneAndUpdate({
+    bookingId: booking.bookingId, shipperId: req.auth!.userId,
+    status: "accepted", tripStatus: booking.tripStatus,
+    $or: [
+      { "handoverOtp.issuedAt": { $exists: false } },
+      { "handoverOtp.issuedAt": { $lte: new Date(Date.now() - HANDOVER_OTP_COOLDOWN_MS) } },
+    ],
+  }, { $set: { handoverOtp: challenge } }, { new: true, runValidators: true });
+  if (!updated) {
+    res.status(409).json({ error: "Trip changed or a code was just generated. Wait 30 seconds, then refresh and retry." }); return;
+  }
+  res.json({ data: { code, stage, expiresAt: challenge.expiresAt.toISOString() } });
 }

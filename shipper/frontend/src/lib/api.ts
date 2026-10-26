@@ -115,6 +115,10 @@ export interface CreateBookingBody {
 }
 
 export const shipperApi = {
+  issueHandoverOtp: (id: string) =>
+    request<{ data: { code: string; stage: "picked" | "delivered"; expiresAt: string } }>(
+      `/api/bookings/${encodeURIComponent(id)}/handover-otp`, { method: "POST" },
+    ).then((r) => r.data),
   cancelBooking: (id: string) => request(`/api/bookings/${id}/cancel`, { method: "POST" }),
   trucks: () => request<{ data: TruckType[] }>("/api/trucks").then((r) => r.data),
   estimate: (body: EstimateBody) =>

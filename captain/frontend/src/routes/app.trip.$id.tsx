@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   ChevronLeft, Navigation, MapPin, KeyRound, ShieldAlert, CheckCircle2,
   Truck, Star, X, Wallet,
@@ -68,6 +68,8 @@ function TripPage() {
   const [otp, setOtp] = useState("");
   const [sos, setSos] = useState(false);
   const [rating, setRating] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
 
   if (!trip) {
     return (
@@ -89,17 +91,24 @@ function TripPage() {
   const h = headline(trip.status, etaMins);
   const step = isActive ? stepFor(trip.status) : null;
 
-  function runStep() {
-    if (!step) return;
-    if (step.kind === "advance") {
-      updateStatus(step.next);
-    } else {
-      if (otp.length !== 4) return;
-      const code = otp;
-      setOtp("");
-      if (step.complete) completeTrip(undefined, code);
-      else updateStatus(step.next, code);
-    }
+  async function runStep() {
+    if (!step || busyRef.current || (step.kind === "otp" && otp.length !== 6)) return;
+    busyRef.current = true;
+    setBusy(true);
+    try {
+      const ok = step.kind === "advance" ? await updateStatus(step.next)
+        : step.complete ? await completeTrip(undefined, otp) : await updateStatus(step.next, otp);
+      if (ok) setOtp("");
+    } finally { busyRef.current = false; setBusy(false); }
+  }
+
+  async function cancel() {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    try {
+      if (await cancelTrip()) await navigate({ to: "/app" });
+    } finally { busyRef.current = false; setBusy(false); }
   }
 
   return (
@@ -172,24 +181,24 @@ function TripPage() {
                 </span>
                 <p className="text-xs font-semibold text-muted-foreground">
                   {step.otp === "pickup"
-                    ? "Ask the customer for the 4-digit pickup OTP"
-                    : "Ask the customer for the 4-digit drop OTP"}
+                    ? "Ask the shipper to generate a 6-digit pickup code"
+                    : "Ask the shipper to generate a 6-digit delivery code"}
                 </p>
               </div>
               <div className="mt-3 flex justify-center">
-                <InputOTP maxLength={4} value={otp} onChange={setOtp} pattern={REGEXP_ONLY_DIGITS} inputMode="numeric">
-                  <InputOTPGroup className="gap-2.5">
-                    {[0, 1, 2, 3].map((i) => (
+                <InputOTP maxLength={6} value={otp} onChange={setOtp} disabled={busy} pattern={REGEXP_ONLY_DIGITS} inputMode="numeric" aria-label="Six-digit handover code">
+                  <InputOTPGroup className="gap-1.5">
+                    {[0, 1, 2, 3, 4, 5].map((i) => (
                       <InputOTPSlot
                         key={i}
                         index={i}
-                        className="h-14 w-14 rounded-xl border border-border bg-background text-xl font-extrabold text-foreground shadow-sm"
+                        className="h-12 w-9 rounded-xl border border-border bg-background text-xl font-extrabold text-foreground shadow-sm sm:w-10"
                       />
                     ))}
                   </InputOTPGroup>
                 </InputOTP>
               </div>
-              <p className="mt-2 text-center text-[11px] text-muted-foreground">Demo: enter any 4 digits.</p>
+              <p className="mt-2 text-center text-[11px] text-muted-foreground">Use the latest code from the shipper's tracking screen. Codes expire after 10 minutes and allow five attempts.</p>
             </div>
           )}
 
@@ -209,11 +218,11 @@ function TripPage() {
           {step && (
             <Button
               onClick={runStep}
-              disabled={step.kind === "otp" && otp.length !== 4}
+              disabled={busy || (step.kind === "otp" && otp.length !== 6)}
               className="mt-4 h-12 w-full rounded-xl text-base"
             >
               {step.kind === "advance" && <step.icon className="h-4 w-4" />}
-              {step.label}
+              {busy ? "Saving…" : step.label}
             </Button>
           )}
 
@@ -226,15 +235,13 @@ function TripPage() {
               >
                 <ShieldAlert className="h-4 w-4" /> SOS
               </button>
-              <button
-                onClick={() => {
-                  cancelTrip();
-                  navigate({ to: "/app" });
-                }}
+              {["accepted", "enroute_pickup", "at_pickup"].includes(trip.status) && <button
+                onClick={cancel}
+                disabled={busy}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card text-sm font-bold text-muted-foreground hover:bg-secondary hover:text-foreground"
               >
                 <X className="h-4 w-4" /> Cancel
-              </button>
+              </button>}
               {sos && (
                 <p className="col-span-2 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
                   Live location shared with LoadMitra safety team and your emergency contact.

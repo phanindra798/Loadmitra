@@ -9,18 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as AppTripsRouteImport } from './routes/app.trips'
-import { Route as AppEarningsRouteImport } from './routes/app.earnings'
 import { Route as AppAccountRouteImport } from './routes/app.account'
+import { Route as AppEarningsRouteImport } from './routes/app.earnings'
+import { Route as AppTripsRouteImport } from './routes/app.trips'
 import { Route as AppTripIdRouteImport } from './routes/app.trip.$id'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -28,9 +28,9 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -38,9 +38,9 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppTripsRoute = AppTripsRouteImport.update({
-  id: '/trips',
-  path: '/trips',
+const AppAccountRoute = AppAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEarningsRoute = AppEarningsRouteImport.update({
@@ -48,9 +48,9 @@ const AppEarningsRoute = AppEarningsRouteImport.update({
   path: '/earnings',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAccountRoute = AppAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const AppTripsRoute = AppTripsRouteImport.update({
+  id: '/trips',
+  path: '/trips',
   getParentRoute: () => AppRoute,
 } as any)
 const AppTripIdRoute = AppTripIdRouteImport.update({
@@ -129,11 +129,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -143,11 +143,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -157,11 +157,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/trips': {
-      id: '/app/trips'
-      path: '/trips'
-      fullPath: '/app/trips'
-      preLoaderRoute: typeof AppTripsRouteImport
+    '/app/account': {
+      id: '/app/account'
+      path: '/account'
+      fullPath: '/app/account'
+      preLoaderRoute: typeof AppAccountRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/earnings': {
@@ -171,11 +171,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEarningsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/account': {
-      id: '/app/account'
-      path: '/account'
-      fullPath: '/app/account'
-      preLoaderRoute: typeof AppAccountRouteImport
+    '/app/trips': {
+      id: '/app/trips'
+      path: '/trips'
+      fullPath: '/app/trips'
+      preLoaderRoute: typeof AppTripsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/trip/$id': {

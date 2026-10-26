@@ -1,7 +1,7 @@
 import { asyncHandler } from "../middleware/async-handler";
 import { Router, type Request, type Response } from "express";
 import { sendOtp, verifyOtp, me, updateMe, logout } from "../controllers/auth.controller";
-import { requireAuth, requireRole } from "../middleware/auth";
+import { requireAuth, requireRole, type AuthedRequest } from "../middleware/auth";
 import { rateLimit } from "../middleware/rate-limit";
 import { listTrucks } from "../controllers/trucks.controller";
 import { postEstimate } from "../controllers/pricing.controller";
@@ -9,7 +9,7 @@ import { getMe } from "../controllers/captain.controller";
 import { listRequests } from "../controllers/requests.controller";
 import { acceptRequest, listTrips, updateTripStatus } from "../controllers/trips.controller";
 import { getEarnings, postQuote } from "../controllers/earnings.controller";
-import { createBooking, getBooking, cancelBooking } from "../controllers/bookings.controller";
+import { createBooking, getBooking, cancelBooking, issueHandoverOtp } from "../controllers/bookings.controller";
 
 const router = Router();
 
@@ -41,6 +41,11 @@ router.post("/api/bookings", requireAuth, requireRole("shipper"), bookingWriteLi
 router.get("/api/bookings/:id", requireAuth, requireRole("shipper"), bookingReadLimiter, asyncHandler(getBooking));
 
 router.post("/api/bookings/:id/cancel", requireAuth, requireRole("shipper"), bookingWriteLimiter, asyncHandler(cancelBooking));
+const handoverOtpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, max: 5,
+  key: (req: AuthedRequest) => `${req.auth!.userId}:${req.params.id}`,
+});
+router.post("/api/bookings/:id/handover-otp", requireAuth, requireRole("shipper"), handoverOtpLimiter, asyncHandler(issueHandoverOtp));
 
 // Captain endpoints — captain-only. The captain always signs in before reaching
 // the app, so gating these is safe. Closes the hole where anyone could read the

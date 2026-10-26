@@ -48,7 +48,7 @@ test('two claim attempts produce one winner; supplied captain identity ignored',
 });
 test('nonowner cannot change trip and owner cannot skip lifecycle steps',async()=>{
  row=null;await create();await accept('captain-a');let r=res();await updateTripStatus(req('captain-b',{status:'enroute_pickup'}),r);assert.equal(r.code,404);
- r=res();await updateTripStatus(req('captain-a',{status:'delivered',otp:'1234'}),r);assert.equal(r.code,409);assert.equal(row.tripStatus,'accepted');
+ r=res();await updateTripStatus(req('captain-a',{status:'delivered',otp:'123456'}),r);assert.equal(r.code,409);assert.equal(row.tripStatus,'accepted');
  r=res();await updateTripStatus(req('captain-a',{status:'enroute_pickup'}),r);assert.equal(r.code,200);assert.equal(row.tripStatus,'enroute_pickup');
 });
 test('unknown trip update is not reported as success',async()=>{row=null;const r=res();await updateTripStatus(req('captain',{status:'enroute_pickup'}),r);assert.equal(r.code,404)});

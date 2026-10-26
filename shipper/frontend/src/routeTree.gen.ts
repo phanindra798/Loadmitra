@@ -9,21 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as AppSearchRouteImport } from './routes/app.search'
-import { Route as AppQuoteRouteImport } from './routes/app.quote'
-import { Route as AppOffersRouteImport } from './routes/app.offers'
-import { Route as AppMatchingRouteImport } from './routes/app.matching'
-import { Route as AppBookingsRouteImport } from './routes/app.bookings'
 import { Route as AppAccountRouteImport } from './routes/app.account'
+import { Route as AppBookingsRouteImport } from './routes/app.bookings'
+import { Route as AppMatchingRouteImport } from './routes/app.matching'
+import { Route as AppOffersRouteImport } from './routes/app.offers'
+import { Route as AppQuoteRouteImport } from './routes/app.quote'
+import { Route as AppSearchRouteImport } from './routes/app.search'
 import { Route as AppTrackIdRouteImport } from './routes/app.track.$id'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -31,9 +31,9 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -41,24 +41,9 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppSearchRoute = AppSearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppQuoteRoute = AppQuoteRouteImport.update({
-  id: '/quote',
-  path: '/quote',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppOffersRoute = AppOffersRouteImport.update({
-  id: '/offers',
-  path: '/offers',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppMatchingRoute = AppMatchingRouteImport.update({
-  id: '/matching',
-  path: '/matching',
+const AppAccountRoute = AppAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => AppRoute,
 } as any)
 const AppBookingsRoute = AppBookingsRouteImport.update({
@@ -66,9 +51,24 @@ const AppBookingsRoute = AppBookingsRouteImport.update({
   path: '/bookings',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAccountRoute = AppAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const AppMatchingRoute = AppMatchingRouteImport.update({
+  id: '/matching',
+  path: '/matching',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOffersRoute = AppOffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQuoteRoute = AppQuoteRouteImport.update({
+  id: '/quote',
+  path: '/quote',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSearchRoute = AppSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => AppRoute,
 } as any)
 const AppTrackIdRoute = AppTrackIdRouteImport.update({
@@ -165,11 +165,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -179,11 +179,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -193,32 +193,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/search': {
-      id: '/app/search'
-      path: '/search'
-      fullPath: '/app/search'
-      preLoaderRoute: typeof AppSearchRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/quote': {
-      id: '/app/quote'
-      path: '/quote'
-      fullPath: '/app/quote'
-      preLoaderRoute: typeof AppQuoteRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/offers': {
-      id: '/app/offers'
-      path: '/offers'
-      fullPath: '/app/offers'
-      preLoaderRoute: typeof AppOffersRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/matching': {
-      id: '/app/matching'
-      path: '/matching'
-      fullPath: '/app/matching'
-      preLoaderRoute: typeof AppMatchingRouteImport
+    '/app/account': {
+      id: '/app/account'
+      path: '/account'
+      fullPath: '/app/account'
+      preLoaderRoute: typeof AppAccountRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/bookings': {
@@ -228,11 +207,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookingsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/account': {
-      id: '/app/account'
-      path: '/account'
-      fullPath: '/app/account'
-      preLoaderRoute: typeof AppAccountRouteImport
+    '/app/matching': {
+      id: '/app/matching'
+      path: '/matching'
+      fullPath: '/app/matching'
+      preLoaderRoute: typeof AppMatchingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/offers': {
+      id: '/app/offers'
+      path: '/offers'
+      fullPath: '/app/offers'
+      preLoaderRoute: typeof AppOffersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/quote': {
+      id: '/app/quote'
+      path: '/quote'
+      fullPath: '/app/quote'
+      preLoaderRoute: typeof AppQuoteRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/search': {
+      id: '/app/search'
+      path: '/search'
+      fullPath: '/app/search'
+      preLoaderRoute: typeof AppSearchRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/track/$id': {

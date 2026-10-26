@@ -136,9 +136,9 @@ interface CaptainContextValue extends State {
   addRequest: (request: LoadRequest) => void;
   declineRequest: (id: string) => void;
   acceptRequest: (id: string) => Promise<boolean>;
-  updateStatus: (status: TripStatus, otp?: string) => void;
-  completeTrip: (ratingGiven?: number, otp?: string) => void;
-  cancelTrip: () => void;
+  updateStatus: (status: TripStatus, otp?: string) => Promise<boolean>;
+  completeTrip: (ratingGiven?: number, otp?: string) => Promise<boolean>;
+  cancelTrip: () => Promise<boolean>;
   getTrip: (id: string) => Trip | undefined;
   /** Re-read the registered name/email from storage (call after editing profile). */
   refreshProfile: () => void;
@@ -244,25 +244,28 @@ export function CaptainProvider({ children }: { children: ReactNode }) {
         } catch (error) { toast.error(error instanceof Error ? error.message : "Acceptance failed"); return false; }
       },
       updateStatus: async (status, otp) => {
-        if (!state.activeTrip) return;
+        if (!state.activeTrip) return false;
         try {
           await captainApi.updateStatus(state.activeTrip.id, status, otp);
           dispatch({ type: "updateStatus", status });
-        } catch (error) { toast.error(error instanceof Error ? error.message : "Status update failed"); }
+          return true;
+        } catch (error) { toast.error(error instanceof Error ? error.message : "Status update failed"); return false; }
       },
       completeTrip: async (ratingGiven, otp) => {
-        if (!state.activeTrip) return;
+        if (!state.activeTrip) return false;
         try {
           await captainApi.updateStatus(state.activeTrip.id, "delivered", otp);
           dispatch({ type: "completeTrip", ratingGiven });
-        } catch (error) { toast.error(error instanceof Error ? error.message : "Delivery failed"); }
+          return true;
+        } catch (error) { toast.error(error instanceof Error ? error.message : "Delivery failed"); return false; }
       },
       cancelTrip: async () => {
-        if (!state.activeTrip) return;
+        if (!state.activeTrip) return false;
         try {
           await captainApi.updateStatus(state.activeTrip.id, "cancelled");
           dispatch({ type: "cancelTrip" });
-        } catch (error) { toast.error(error instanceof Error ? error.message : "Cancellation failed"); }
+          return true;
+        } catch (error) { toast.error(error instanceof Error ? error.message : "Cancellation failed"); return false; }
       },
       getTrip,
     }),

@@ -4,13 +4,13 @@ import {
   ChevronLeft,
   ShieldAlert,
   Share2,
-  KeyRound,
   Truck,
   CheckCircle2,
   Leaf,
 } from "lucide-react";
 import { MapCanvas } from "@/components/app/map-canvas";
 import { CaptainCard } from "@/components/app/captain-card";
+import { HandoverCode } from "@/components/app/handover-code";
 import { StatusTimeline } from "@/components/app/status-timeline";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,12 +58,6 @@ function headline(status: BookingStatus, etaMins: number, t: Translate) {
     default:
       return { title: t("track.arrivingPickup", { min: etaMins }), sub: t("track.arrivingPickupSub") };
   }
-}
-
-function hash(s: string) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-  return h;
 }
 
 function TrackPage() {
@@ -145,9 +139,8 @@ function TrackPage() {
       : (booking.captain?.etaMins ?? 8);
   const h = headline(booking.status, eta, t);
   const delivered = booking.status === "delivered";
-  const pickedOrLater = ["picked", "enroute_drop", "delivered"].includes(booking.status);
-  const otp = String((hash(id) % 9000) + 1000);
-  const dropOtp = String((hash(id + "drop") % 9000) + 1000);
+  const handoverStage = booking.status === "at_pickup" ? "picked"
+    : booking.status === "enroute_drop" ? "delivered" : null;
 
   function shareTrip() {
     const text = `Track my LoadMitra shipment ${booking!.id}: ${booking!.pickup.label} → ${booking!.drop.label}`;
@@ -205,21 +198,7 @@ function TrackPage() {
           {booking.captain && <div className="mt-3"><CaptainCard captain={booking.captain} /></div>}
 
           {/* OTP */}
-          {!delivered && (
-            <div className="mt-3 flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
-                <KeyRound className="h-5 w-5" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-muted-foreground">
-                  {pickedOrLater ? t("track.dropOtp") : t("track.pickupOtp")}
-                </p>
-                <p className="text-2xl font-extrabold tracking-[0.3em] text-foreground">
-                  {pickedOrLater ? dropOtp : otp}
-                </p>
-              </div>
-            </div>
-          )}
+          {handoverStage && <HandoverCode key={`${booking.id}:${handoverStage}`} bookingId={booking.id} stage={handoverStage} />}
 
           {/* Delivered summary */}
           {delivered && (

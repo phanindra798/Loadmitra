@@ -1,8 +1,9 @@
 import type { AuthedRequest } from "../middleware/auth";
 import { User } from "../models/user.model";
-import type { Request, Response } from "express";
+import type { Response } from "express";
 import { z } from "zod";
 import { Booking, bookingToTrip } from "../models/booking.model";
+import { HANDOVER_OTP_MAX_ATTEMPTS, matchesHandoverOtp } from "../services/handover-otp.service";
 
 /** GET /api/captain/trips — the captain's trip history. */
 export async function listTrips(req: AuthedRequest, res: Response): Promise<void> {
@@ -35,7 +36,7 @@ const StatusSchema = z.object({
     "delivered",
     "cancelled",
   ]),
-  otp: z.string().regex(/^\d{4}$/).optional(),
+  otp: z.string().regex(/^\d{6}$/).optional(),
 });
 
 /** POST /api/captain/trips/:id/status — advance a trip through its lifecycle. */
@@ -45,8 +46,6 @@ export async function updateTripStatus(req: AuthedRequest, res: Response): Promi
     res.status(400).json({ error: "Invalid request", details: parsed.error.flatten() });
     return;
   }
-  // OTP-gated transitions in a real build verify against the booking; here we
-  // just require a 4-digit code to move into "picked" / "delivered".
   const otpRequired = parsed.data.status === "picked" || parsed.data.status === "delivered";
   if (otpRequired && !parsed.data.otp) {
     res.status(400).json({ error: "OTP required for this transition" });
@@ -65,10 +64,42 @@ export async function updateTripStatus(req: AuthedRequest, res: Response): Promi
   if (booking.status !== "accepted" || !transitions[current]?.includes(parsed.data.status)) {
     res.status(409).json({ error: "Invalid trip transition" }); return;
   }
-  const updated = await Booking.findOneAndUpdate({
+  const transitionFilter = {
     bookingId: booking.bookingId, acceptedByCaptainId: req.auth!.userId,
     status: "accepted", tripStatus: booking.tripStatus,
-  }, { $set: { tripStatus: parsed.data.status, ...(parsed.data.status === "cancelled" ? { status: "cancelled" } : {}) } }, { new: true });
+  };
+  const next = parsed.data.status;
+  if (next === "picked" || next === "delivered") {
+    // Reserve an attempt atomically, including for incorrect codes. The final
+    // transition also checks this challenge so regeneration/replay cannot win a race.
+    const attempted = await Booking.findOneAndUpdate({
+      ...transitionFilter,
+      "handoverOtp.stage": next,
+      "handoverOtp.expiresAt": { $gt: new Date() },
+      "handoverOtp.attempts": { $lt: HANDOVER_OTP_MAX_ATTEMPTS },
+    }, { $inc: { "handoverOtp.attempts": 1 } }, { new: true });
+    const challenge = attempted?.handoverOtp;
+    if (!challenge) {
+      res.status(409).json({ error: "Code unavailable, expired, or locked. Ask the shipper to generate a new code." }); return;
+    }
+    if (!matchesHandoverOtp(booking.bookingId, next, parsed.data.otp!, challenge.codeHash)) {
+      res.status(400).json({ error: "Incorrect handover code" }); return;
+    }
+    const verified = await Booking.findOneAndUpdate({
+      ...transitionFilter,
+      "handoverOtp.stage": next, "handoverOtp.codeHash": challenge.codeHash,
+      "handoverOtp.issuedAt": challenge.issuedAt,
+      "handoverOtp.expiresAt": { $gt: new Date() },
+      "handoverOtp.attempts": { $lte: HANDOVER_OTP_MAX_ATTEMPTS },
+    }, { $set: { tripStatus: next }, $unset: { handoverOtp: 1 } }, { new: true });
+    if (!verified) { res.status(409).json({ error: "Trip or code changed; refresh and retry" }); return; }
+    res.json({ data: { id: booking.bookingId, status: next } });
+    return;
+  }
+  const updated = await Booking.findOneAndUpdate(transitionFilter, {
+    $set: { tripStatus: next, ...(next === "cancelled" ? { status: "cancelled" } : {}) },
+    ...(next === "cancelled" ? { $unset: { handoverOtp: 1 } } : {}),
+  }, { new: true });
   if (!updated) { res.status(409).json({ error: "Trip changed; refresh and retry" }); return; }
   res.json({ data: { id: req.params.id, status: parsed.data.status } });
 }

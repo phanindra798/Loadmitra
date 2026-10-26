@@ -1,5 +1,7 @@
 # LoadMitra review — 25 October 2026
 
+This document preserves the original audit baseline. Several findings have since been addressed; see [TODAY_PROGRESS.md](TODAY_PROGRESS.md) for completed work and current limitations.
+
 ## Scope and baseline
 
 Reviewed the repository inventory, backend handlers/models/services, frontend booking and trip flows, session handling, configuration, and supporting screens. Inventory: 246 tracked files (107 shipper, 105 captain, 31 server, 3 root). Generated dependencies and build output were excluded from source review; reusable UI wrappers were considered as a group. This is not a claim of exhaustive browser or production validation.

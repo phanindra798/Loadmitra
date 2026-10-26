@@ -50,6 +50,17 @@ const bookingSchema = new Schema(
     status: { type: String, enum: ["open", "accepted", "cancelled"], default: "open", index: true },
     acceptedByCaptainId: { type: String },
     captain: { type: acceptedCaptainSchema, default: undefined }, // set when a captain accepts
+    // Only a keyed hash is persisted. Codes are returned once to the owning shipper.
+    handoverOtp: {
+      type: new Schema({
+        stage: { type: String, enum: ["picked", "delivered"], required: true },
+        codeHash: { type: String, required: true },
+        expiresAt: { type: Date, required: true },
+        issuedAt: { type: Date, required: true },
+        attempts: { type: Number, default: 0, required: true },
+      }, { _id: false }),
+      default: undefined,
+    },
     // Captain's live trip lifecycle, mirrored to the shipper's track screen.
     tripStatus: {
       type: String,
