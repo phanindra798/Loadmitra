@@ -79,8 +79,23 @@ const bookingSchema = new Schema(
   { timestamps: true },
 );
 
+// Keep the constraint in schema metadata as well as installing it explicitly
+// before acceptance; future index synchronization must retain this invariant.
+export const ACTIVE_TRIP_INDEX_OPTIONS = {
+  name: "one_active_trip_per_captain",
+  unique: true,
+  partialFilterExpression: {
+    status: "accepted",
+    acceptedByCaptainId: { $type: "string" },
+    // null also includes legacy accepted bookings with no tripStatus.
+    tripStatus: { $in: [null, "accepted", "enroute_pickup", "at_pickup", "picked", "enroute_drop"] },
+  },
+};
+bookingSchema.index({ acceptedByCaptainId: 1 }, ACTIVE_TRIP_INDEX_OPTIONS);
+
 export type BookingDoc = InferSchemaType<typeof bookingSchema>;
 bookingSchema.index({ shipperId: 1, _id: -1 });
+bookingSchema.index({ acceptedByCaptainId: 1, createdAt: -1, _id: -1 });
 export const Booking = model("Booking", bookingSchema);
 
 /** Captain payout for a booking — same economics as the seed (earnings.service). */
@@ -124,7 +139,9 @@ export function bookingToTrip(b: BookingDoc, status: TripStatus): Trip {
     payout: r.payout,
     customerName: r.customerName,
     customerRating: r.customerRating,
-    status,
+    status: b.status === "cancelled" ? "cancelled" : status,
     createdLabel: r.createdLabel,
+    createdAt: b.createdAt?.toISOString(),
+    updatedAt: b.updatedAt?.toISOString(),
   };
 }

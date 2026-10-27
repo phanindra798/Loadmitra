@@ -2,28 +2,61 @@ import type { AuthedRequest } from "../middleware/auth";
 import { User } from "../models/user.model";
 import type { Response } from "express";
 import { z } from "zod";
-import { Booking, bookingToTrip } from "../models/booking.model";
+import { Booking, bookingToTrip, ACTIVE_TRIP_INDEX_OPTIONS } from "../models/booking.model";
+import { ensureActiveTripIndex, isActiveTripConflict } from "../services/active-trip.service";
+import { logger } from "../utils/logger";
 import { HANDOVER_OTP_MAX_ATTEMPTS, matchesHandoverOtp } from "../services/handover-otp.service";
 
 /** GET /api/captain/trips — the captain's trip history. */
 export async function listTrips(req: AuthedRequest, res: Response): Promise<void> {
-  const bookings = await Booking.find({ acceptedByCaptainId: req.auth!.userId }).sort({ createdAt: -1 }).limit(100);
-  res.json({ data: bookings.map(b => bookingToTrip(b, b.tripStatus ?? "accepted")) });
+  res.setHeader("Cache-Control", "no-store");
+  const captainId = req.auth!.userId;
+  const [bookings, active] = await Promise.all([
+    Booking.find({ acceptedByCaptainId: captainId }).sort({ createdAt: -1, _id: -1 }).limit(100),
+    Booking.findOne({ ...ACTIVE_TRIP_INDEX_OPTIONS.partialFilterExpression, acceptedByCaptainId: captainId })
+      .sort({ updatedAt: -1 }),
+  ]);
+  res.json({ data: bookings.map(b => bookingToTrip(b, b.tripStatus ?? "accepted")),
+    activeTrip: active ? bookingToTrip(active, active.tripStatus ?? "accepted") : null });
+}
+
+/** Recover an owned trip directly, even when it is outside the history window. */
+export async function getTrip(req: AuthedRequest, res: Response): Promise<void> {
+  res.setHeader("Cache-Control", "no-store");
+  const booking = await Booking.findOne({ bookingId: req.params.id, acceptedByCaptainId: req.auth!.userId });
+  if (!booking) { res.status(404).json({ error: "Trip not found" }); return; }
+  res.json({ data: bookingToTrip(booking, booking.tripStatus ?? "accepted") });
 }
 
 /** Claim an open booking atomically; client-supplied captain identity is ignored. */
 export async function acceptRequest(req: AuthedRequest, res: Response): Promise<void> {
   const user = await User.findById(req.auth!.userId);
   if (!user) { res.status(401).json({ error: "Account not found" }); return; }
-  const booking = await Booking.findOneAndUpdate(
-    { bookingId: req.params.id, status: "open", shipperId: { $exists: true } },
-    { $set: { status: "accepted", tripStatus: "accepted", acceptedByCaptainId: req.auth!.userId,
-      captain: { id: req.auth!.userId, name: user.name, rating: 0, trips: 0, badges: [],
-        vehicleNumber: "Not registered", truckTypeId: "", phoneMasked: "", etaMins: 0 } } },
-    { new: true, runValidators: true },
-  );
-  if (!booking) { res.status(409).json({ error: "This load is no longer available" }); return; }
-  res.status(201).json({ data: bookingToTrip(booking, "accepted") });
+  // Never accept without the database guard, including during startup/index builds.
+  try {
+    await ensureActiveTripIndex();
+  } catch {
+    logger.error("Captain acceptance unavailable: verify the active-trip index, MongoDB version and conflicting active bookings");
+    res.status(503).json({ error: "Load acceptance is temporarily unavailable. Please try again later." });
+    return;
+  }
+  try {
+    const booking = await Booking.findOneAndUpdate(
+      { bookingId: req.params.id, status: "open", shipperId: { $exists: true } },
+      { $set: { status: "accepted", tripStatus: "accepted", acceptedByCaptainId: req.auth!.userId,
+        captain: { id: req.auth!.userId, name: user.name, rating: 0, trips: 0, badges: [],
+          vehicleNumber: "Not registered", truckTypeId: "", phoneMasked: "", etaMins: 0 } } },
+      { new: true, runValidators: true },
+    );
+    if (!booking) { res.status(409).json({ error: "This load is no longer available" }); return; }
+    res.status(201).json({ data: bookingToTrip(booking, "accepted") });
+  } catch (error) {
+    if (isActiveTripConflict(error)) {
+      res.status(409).json({ code: "ACTIVE_TRIP_EXISTS", error: "You already have an active trip. Finish or cancel it before accepting another load." });
+      return;
+    }
+    throw error;
+  }
 }
 
 const StatusSchema = z.object({
@@ -93,7 +126,7 @@ export async function updateTripStatus(req: AuthedRequest, res: Response): Promi
       "handoverOtp.attempts": { $lte: HANDOVER_OTP_MAX_ATTEMPTS },
     }, { $set: { tripStatus: next }, $unset: { handoverOtp: 1 } }, { new: true });
     if (!verified) { res.status(409).json({ error: "Trip or code changed; refresh and retry" }); return; }
-    res.json({ data: { id: booking.bookingId, status: next } });
+    res.json({ data: bookingToTrip(verified, next) });
     return;
   }
   const updated = await Booking.findOneAndUpdate(transitionFilter, {
@@ -101,5 +134,5 @@ export async function updateTripStatus(req: AuthedRequest, res: Response): Promi
     ...(next === "cancelled" ? { $unset: { handoverOtp: 1 } } : {}),
   }, { new: true });
   if (!updated) { res.status(409).json({ error: "Trip changed; refresh and retry" }); return; }
-  res.json({ data: { id: req.params.id, status: parsed.data.status } });
+  res.json({ data: bookingToTrip(updated, next) });
 }

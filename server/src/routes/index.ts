@@ -7,7 +7,7 @@ import { listTrucks } from "../controllers/trucks.controller";
 import { postEstimate } from "../controllers/pricing.controller";
 import { getMe } from "../controllers/captain.controller";
 import { listRequests } from "../controllers/requests.controller";
-import { acceptRequest, listTrips, updateTripStatus } from "../controllers/trips.controller";
+import { acceptRequest, listTrips, getTrip, updateTripStatus } from "../controllers/trips.controller";
 import { getEarnings, postQuote } from "../controllers/earnings.controller";
 import { createBooking, getBooking, listBookings, cancelBooking, issueHandoverOtp } from "../controllers/bookings.controller";
 
@@ -62,6 +62,7 @@ router.post("/api/captain/requests/:id/accept", ...captainOnly, asyncHandler(acc
 
 // Trips: history + status transitions
 router.get("/api/captain/trips", ...captainOnly, asyncHandler(listTrips));
+router.get("/api/captain/trips/:id", ...captainOnly, asyncHandler(getTrip));
 router.post("/api/captain/trips/:id/status", ...captainOnly, asyncHandler(updateTripStatus));
 
 // Earnings: summary + per-load quote

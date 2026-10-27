@@ -1,282 +1,173 @@
 import { toast } from "sonner";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-import { useQuery } from "@tanstack/react-query";
-import { fetchProfile, type Profile } from "@/lib/account";
-import { captainApi } from "@/lib/api";
-import { CAPTAIN, EARNINGS, LOAD_REQUESTS, SAMPLE_TRIPS, captainIdentityFor } from "./mock-data";
-import type {
-  CaptainProfile,
-  EarningsSummary,
-  LoadRequest,
-  Trip,
-  TripStatus,
-} from "./types";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api, ApiError, captainApi, getToken, subscribeSession } from "@/lib/api";
+import { isActiveTrip, latestTrip, mergeTrips } from "./trip-record";
+import type { CaptainProfile, EarningsSummary, LoadRequest, Trip, TripStatus } from "./types";
 
-/**
- * Holds the captain's live working state: whether they're online, the incoming
- * load requests being broadcast to them, the trip they're currently running,
- * and their completed-trip history. The provider lives in the /app layout route
- * so this state survives every /app/* navigation without a store library.
- * State is in-memory (no persistence) by design for this demo build.
- */
+const TRIPS_KEY = ["captain-trips"] as const;
+const LIST_KEY = [...TRIPS_KEY, "list"] as const;
+const detailKey = (id: string) => [...TRIPS_KEY, "detail", id];
+const EMPTY_TRIPS: Trip[] = [];
+const EMPTY_REQUESTS: LoadRequest[] = [];
+const EMPTY_EARNINGS: EarningsSummary = { today: 0, week: 0, month: 0, tripsToday: 0, onlineHoursToday: 0, incentiveThisWeek: 0, acceptanceRate: 0, ledger: [] };
+const EMPTY_PROFILE: CaptainProfile = { id: "", name: "Captain", phoneMasked: "", vehicleNumber: "Not registered", truckTypeId: "", rating: 0, trips: 0, joinedLabel: "", hue: 211, kycVerified: false, city: "" };
 
-interface State {
+interface CaptainContextValue {
+  authenticated: boolean;
   online: boolean;
   profile: CaptainProfile;
-  /** Offer pool the dashboard "broadcasts" from (server requests, or mock seed). */
+  earnings: EarningsSummary;
   requestPool: LoadRequest[];
   requests: LoadRequest[];
   activeTrip: Trip | null;
   trips: Trip[];
-  /** Baseline earnings (today/week/month) before this session's completed trips. */
-  earningsBase: EarningsSummary;
-  /** Net ₹ earned + trips completed during this session, for live earnings. */
-  sessionEarned: number;
-  sessionTrips: number;
-}
-
-const initialState: State = {
-  online: false,
-  profile: CAPTAIN,
-  requestPool: [],
-  requests: [],
-  activeTrip: null,
-  trips: [],
-  earningsBase: EARNINGS,
-  sessionEarned: 0,
-  sessionTrips: 0,
-};
-
-type Action =
-  | { type: "hydrate"; profile: CaptainProfile; requestPool: LoadRequest[]; trips: Trip[]; earnings: EarningsSummary }
-  | { type: "setRequestPool"; requestPool: LoadRequest[] }
-  | { type: "setOnline"; online: boolean }
-  | { type: "setRequests"; requests: LoadRequest[] }
-  | { type: "addRequest"; request: LoadRequest }
-  | { type: "declineRequest"; id: string }
-  | { type: "acceptRequest"; trip: Trip }
-  | { type: "updateStatus"; status: TripStatus }
-  | { type: "completeTrip"; ratingGiven?: number }
-  | { type: "cancelTrip" };
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case "hydrate":
-      // Seed live state from the server once on load. Leaves session-only fields
-      // (online, activeTrip, requests, sessionEarned/Trips) untouched.
-      return {
-        ...state,
-        profile: action.profile,
-        requestPool: action.requestPool,
-        trips: action.trips.filter(t => ["delivered", "cancelled"].includes(t.status)),
-        activeTrip: action.trips.find(t => !["delivered", "cancelled"].includes(t.status)) ?? null,
-        earningsBase: action.earnings,
-      };
-    case "setRequestPool":
-      // Live refresh of the offer pool (polled). Touches only the pool, so an
-      // in-progress trip / pending offers / session earnings are untouched.
-      return { ...state, requestPool: action.requestPool };
-    case "setOnline":
-      // Going offline clears pending offers (you stop receiving them).
-      return { ...state, online: action.online, requests: action.online ? state.requests : [] };
-    case "setRequests":
-      return { ...state, requests: action.requests };
-    case "addRequest":
-      if (state.requests.some((r) => r.id === action.request.id)) return state;
-      return { ...state, requests: [action.request, ...state.requests] };
-    case "declineRequest":
-      return { ...state, requests: state.requests.filter((r) => r.id !== action.id) };
-    case "acceptRequest": {
-      return { ...state, activeTrip: action.trip, requests: [] };
-    }
-    case "updateStatus": {
-      if (!state.activeTrip) return state;
-      return { ...state, activeTrip: { ...state.activeTrip, status: action.status } };
-    }
-    case "completeTrip": {
-      if (!state.activeTrip) return state;
-      const done: Trip = {
-        ...state.activeTrip,
-        status: "delivered",
-        ratingGiven: action.ratingGiven,
-      };
-      return {
-        ...state,
-        activeTrip: null,
-        trips: [done, ...state.trips],
-        sessionEarned: state.sessionEarned + done.payout.net,
-        sessionTrips: state.sessionTrips + 1,
-      };
-    }
-    case "cancelTrip": {
-      if (!state.activeTrip) return state;
-      const cancelled: Trip = { ...state.activeTrip, status: "cancelled" };
-      return { ...state, activeTrip: null, trips: [cancelled, ...state.trips] };
-    }
-    default:
-      return state;
-  }
-}
-
-interface CaptainContextValue extends State {
-  earnings: EarningsSummary;
+  tripsLoading: boolean;
+  tripsError: string | null;
+  refreshTrips: () => void;
   setOnline: (online: boolean) => void;
   toggleOnline: () => void;
   setRequests: (requests: LoadRequest[]) => void;
   addRequest: (request: LoadRequest) => void;
   declineRequest: (id: string) => void;
   acceptRequest: (id: string) => Promise<boolean>;
-  updateStatus: (status: TripStatus, otp?: string) => Promise<boolean>;
-  completeTrip: (ratingGiven?: number, otp?: string) => Promise<boolean>;
-  cancelTrip: () => Promise<boolean>;
+  updateStatus: (status: TripStatus, otp?: string, id?: string) => Promise<boolean>;
+  completeTrip: (ratingGiven?: number, otp?: string, id?: string) => Promise<boolean>;
+  cancelTrip: (id?: string) => Promise<boolean>;
   getTrip: (id: string) => Trip | undefined;
-  /** Re-read the registered name/email from storage (call after editing profile). */
   refreshProfile: () => void;
 }
-
 const CaptainContext = createContext<CaptainContextValue | null>(null);
 
+/** Changing accounts replaces the entire private query cache and local UI state. */
 export function CaptainProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const session = useSyncExternalStore(subscribeSession, getToken, () => null);
+  return <CaptainSession key={session ?? "guest"} session={session}>{children}</CaptainSession>;
+}
+function CaptainSession({ session, children }: { session: string | null; children: ReactNode }) {
+  const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 0 } } }));
+  useEffect(() => () => { void client.cancelQueries(); client.clear(); }, [client]);
+  return <QueryClientProvider client={client}><CaptainStore session={session}>{children}</CaptainStore></QueryClientProvider>;
+}
 
-  // Map the signed-in captain (by phone) to a distinct identity from the pool —
-  // so different captains show different vehicle/rating/avatar to the shipper,
-  // not always the same seed driver. Their registered name still wins.
-  const [account, setAccount] = useState<Profile | null>(null);
-  const refreshProfile = useCallback(() => {
-    fetchProfile().then((p) => setAccount(p));
+function CaptainStore({ session, children }: { session: string | null; children: ReactNode }) {
+  const client = useQueryClient();
+  const authenticated = Boolean(session);
+  const [online, setOnlineState] = useState(false);
+  const [requests, setRequests] = useState<LoadRequest[]>([]);
+  const [completed, setCompleted] = useState<Trip[]>([]);
+  const alive = useRef(true);
+  const pending = useRef<AbortController | null>(null);
+  useEffect(() => {
+    alive.current = true;
+    return () => { alive.current = false; pending.current?.abort(); };
   }, []);
-  useEffect(() => refreshProfile(), [refreshProfile]);
-  const profile = account
-    ? (() => {
-        const base = captainIdentityFor(account.phone);
-        return { ...base, name: account.name || base.name };
-      })()
-    : state.profile;
+  const currentSession = useCallback(() => alive.current && Boolean(session) && getToken() === session, [session]);
 
-  // Hydrate live state from the shared API once on load. If the server is
-  // unreachable the query just stays empty and the mock seed remains — so the
-  // captain app still works standalone/offline.
-  const hydratedRef = useRef(false);
-  const { data: bootstrap } = useQuery({
-    queryKey: ["captain", "bootstrap"],
-    queryFn: async () => {
-      const [p, requestPool, trips, earnings] = await Promise.all([
-        captainApi.profile(),
-        captainApi.requests(),
-        captainApi.trips(),
-        captainApi.earnings(),
-      ]);
-      return { profile: p, requestPool, trips, earnings };
+  // Trip recovery does not depend on the profile, earnings or offer endpoints.
+  const tripQuery = useQuery({
+    queryKey: LIST_KEY, enabled: authenticated,
+    queryFn: async ({ signal }) => {
+      const incoming = await captainApi.trips(signal);
+      return mergeTrips(client.getQueryData<Trip[]>(LIST_KEY) ?? [], incoming);
     },
-    staleTime: Infinity,
-    retry: false,
-    refetchOnWindowFocus: false,
+    refetchInterval: 3000,
   });
-  useEffect(() => {
-    if (!bootstrap || hydratedRef.current) return;
-    // Don't overwrite a session already in progress.
-    if (state.activeTrip || state.sessionTrips > 0) return;
-    hydratedRef.current = true;
-    dispatch({ type: "hydrate", ...bootstrap });
-  }, [bootstrap, state.activeTrip, state.sessionTrips]);
+  const records = tripQuery.data ?? EMPTY_TRIPS;
+  const activeTrip = records.find(isActiveTrip) ?? null;
+  const trips = records.filter(trip => !isActiveTrip(trip));
+  const tripsLoading = authenticated && tripQuery.isPending;
+  const profileQuery = useQuery({ queryKey: ["captain-account"], enabled: authenticated, queryFn: ({ signal }) => api.me(signal), staleTime: 60000 });
+  const earningsQuery = useQuery({ queryKey: ["captain-earnings"], enabled: authenticated, queryFn: ({ signal }) => captainApi.earnings(signal), staleTime: Infinity });
+  const offersQuery = useQuery({ queryKey: ["captain-offers"], enabled: authenticated && !tripsLoading && !activeTrip,
+    queryFn: ({ signal }) => captainApi.requests(signal), refetchInterval: 6000 });
+  const requestPool = offersQuery.data ?? EMPTY_REQUESTS;
+  const account = profileQuery.data?.user;
+  // Vehicle/KYC onboarding is still pending: do not invent an identity from a phone number.
+  const profile = account ? { ...EMPTY_PROFILE, id: account.id, name: account.name,
+    phoneMasked: account.phone.replace(/.(?=.{4})/g, "•") } : EMPTY_PROFILE;
+  const earnings = useMemo(() => {
+    const base = earningsQuery.data ?? EMPTY_EARNINGS;
+    const net = completed.reduce((sum, trip) => sum + trip.payout.net, 0);
+    return { ...base, today: base.today + net, week: base.week + net, month: base.month + net, tripsToday: base.tripsToday + completed.length };
+  }, [earningsQuery.data, completed]);
 
-  // Keep the offer pool fresh: poll the shared API so a load a shipper books
-  // *after* this app loaded still shows up (no manual refresh needed). On a
-  // failed poll the last good pool stays, so offline/standalone still works.
-  const { data: livePool } = useQuery({
-    queryKey: ["captain", "requests", "live"],
-    queryFn: () => captainApi.requests(),
-    refetchInterval: 6000,
-    retry: false,
-  });
-  useEffect(() => {
-    if (livePool) dispatch({ type: "setRequestPool", requestPool: livePool });
-  }, [livePool]);
+  const refreshTrips = useCallback(() => { void client.invalidateQueries({ queryKey: TRIPS_KEY }); }, [client]);
+  const refreshProfile = useCallback(() => { void client.invalidateQueries({ queryKey: ["captain-account"] }); }, [client]);
+  const getTrip = useCallback((id: string) => records.find(trip => trip.id === id), [records]);
+  const setOnline = useCallback((value: boolean) => { setOnlineState(value); if (!value) setRequests([]); }, []);
+  const toggleOnline = useCallback(() => { setOnlineState(value => !value); setRequests([]); }, []);
+  const addRequest = useCallback((request: LoadRequest) => { setRequests(current => current.some(item => item.id === request.id) ? current : [request, ...current]); }, []);
+  const declineRequest = useCallback((id: string) => { setRequests(current => current.filter(item => item.id !== id)); }, []);
 
-  const getTrip = useCallback(
-    (id: string) =>
-      state.activeTrip?.id === id ? state.activeTrip : state.trips.find((t) => t.id === id),
-    [state.activeTrip, state.trips],
-  );
+  const mutateTrip = useCallback(async (perform: (signal: AbortSignal) => Promise<Trip>): Promise<boolean> => {
+    if (!currentSession() || pending.current) return false;
+    const controller = new AbortController(); pending.current = controller;
+    try {
+      await client.cancelQueries({ queryKey: TRIPS_KEY });
+      if (!currentSession()) return false;
+      const trip = await perform(controller.signal);
+      // Cancel reads started while the mutation was pending before updating both caches.
+      await client.cancelQueries({ queryKey: TRIPS_KEY });
+      if (!currentSession()) return false;
+      client.setQueryData<Trip[]>(LIST_KEY, previous => mergeTrips(previous ?? [], [trip]));
+      client.setQueryData<Trip>(detailKey(trip.id), previous => latestTrip(previous, trip));
+      setRequests([]);
+      if (trip.status === "delivered") setCompleted(previous => previous.some(item => item.id === trip.id) ? previous : [...previous, trip]);
+      return true;
+    } catch (error) {
+      if (currentSession() && !controller.signal.aborted) {
+        toast.error(error instanceof Error ? error.message : "Trip update failed");
+        refreshTrips();
+      }
+      return false;
+    } finally { if (pending.current === controller) pending.current = null; }
+  }, [client, currentSession, refreshTrips]);
 
-  // Earnings stay live: the baseline (from the server, or the mock seed) already
-  // includes the day's history, so we layer this session's completed-trip net on
-  // top of all three windows.
-  const earnings = useMemo<EarningsSummary>(
-    () => ({
-      ...state.earningsBase,
-      today: state.earningsBase.today + state.sessionEarned,
-      week: state.earningsBase.week + state.sessionEarned,
-      month: state.earningsBase.month + state.sessionEarned,
-      tripsToday: state.earningsBase.tripsToday + state.sessionTrips,
-    }),
-    [state.earningsBase, state.sessionEarned, state.sessionTrips],
-  );
-
-  const value = useMemo<CaptainContextValue>(
-    () => ({
-      ...state,
-      profile,
-      earnings,
-      refreshProfile,
-      setOnline: (online) => dispatch({ type: "setOnline", online }),
-      toggleOnline: () => dispatch({ type: "setOnline", online: !state.online }),
-      setRequests: (requests) => dispatch({ type: "setRequests", requests }),
-      addRequest: (request) => dispatch({ type: "addRequest", request }),
-      declineRequest: (id) => dispatch({ type: "declineRequest", id }),
-      acceptRequest: async (id) => {
-        if (state.activeTrip) return false;
-        try {
-          const trip = await captainApi.accept(id);
-          dispatch({ type: "acceptRequest", trip });
-          return true;
-        } catch (error) { toast.error(error instanceof Error ? error.message : "Acceptance failed"); return false; }
-      },
-      updateStatus: async (status, otp) => {
-        if (!state.activeTrip) return false;
-        try {
-          await captainApi.updateStatus(state.activeTrip.id, status, otp);
-          dispatch({ type: "updateStatus", status });
-          return true;
-        } catch (error) { toast.error(error instanceof Error ? error.message : "Status update failed"); return false; }
-      },
-      completeTrip: async (ratingGiven, otp) => {
-        if (!state.activeTrip) return false;
-        try {
-          await captainApi.updateStatus(state.activeTrip.id, "delivered", otp);
-          dispatch({ type: "completeTrip", ratingGiven });
-          return true;
-        } catch (error) { toast.error(error instanceof Error ? error.message : "Delivery failed"); return false; }
-      },
-      cancelTrip: async () => {
-        if (!state.activeTrip) return false;
-        try {
-          await captainApi.updateStatus(state.activeTrip.id, "cancelled");
-          dispatch({ type: "cancelTrip" });
-          return true;
-        } catch (error) { toast.error(error instanceof Error ? error.message : "Cancellation failed"); return false; }
-      },
-      getTrip,
-    }),
-    [state, profile, earnings, refreshProfile, getTrip],
-  );
-
+  const acceptRequest = useCallback(async (id: string) => {
+    if (activeTrip || !tripQuery.data || tripQuery.isError) return false;
+    return mutateTrip(signal => captainApi.accept(id, signal));
+  }, [activeTrip, tripQuery.data, tripQuery.isError, mutateTrip]);
+  const updateStatus = useCallback(async (status: TripStatus, otp?: string, id = activeTrip?.id) => {
+    if (!id) return false;
+    return mutateTrip(signal => captainApi.updateStatus(id, status, otp, signal));
+  }, [activeTrip?.id, mutateTrip]);
+  const value: CaptainContextValue = {
+    authenticated, online, profile, earnings, requestPool,
+    requests: activeTrip ? [] : requests.filter(request => requestPool.some(item => item.id === request.id)),
+    activeTrip, trips, tripsLoading,
+    tripsError: tripQuery.error ? tripQuery.error.message : null,
+    refreshTrips, setOnline, toggleOnline, setRequests, addRequest, declineRequest, acceptRequest, updateStatus,
+    completeTrip: (_rating, otp, id) => updateStatus("delivered", otp, id),
+    cancelTrip: id => updateStatus("cancelled", undefined, id), getTrip, refreshProfile,
+  };
   return <CaptainContext.Provider value={value}>{children}</CaptainContext.Provider>;
 }
 
 export function useCaptain() {
-  const ctx = useContext(CaptainContext);
-  if (!ctx) throw new Error("useCaptain must be used within <CaptainProvider>");
-  return ctx;
+  const context = useContext(CaptainContext);
+  if (!context) throw new Error("useCaptain must be used within <CaptainProvider>");
+  return context;
+}
+
+/** A direct link reads its own record, including trips older than the history page. */
+export function useStoredTrip(id: string) {
+  const { authenticated, getTrip } = useCaptain();
+  const client = useQueryClient();
+  const query = useQuery({
+    queryKey: detailKey(id), enabled: authenticated && Boolean(id),
+    queryFn: async ({ signal }) => {
+      const incoming = await captainApi.trip(id, signal);
+      return latestTrip(client.getQueryData<Trip>(detailKey(id)), incoming);
+    },
+    refetchInterval: query => {
+      if (query.state.error instanceof ApiError && [401, 403, 404].includes(query.state.error.status)) return false;
+      return query.state.data && !isActiveTrip(query.state.data) ? false : 3000;
+    },
+  });
+  const unavailable = query.error instanceof ApiError && [401, 403, 404].includes(query.error.status);
+  const saved = getTrip(id);
+  const trip = !authenticated || unavailable ? undefined : query.data ? latestTrip(saved, query.data) : saved;
+  return { trip, loading: authenticated && query.isPending && !trip, error: query.error?.message ?? null,
+    retry: () => { void query.refetch(); } };
 }

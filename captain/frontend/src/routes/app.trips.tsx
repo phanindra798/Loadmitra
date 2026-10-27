@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Route as RouteIcon, Navigation2 } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
+import { TripSyncStatus } from "@/components/app/trip-sync-status";
 import { TripRow } from "@/components/app/trip-row";
 import { useCaptain } from "@/features/captain/captain-context";
 import { inr } from "@/features/captain/earnings";
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/app/trips")({
 type Filter = "all" | "delivered" | "cancelled";
 
 function TripsPage() {
-  const { trips, activeTrip } = useCaptain();
+  const { trips, activeTrip, authenticated, tripsLoading, tripsError, refreshTrips } = useCaptain();
   const [filter, setFilter] = useState<Filter>("all");
 
   const history = trips.filter((t) =>
@@ -25,9 +26,11 @@ function TripsPage() {
 
   return (
     <div className="mx-auto min-h-[100dvh] w-full max-w-2xl pb-28 lg:pb-10">
-      <PageHeader title="My trips" subtitle={`${trips.length} trips · ${inr(totalEarned)} earned`} back={false} />
+      <PageHeader title="My trips" subtitle={`${trips.length} recent trips · ${inr(totalEarned)} estimated payout`} back={false} />
 
       <div className="px-4 pt-4 sm:px-6">
+        <TripSyncStatus />
+        <button type="button" onClick={refreshTrips} disabled={!authenticated || tripsLoading} className="mb-3 text-sm font-semibold underline disabled:opacity-50">Refresh trips</button>
         {/* Active trip */}
         {activeTrip && (
           <Link
@@ -75,7 +78,7 @@ function TripsPage() {
               <TripRow key={t.id} trip={t} />
             ))}
           </div>
-        ) : (
+        ) : authenticated && !tripsLoading && !tripsError ? (
           <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-card px-6 py-16 text-center">
             <RouteIcon className="h-7 w-7 text-muted-foreground" />
             <p className="text-sm font-semibold text-foreground">No trips here yet</p>
@@ -89,7 +92,8 @@ function TripsPage() {
               Go to dashboard
             </Link>
           </div>
-        )}
+        ) : null}
+        {trips.length >= 100 && <p className="mt-3 text-xs text-muted-foreground">Showing recent history. Older trips can still be opened using their saved link.</p>}
       </div>
     </div>
   );

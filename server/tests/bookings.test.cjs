@@ -6,6 +6,8 @@ const {User}=require('../dist/models/user.model');
 const {createBooking,getBooking,cancelBooking}=require('../dist/controllers/bookings.controller');
 const {acceptRequest,updateTripStatus}=require('../dist/controllers/trips.controller');
 const {createApp}=require('../dist/app');
+// This suite stubs persistence; real index enforcement is covered by integration tests.
+Booking.collection.createIndex = async () => 'one_active_trip_per_captain';
 let row;
 const payload={bookingId:'LM-TEST-123456',mode:'full',pickup:{label:'A'},drop:{label:'B'},distanceKm:100,truckTypeId:'ace',truckTypeName:'Spoofed',loadWeightKg:500,agreedPrice:1};
 const req=(userId='owner',body=payload)=>({auth:{userId,role:'shipper'},body,params:{id:payload.bookingId}});

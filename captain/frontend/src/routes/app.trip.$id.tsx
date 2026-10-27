@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ChevronLeft, Navigation, MapPin, KeyRound, ShieldAlert, CheckCircle2,
   Truck, Star, X, Wallet,
@@ -11,7 +11,7 @@ import { StatusTimeline } from "@/components/app/status-timeline";
 import { PayoutCard } from "@/components/app/payout-card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { useCaptain } from "@/features/captain/captain-context";
+import { useCaptain, useStoredTrip } from "@/features/captain/captain-context";
 import { inr } from "@/features/captain/earnings";
 import type { TripStatus } from "@/features/captain/types";
 
@@ -53,7 +53,7 @@ function headline(status: TripStatus, etaMins: number) {
     case "enroute_drop":
       return { title: "On the way to drop", sub: "Collect the drop OTP at delivery" };
     case "delivered":
-      return { title: "Delivered 🎉", sub: "Nice work — payment settled offline" };
+      return { title: "Delivered 🎉", sub: "Delivery confirmed" };
     case "cancelled":
       return { title: "Trip cancelled", sub: "" };
   }
@@ -62,21 +62,23 @@ function headline(status: TripStatus, etaMins: number) {
 function TripPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { getTrip, activeTrip, updateStatus, completeTrip, cancelTrip } = useCaptain();
-  const trip = getTrip(id);
+  const { authenticated, updateStatus, completeTrip, cancelTrip } = useCaptain();
+  const { trip, loading, error, retry } = useStoredTrip(id);
 
   const [otp, setOtp] = useState("");
   const [sos, setSos] = useState(false);
   const [rating, setRating] = useState(0);
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
+  useEffect(() => { setOtp(""); }, [id, trip?.status]);
 
   if (!trip) {
     return (
       <div className="mx-auto min-h-[100dvh] w-full max-w-2xl">
         <div className="flex flex-col items-center gap-3 px-6 py-24 text-center">
           <Truck className="h-8 w-8 text-muted-foreground" />
-          <p className="font-semibold text-foreground">Trip not found</p>
+          <p role="status" className="font-semibold text-foreground">{!authenticated ? "Sign in to view this trip" : loading ? "Loading your saved trip…" : error ?? "Trip not found"}</p>
+          {!authenticated ? <Link to="/login"><Button>Sign in</Button></Link> : !loading && <Button onClick={retry} variant="outline">Retry</Button>}
           <Link to="/app">
             <Button className="rounded-xl">Back to dashboard</Button>
           </Link>
@@ -85,7 +87,7 @@ function TripPage() {
     );
   }
 
-  const isActive = activeTrip?.id === trip.id && trip.status !== "delivered" && trip.status !== "cancelled";
+  const isActive = trip.status !== "delivered" && trip.status !== "cancelled";
   const delivered = trip.status === "delivered";
   const etaMins = Math.max(4, Math.round((trip.distanceKm / 45) * 4));
   const h = headline(trip.status, etaMins);
@@ -96,8 +98,8 @@ function TripPage() {
     busyRef.current = true;
     setBusy(true);
     try {
-      const ok = step.kind === "advance" ? await updateStatus(step.next)
-        : step.complete ? await completeTrip(undefined, otp) : await updateStatus(step.next, otp);
+      const ok = step.kind === "advance" ? await updateStatus(step.next, undefined, id)
+        : step.complete ? await completeTrip(undefined, otp, id) : await updateStatus(step.next, otp, id);
       if (ok) setOtp("");
     } finally { busyRef.current = false; setBusy(false); }
   }
@@ -107,7 +109,7 @@ function TripPage() {
     busyRef.current = true;
     setBusy(true);
     try {
-      if (await cancelTrip()) await navigate({ to: "/app" });
+      if (await cancelTrip(id)) await navigate({ to: "/app" });
     } finally { busyRef.current = false; setBusy(false); }
   }
 
@@ -138,6 +140,7 @@ function TripPage() {
       {/* Trip sheet */}
       <div className="absolute inset-x-0 bottom-16 z-20 px-2 sm:px-4 lg:inset-auto lg:bottom-6 lg:right-6 lg:top-6 lg:w-[420px] lg:px-0">
         <div className="mx-auto max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl lm-no-scrollbar lg:max-h-[calc(100vh-3rem)]">
+          {error && <div role="alert" className="mb-3 rounded-xl border border-destructive/30 p-3 text-sm">Could not refresh this trip. <button type="button" onClick={retry} className="font-semibold underline">Retry</button></div>}
           {/* Headline */}
           <div className="flex items-center gap-3">
             <span
@@ -153,6 +156,21 @@ function TripPage() {
               {h.sub && <p className="truncate text-sm text-muted-foreground">{h.sub}</p>}
             </div>
           </div>
+
+          <section aria-label="Trip route" className="mt-3 rounded-2xl border border-border bg-card p-3">
+            <p className="mb-3 break-all text-xs font-semibold text-muted-foreground">{trip.id}</p>
+            <dl className="space-y-3">
+              {[{ label: "Pickup", place: trip.pickup }, { label: "Drop-off", place: trip.drop }].map(({ label, place }) => (
+                <div key={label}>
+                  <dt className="text-xs font-semibold text-muted-foreground">{label}</dt>
+                  <dd className="break-words text-sm font-semibold text-foreground">
+                    {place.label}
+                    {place.address && <span className="mt-0.5 block text-xs font-normal text-muted-foreground">{place.address}</span>}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
 
           {/* Customer */}
           <div className="mt-3">

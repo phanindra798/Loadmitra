@@ -61,3 +61,36 @@ Next priorities: restore shipper bookings after refresh, enforce one active trip
 - This batch is local only: no commit, push or deployment. The API must be updated with the frontend. Unfinished drafts still reset on a page refresh; history loads 50 records initially, with older records available through pagination.
 
 Next priorities: one active trip per captain, production SMS login, real vehicle/KYC and earnings persistence, session hardening, remaining dependency findings, and full live-flow validation before AWS deployment.
+
+
+## 27 October 2026 — Prevent overlapping captain trips
+
+- Added a unique partial MongoDB index so one captain cannot hold multiple active bookings, even when requests arrive simultaneously from separate tabs/devices. Rejected claims return a clear 409 and leave the other load open.
+- Await index readiness at startup and before acceptance, even with automatic indexes disabled. Failed installation returns 503 and can retry; conflicting legacy bookings are not modified automatically. Existing accepted records without a lifecycle value also occupy a slot.
+- Delivery and authorized cancellation release the slot atomically while preserving trip history. Incorrect handover codes and unauthorized cancellation cannot release it. The captain UI suppresses overlapping acceptance submissions.
+- Added six regression tests (69 total) and a separate 12-case integration suite using a real, isolated MongoDB 8.0 process and local HTTP requests. It covers eight simultaneous claims, lifecycle transitions, legacy data, authorization, index creation failures/recovery and direct database constraint enforcement. No production database or existing MongoDB service is used.
+- Captain TypeScript checking and production build passed. Focused lint reports no errors and one existing Fast Refresh export warning.
+- Documented index permissions, a read-only duplicate audit, and PowerShell integration-test commands in `server/README.md`. Browser end-to-end checks and production index readiness remain outstanding.
+- Changes are local and uncommitted. Deploy the API to activate the database safeguard; no GitHub push or deployment was performed for this batch.
+
+Next priorities: production SMS login, real vehicle/KYC and earnings persistence, captain session/recovery hardening, remaining dependency findings, and full live-flow validation before AWS deployment.
+
+
+## 27 October 2026 — Captain recovery and session isolation
+
+- Replaced shared, one-time captain hydration with a private per-session query cache and independent trip polling. Account switches/logouts clear cached state and cancel old requests; delayed responses cannot populate another session or clear its token. Expired captain sessions return to a sign-in state.
+- Added owner-scoped direct trip recovery and a separate active-trip result outside the 100-record history window. Trip reads disable caching and return only public fields. Status mutations return complete saved records with timestamps; merging protects newer progress from slow list/detail responses.
+- Added loading/error/retry states, guarded offers until recovery completes, and target trip actions by the visible ID. OTP input clears when the trip stage changes. Removed phone-derived demo identity/vehicle/KYC claims from the captain context; vehicle onboarding and persistent earnings remain pending.
+- Validation: 69 backend regression tests, 16 isolated real-MongoDB integration tests and 16 captain frontend tests pass. Captain type checking and production build pass. Focused lint has no errors and two Fast Refresh export warnings. Browser account-switch/refresh flows and production deployment checks remain outstanding.
+- Both today's batches remain local and uncommitted. Deploy the updated API before/with the captain frontend; it requires full mutation responses and direct-trip reads. Nothing was pushed or deployed.
+
+Next priorities: persistent captain earnings, real vehicle/KYC onboarding, production SMS login, token/session hardening, remaining dependency findings, and full live-flow validation before AWS deployment.
+
+
+## 27 October 2026 — Browser verification and route details
+
+- Added a repeatable `server` command, `npm run test:browser`, using installed Chrome/Edge, a local API and temporary MongoDB. No existing browser profile, production data or external deployment is used.
+- The browser journey passed reload recovery, a lifecycle write confirmed in MongoDB, shipper cancellation reaching the UI, same-tab and cross-tab account changes, an older direct link, logout, and retry after a simulated API outage. Zero uncaught browser exceptions were recorded.
+- Found and fixed missing pickup/drop-off addresses on the trip screen. The saved route and booking ID now appear in a labelled section, with wrapping for full addresses. TypeScript and focused lint passed for the change.
+- Evidence and reproduction instructions are in `server/BROWSER_VERIFICATION.md`. Production SMS login, mobile layout coverage, mapping, payments/KYC, earnings persistence and deployment validation are still separate work.
+- All current improvements remain local and uncommitted; nothing was pushed or deployed.

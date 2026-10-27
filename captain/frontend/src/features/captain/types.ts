@@ -104,6 +104,8 @@ export interface Trip {
   customerRating: number;
   status: TripStatus;
   createdLabel: string;
+  createdAt?: string;
+  updatedAt?: string;
   ratingGiven?: number; // stars the captain gave the customer
 }
 

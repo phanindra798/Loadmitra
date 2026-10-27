@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { MapCanvas } from "@/components/app/map-canvas";
 import { OnlineToggle } from "@/components/app/online-toggle";
+import { TripSyncStatus } from "@/components/app/trip-sync-status";
 import { RequestCard } from "@/components/app/request-card";
 import { useCaptain } from "@/features/captain/captain-context";
 import { inr } from "@/features/captain/earnings";
@@ -25,7 +26,7 @@ function CaptainDashboard() {
   const navigate = useNavigate();
   const {
     online, requests, activeTrip, earnings, profile, requestPool,
-    addRequest, acceptRequest, declineRequest,
+    addRequest, acceptRequest, declineRequest, tripsLoading, tripsError, authenticated,
   } = useCaptain();
 
   // Live location for the captain (real GPS via the browser).
@@ -44,11 +45,9 @@ function CaptainDashboard() {
     if (!online) seenRef.current = new Set();
   }, [online]);
 
-  // Simulate the matching engine streaming nearby loads while online & free.
-  // The pool comes from the server (GET /api/captain/requests, polled live), or
-  // the mock seed if the API is unreachable. Feed the next not-yet-seen load.
+  // Present saved API offers while online and after active-trip recovery.
   useEffect(() => {
-    if (!online || activeTrip) return;
+    if (!authenticated || tripsLoading || tripsError || !online || activeTrip) return;
     const next = requestPool.find(
       (r) => !seenRef.current.has(r.id) && !requests.some((x) => x.id === r.id),
     );
@@ -59,7 +58,7 @@ function CaptainDashboard() {
       addRequest(next);
     }, delay);
     return () => clearTimeout(t);
-  }, [online, activeTrip, requests, requestPool, addRequest]);
+  }, [authenticated, tripsLoading, tripsError, online, activeTrip, requests, requestPool, addRequest]);
 
   // Countdown on the top (featured) offer; auto-skip when it expires.
   const firstId = requests[0]?.id;
@@ -136,6 +135,7 @@ function CaptainDashboard() {
       {/* Bottom sheet on mobile, floating card on desktop */}
       <div className="absolute inset-x-0 bottom-16 z-20 px-2 sm:px-4 lg:inset-auto lg:bottom-auto lg:left-6 lg:top-20 lg:w-[420px] lg:px-0">
         <div className="mx-auto max-h-[76vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl lm-no-scrollbar lg:max-h-[calc(100vh-7rem)]">
+          <TripSyncStatus />
           {/* Active trip banner */}
           {activeTrip && (
             <Link
