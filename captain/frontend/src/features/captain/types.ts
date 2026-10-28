@@ -116,6 +116,7 @@ export interface EarningEntry {
   mode: LoadMode;
   dateLabel: string;
   net: number;
+  legacyEstimate?: boolean;
 }
 
 export interface EarningsSummary {
@@ -123,8 +124,11 @@ export interface EarningsSummary {
   week: number;
   month: number;
   tripsToday: number;
-  onlineHoursToday: number;
+  onlineHoursToday: number | null;
   incentiveThisWeek: number;
-  acceptanceRate: number; // 0..1
+  acceptanceRate: number | null; // 0..1
   ledger: EarningEntry[];
+  timeZone?: string;
+  weekly?: { date: string; day: string; net: number }[];
+  unknownCompletionTrips?: number;
 }

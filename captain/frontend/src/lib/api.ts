@@ -7,6 +7,7 @@ import { readStored, writeStored, removeStored } from "./storage";
 import { mergeTrips } from "@/features/captain/trip-record";
 import type {
   CaptainProfile,
+  TruckType,
   EarningsSummary,
   LoadRequest,
   Trip,
@@ -115,6 +116,9 @@ export const api = {
  * features/captain/types exactly, so server data is a drop-in for the mock seed.
  */
 export const captainApi = {
+  trucks: (signal?: AbortSignal) => request<{ data: TruckType[] }>("/api/trucks", { signal }).then(r => r.data),
+  saveVehicle: (vehicle: { vehicleNumber: string; truckTypeId: string; city: string }, signal?: AbortSignal) =>
+    request<{ data: CaptainProfile }>("/api/captain/vehicle", { method: "PATCH", body: JSON.stringify(vehicle), signal }).then(r => r.data),
   profile: (signal?: AbortSignal) => request<{ data: CaptainProfile }>("/api/captain/me", { signal, cache: "no-store" }).then(r => r.data),
   requests: (signal?: AbortSignal) => request<{ data: LoadRequest[] }>("/api/captain/requests", { signal, cache: "no-store" }).then(r => r.data),
   trips: (signal?: AbortSignal) => request<{ data: Trip[]; activeTrip?: Trip | null }>("/api/captain/trips", { signal, cache: "no-store" })

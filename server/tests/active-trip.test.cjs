@@ -12,7 +12,7 @@ beforeEach(() => {
   Booking.db.emit('disconnected');
   indexCalls = 0; claimCalls = 0;
   Booking.collection.createIndex = async () => { indexCalls++; return ACTIVE_TRIP_INDEX_NAME; };
-  User.findById = async () => ({ name: 'Test captain' });
+  User.findById = async () => ({ name: 'Test captain', phone: '9000000001', vehicle: { vehicleNumber: 'TS09AB1234', truckTypeId: 'ace', city: 'Hyderabad' } });
   Booking.findOneAndUpdate = async () => { claimCalls++; return null; };
 });
 const req = { auth: { userId: 'captain-a', role: 'captain' }, params: { id: 'LM-TEST-123456' } };

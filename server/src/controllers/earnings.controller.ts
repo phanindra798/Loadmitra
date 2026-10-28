@@ -1,11 +1,13 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { EARNINGS } from "../data/captain";
+import type { AuthedRequest } from "../middleware/auth";
+import { getEarningsSummary } from "../services/earnings-summary.service";
 import { estimateDistanceKm, quotePayout, truckById } from "../services/earnings.service";
 
 /** GET /api/captain/earnings — earnings summary + ledger. */
-export function getEarnings(_req: Request, res: Response): void {
-  res.json({ data: EARNINGS });
+export async function getEarnings(req: AuthedRequest, res: Response): Promise<void> {
+  res.setHeader("Cache-Control", "no-store");
+  res.json({ data: await getEarningsSummary(req.auth!.userId) });
 }
 
 const QuoteSchema = z

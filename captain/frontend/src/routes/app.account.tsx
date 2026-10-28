@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Pencil, Sun, Moon, Languages, Truck, FileCheck, Headphones, Info, Star,
-  LogOut, ChevronRight, ShieldCheck, BadgeCheck, Phone,
+  LogOut, ChevronRight, ShieldCheck, Phone,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
@@ -19,7 +19,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { LANGS, useLanguage } from "@/features/captain/i18n";
 import { useCaptain } from "@/features/captain/captain-context";
 import { OnlineToggle } from "@/components/app/online-toggle";
-import { truckById } from "@/features/captain/mock-data";
+import { VehicleRegistration } from "@/components/app/vehicle-registration";
 import { SHIPPER_PORTAL_URL } from "@/lib/portals";
 import { fetchProfile, clearSession, type Profile } from "@/lib/account";
 import { api } from "@/lib/api";
@@ -36,8 +36,7 @@ function AccountPage() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { lang, setLang } = useLanguage();
-  const { profile, refreshProfile } = useCaptain();
-  const truck = truckById(profile.truckTypeId);
+  const { profile, refreshProfile, profileLoading, profileError, authenticated } = useCaptain();
   const [push, setPush] = useState(true);
   const [sms, setSms] = useState(true);
   const [promo, setPromo] = useState(true);
@@ -87,9 +86,9 @@ function AccountPage() {
             {account?.email && <p className="truncate text-xs text-muted-foreground">{account.email}</p>}
             <p className="flex items-center gap-2 truncate text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1 font-semibold text-foreground">
-                <Star className="h-3.5 w-3.5 fill-current text-savings" /> {profile.rating}
+                <Star className="h-3.5 w-3.5 fill-current text-savings" /> {profile.rating > 0 ? profile.rating : "Not rated"}
               </span>
-              · {profile.trips.toLocaleString("en-IN")} trips
+              · {profile.trips.toLocaleString("en-IN")} deliveries
             </p>
             <span className="mt-1 inline-flex rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold text-foreground">
               {profile.joinedLabel}
@@ -114,41 +113,18 @@ function AccountPage() {
 
         {/* Vehicle */}
         <Section title="Your vehicle" icon={Truck}>
-          <div className="flex items-center gap-3 py-1">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-secondary text-xl">
-              {truck?.emoji ?? "🚚"}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-foreground">{truck?.name ?? "Truck"}</p>
-              <p className="truncate text-xs text-muted-foreground">{truck?.desc}</p>
-            </div>
-            <span className="rounded-lg border border-border bg-background px-2.5 py-1 text-sm font-bold text-foreground">
-              {profile.vehicleNumber}
-            </span>
-          </div>
+          {!authenticated ? <p>Sign in to register your vehicle.</p> : profileLoading ? <p role="status">Loading vehicle…</p> : profileError ?
+            <div role="alert"><p>Could not load your vehicle. {profileError}</p><Button onClick={refreshProfile}>Retry profile</Button></div> :
+            <VehicleRegistration key={`${profile.id}:${profile.vehicleNumber}:${profile.truckTypeId}:${profile.city}`} profile={profile} />}
         </Section>
 
         {/* Documents / KYC */}
         <Section title="Documents & KYC" icon={FileCheck}>
-          {[
-            { label: "Driving licence", status: "Verified" },
-            { label: "Vehicle RC", status: "Verified" },
-            { label: "Insurance", status: "Verified" },
-            { label: "Aadhaar / PAN", status: profile.kycVerified ? "Verified" : "Pending" },
-          ].map((d) => (
-            <div key={d.label} className="flex items-center gap-3 py-2.5">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-primary">
-                <FileCheck className="h-4 w-4" />
-              </span>
-              <span className="flex-1 text-sm font-semibold text-foreground">{d.label}</span>
-              <span
-                className={[
-                  "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold",
-                  d.status === "Verified" ? "bg-success/10 text-success" : "bg-savings/10 text-savings",
-                ].join(" ")}
-              >
-                <BadgeCheck className="h-3.5 w-3.5" /> {d.status}
-              </span>
+          <p className="mb-2 text-xs text-muted-foreground">Document collection and verification are not available yet. Saving a vehicle does not verify these documents.</p>
+          {["Driving licence", "Vehicle RC", "Insurance", "Aadhaar / PAN"].map(label => (
+            <div key={label} className="flex items-center justify-between gap-3 py-2.5">
+              <span className="text-sm font-semibold">{label}</span>
+              <span className="rounded-full bg-secondary px-2 py-1 text-xs">Not submitted</span>
             </div>
           ))}
         </Section>
@@ -231,13 +207,13 @@ function AccountPage() {
         </p>
       </div>
 
-      <EditProfileDialog
+      {editOpen && <EditProfileDialog
         open={editOpen}
         onOpenChange={setEditOpen}
         name={displayName}
         email={account?.email ?? ""}
         onSave={saveEdit}
-      />
+      />}
     </div>
   );
 }

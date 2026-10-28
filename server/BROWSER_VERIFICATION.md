@@ -1,8 +1,8 @@
-# Captain recovery browser verification — 27 October 2026
+# Captain recovery, earnings and vehicle browser verification — 28 October 2026
 
-**Result: passed.** One end-to-end browser scenario completed nine checkpoints, with zero uncaught browser exceptions. This ran in headless Chrome at 1280×900 against the local captain app, Express API and a separate temporary MongoDB 8.0 instance. Existing databases, browser profiles and deployed services were not used.
+**Result: passed.** One end-to-end browser scenario completed thirteen checkpoints, with zero uncaught browser exceptions. This ran in headless Chrome at 1280×900 against the local captain app, Express API and a separate temporary MongoDB 8.0 instance. Existing databases, browser profiles and deployed services were not used.
 
-**Story:** A signed-in captain opens a saved trip, reloads, advances its status, sees a shipper cancellation, changes accounts across tabs, recovers an older trip and retries after an API outage without displaying another account's records.
+**Story:** A signed-in captain opens a saved trip, reloads, advances its status, sees a shipper cancellation, changes accounts across tabs, recovers an older trip, verifies delivery, reloads saved earnings, saves a vehicle and retries after API outages without displaying another account's records.
 
 | Boundary | Result | Evidence |
 | --- | --- | --- |
@@ -15,6 +15,11 @@
 | Old direct link | Passed | A delivered trip older than the latest 100 records loaded through the owner-scoped detail endpoint. |
 | Logout | Passed | Private trip details disappeared and the sign-in state appeared. |
 | API error → retry | Passed | A simulated 503 showed an error instead of empty history; Retry recovered saved trips. |
+| Delivery → saved earnings | Passed | Entering the real delivery challenge in the browser saved a ₹1,742 payout snapshot and completion timestamp. Reloading earnings retained ₹1,742 without doubling it. |
+| Earnings account isolation | Passed | A second tab changed to the other account; its period total was ₹0 and the completed trip from the previous captain was absent. |
+| Legacy earnings | Passed | 102 old completed fixtures were labelled as missing completion metadata; no dates or period totals were invented. |
+| Earnings error → retry | Passed | A simulated earnings 503 hid the amount and displayed an error; Retry restored the correct summary. |
+| Vehicle → API → MongoDB → reload | Passed | Saving `ts-09 xy 7654` restored `TS09XY7654` and the operating city after reload; MongoDB matched, the earlier booking kept its original vehicle, and account switches displayed only the current captain’s vehicle. Documents stayed unverified. |
 | Browser runtime | Passed | No uncaught exceptions recorded by the browser protocol. |
 
 ## Issue found and fixed
@@ -38,9 +43,16 @@ Artifacts are stored in the ignored `server/node_modules/.cache/loadmitra-browse
 - `results.json`: successful checkpoints and uncaught browser errors.
 - `cancelled-trip.png`: the corrected route section and cancelled-trip state.
 - `recovered-history.png`: successful history recovery after the simulated outage.
+- `saved-earnings.png`: saved delivery estimate after a browser reload.
+- `saved-vehicle.png`: registered vehicle restored after reload.
 - `processes.log`: local browser and dev-server process output.
 - `failure.png` / `failure.txt`: diagnostic capture if a run fails (may be retained from an earlier run; use `results.json` for the latest outcome).
 
 ## Limits
 
-Accounts and signed sessions were seeded specifically for this isolated test. This does not verify SMS login, mobile layouts, real mapping/navigation, payments, KYC, production hosting or AWS. Production earnings remain unfinished. The API and captain frontend still require coordinated deployment; no changes were committed, pushed or deployed by this verification.
+Accounts and signed sessions were seeded specifically for this isolated test. This does not verify SMS login, mobile layouts, real mapping/navigation, payments, KYC, production hosting or AWS. Payment settlement and online/acceptance statistics remain untracked. Historical deliveries without completion metadata are excluded from dated totals. The API and captain frontend still require coordinated deployment; the earnings and vehicle batches remain local and uncommitted; this verification did not push or deploy it.
+
+
+## Earnings implementation checks
+
+75 backend regression tests, 32 real-MongoDB integration tests and 18 frontend tests passed. Tests cover IST midnight, Monday/week/month/year boundaries, totals beyond the history-page limit, rounding consistency, rejected/repeated delivery codes, preserved snapshots, missing historical metadata, authorization and database failures. The two existing Fast Refresh export warnings remain; focused correctness lint has no errors with the formatting rule excluded for existing files. The new vehicle component is formatted.

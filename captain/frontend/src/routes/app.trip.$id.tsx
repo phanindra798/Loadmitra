@@ -184,7 +184,7 @@ function TripPage() {
                 <Wallet className="h-5 w-5" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-muted-foreground">You earned</p>
+                <p className="text-xs font-semibold text-muted-foreground">Estimated net for this delivery</p>
                 <p className="text-2xl font-extrabold tracking-tight text-foreground">{inr(trip.payout.net)}</p>
               </div>
             </div>

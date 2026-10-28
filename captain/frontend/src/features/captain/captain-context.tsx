@@ -1,7 +1,7 @@
 import { toast } from "sonner";
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, ApiError, captainApi, getToken, subscribeSession } from "@/lib/api";
+import { ApiError, captainApi, getToken, subscribeSession } from "@/lib/api";
 import { isActiveTrip, latestTrip, mergeTrips } from "./trip-record";
 import type { CaptainProfile, EarningsSummary, LoadRequest, Trip, TripStatus } from "./types";
 
@@ -10,14 +10,19 @@ const LIST_KEY = [...TRIPS_KEY, "list"] as const;
 const detailKey = (id: string) => [...TRIPS_KEY, "detail", id];
 const EMPTY_TRIPS: Trip[] = [];
 const EMPTY_REQUESTS: LoadRequest[] = [];
-const EMPTY_EARNINGS: EarningsSummary = { today: 0, week: 0, month: 0, tripsToday: 0, onlineHoursToday: 0, incentiveThisWeek: 0, acceptanceRate: 0, ledger: [] };
+const EMPTY_EARNINGS: EarningsSummary = { today: 0, week: 0, month: 0, tripsToday: 0, onlineHoursToday: null, incentiveThisWeek: 0, acceptanceRate: null, ledger: [], weekly: [], unknownCompletionTrips: 0 };
 const EMPTY_PROFILE: CaptainProfile = { id: "", name: "Captain", phoneMasked: "", vehicleNumber: "Not registered", truckTypeId: "", rating: 0, trips: 0, joinedLabel: "", hue: 211, kycVerified: false, city: "" };
 
 interface CaptainContextValue {
   authenticated: boolean;
   online: boolean;
   profile: CaptainProfile;
+  profileLoading: boolean;
+  profileError: string | null;
   earnings: EarningsSummary;
+  earningsLoading: boolean;
+  earningsError: string | null;
+  refreshEarnings: () => void;
   requestPool: LoadRequest[];
   requests: LoadRequest[];
   activeTrip: Trip | null;
@@ -55,7 +60,6 @@ function CaptainStore({ session, children }: { session: string | null; children:
   const authenticated = Boolean(session);
   const [online, setOnlineState] = useState(false);
   const [requests, setRequests] = useState<LoadRequest[]>([]);
-  const [completed, setCompleted] = useState<Trip[]>([]);
   const alive = useRef(true);
   const pending = useRef<AbortController | null>(null);
   useEffect(() => {
@@ -77,23 +81,17 @@ function CaptainStore({ session, children }: { session: string | null; children:
   const activeTrip = records.find(isActiveTrip) ?? null;
   const trips = records.filter(trip => !isActiveTrip(trip));
   const tripsLoading = authenticated && tripQuery.isPending;
-  const profileQuery = useQuery({ queryKey: ["captain-account"], enabled: authenticated, queryFn: ({ signal }) => api.me(signal), staleTime: 60000 });
-  const earningsQuery = useQuery({ queryKey: ["captain-earnings"], enabled: authenticated, queryFn: ({ signal }) => captainApi.earnings(signal), staleTime: Infinity });
+  const profileQuery = useQuery({ queryKey: ["captain-account"], enabled: authenticated, queryFn: ({ signal }) => captainApi.profile(signal), staleTime: 60000 });
+  const earningsQuery = useQuery({ queryKey: ["captain-earnings"], enabled: authenticated, queryFn: ({ signal }) => captainApi.earnings(signal), staleTime: 10000, refetchInterval: 15000 });
   const offersQuery = useQuery({ queryKey: ["captain-offers"], enabled: authenticated && !tripsLoading && !activeTrip,
     queryFn: ({ signal }) => captainApi.requests(signal), refetchInterval: 6000 });
-  const requestPool = offersQuery.data ?? EMPTY_REQUESTS;
-  const account = profileQuery.data?.user;
-  // Vehicle/KYC onboarding is still pending: do not invent an identity from a phone number.
-  const profile = account ? { ...EMPTY_PROFILE, id: account.id, name: account.name,
-    phoneMasked: account.phone.replace(/.(?=.{4})/g, "•") } : EMPTY_PROFILE;
-  const earnings = useMemo(() => {
-    const base = earningsQuery.data ?? EMPTY_EARNINGS;
-    const net = completed.reduce((sum, trip) => sum + trip.payout.net, 0);
-    return { ...base, today: base.today + net, week: base.week + net, month: base.month + net, tripsToday: base.tripsToday + completed.length };
-  }, [earningsQuery.data, completed]);
+  const requestPool = offersQuery.isError ? EMPTY_REQUESTS : offersQuery.data ?? EMPTY_REQUESTS;
+  const profile = profileQuery.data ?? EMPTY_PROFILE;
+  const earnings = earningsQuery.data ?? EMPTY_EARNINGS;
+  const refreshEarnings = useCallback(() => { void client.invalidateQueries({ queryKey: ["captain-earnings"] }); }, [client]);
 
   const refreshTrips = useCallback(() => { void client.invalidateQueries({ queryKey: TRIPS_KEY }); }, [client]);
-  const refreshProfile = useCallback(() => { void client.invalidateQueries({ queryKey: ["captain-account"] }); }, [client]);
+  const refreshProfile = useCallback(() => { void client.invalidateQueries({ queryKey: ["captain-account"] }); void client.invalidateQueries({ queryKey: ["captain-offers"] }); }, [client]);
   const getTrip = useCallback((id: string) => records.find(trip => trip.id === id), [records]);
   const setOnline = useCallback((value: boolean) => { setOnlineState(value); if (!value) setRequests([]); }, []);
   const toggleOnline = useCallback(() => { setOnlineState(value => !value); setRequests([]); }, []);
@@ -113,8 +111,12 @@ function CaptainStore({ session, children }: { session: string | null; children:
       client.setQueryData<Trip[]>(LIST_KEY, previous => mergeTrips(previous ?? [], [trip]));
       client.setQueryData<Trip>(detailKey(trip.id), previous => latestTrip(previous, trip));
       setRequests([]);
-      if (trip.status === "delivered") setCompleted(previous => previous.some(item => item.id === trip.id) ? previous : [...previous, trip]);
-      return true;
+      if (trip.status === "delivered") {
+        // Cancel an older earnings read before refetching the saved summary.
+        await client.cancelQueries({ queryKey: ["captain-earnings"] });
+        if (currentSession()) refreshEarnings();
+      }
+      return currentSession();
     } catch (error) {
       if (currentSession() && !controller.signal.aborted) {
         toast.error(error instanceof Error ? error.message : "Trip update failed");
@@ -122,7 +124,7 @@ function CaptainStore({ session, children }: { session: string | null; children:
       }
       return false;
     } finally { if (pending.current === controller) pending.current = null; }
-  }, [client, currentSession, refreshTrips]);
+  }, [client, currentSession, refreshTrips, refreshEarnings]);
 
   const acceptRequest = useCallback(async (id: string) => {
     if (activeTrip || !tripQuery.data || tripQuery.isError) return false;
@@ -134,6 +136,9 @@ function CaptainStore({ session, children }: { session: string | null; children:
   }, [activeTrip?.id, mutateTrip]);
   const value: CaptainContextValue = {
     authenticated, online, profile, earnings, requestPool,
+    profileLoading: authenticated && profileQuery.isPending, profileError: profileQuery.error?.message ?? null,
+    earningsLoading: authenticated && earningsQuery.isPending,
+    earningsError: earningsQuery.error?.message ?? null, refreshEarnings,
     requests: activeTrip ? [] : requests.filter(request => requestPool.some(item => item.id === request.id)),
     activeTrip, trips, tripsLoading,
     tripsError: tripQuery.error ? tripQuery.error.message : null,

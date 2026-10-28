@@ -57,8 +57,8 @@ after(async () => {
 beforeEach(async () => {
   await Booking.deleteMany({}); await User.deleteMany({});
   [captainA, captainB, owner] = await User.create([
-    { role: 'captain', name: 'Captain A', phone: '9000000001' },
-    { role: 'captain', name: 'Captain B', phone: '9000000002' },
+    { role: 'captain', name: 'Captain A', phone: '9000000001', vehicle: { vehicleNumber: 'TS09AB1234', truckTypeId: 'ace', city: 'Hyderabad' } },
+    { role: 'captain', name: 'Captain B', phone: '9000000002', vehicle: { vehicleNumber: 'TS09AB1234', truckTypeId: 'ace', city: 'Hyderabad' } },
     { role: 'shipper', name: 'Shipper', phone: '9000000003' },
   ]);
 });
@@ -224,4 +224,168 @@ test('status mutations return the full saved trip for immediate cache replacemen
   assert.equal(result.status, 200); assert.equal(result.body.data.status, 'enroute_pickup');
   assert.equal(result.body.data.id, booking.bookingId); assert.equal(result.body.data.pickup.label, 'Pickup');
   assert.ok(result.body.data.payout.net > 0); assert.ok(result.body.data.updatedAt);
+});
+
+
+const { getEarningsSummary } = require('../../dist/services/earnings-summary.service');
+const { captainPayout } = require('../../dist/services/earnings.service');
+const fixedNow = new Date('2026-11-02T12:00:00Z');
+async function earned(id, completedAt, extra = {}) {
+  return load(id, { status: 'accepted', tripStatus: 'delivered', acceptedByCaptainId: String(captainA._id),
+    completedAt: new Date(completedAt), payoutSnapshot: captainPayout(2050, 'full', 100), ...extra });
+}
+test('earnings use only the assigned captain, completed status and saved calendar date', async () => {
+  await earned('today', '2026-11-01T18:30:00Z');
+  await earned('month-not-week', '2026-10-31T18:30:00Z');
+  await earned('old-month', '2026-10-31T18:29:59Z');
+  await earned('foreign', '2026-11-02T00:00:00Z', { acceptedByCaptainId: String(captainB._id) });
+  await earned('cancelled', '2026-11-02T00:00:00Z', { status: 'cancelled' });
+  await load('unfinished', { status: 'accepted', tripStatus: 'picked', acceptedByCaptainId: String(captainA._id) });
+  const summary = await getEarningsSummary(String(captainA._id), fixedNow);
+  assert.equal(summary.today, 1742); assert.equal(summary.week, 1742); assert.equal(summary.month, 3484);
+  assert.equal(summary.tripsToday, 1); assert.equal(summary.weekly[0].net, 1742); assert.equal(summary.ledger.length, 3);
+  assert.equal(summary.acceptanceRate, null); assert.equal(summary.onlineHoursToday, null);
+  assert.equal(summary.timeZone, 'Asia/Kolkata');
+});
+test('earnings include the earlier-month part of a calendar week and exclude future deliveries', async () => {
+  await earned('previous-month', '2026-10-30T00:00:00Z');
+  await earned('new-month', '2026-10-31T18:30:00Z');
+  await earned('future', '2026-11-02T00:00:00Z');
+  const summary = await getEarningsSummary(String(captainA._id), new Date('2026-11-01T12:00:00Z'));
+  assert.equal(summary.today, 1742); assert.equal(summary.week, 3484); assert.equal(summary.month, 1742);
+});
+test('earnings sum every qualifying delivery while the recent ledger remains bounded', async () => {
+  const template = (await earned('template', '2026-11-02T00:00:00Z')).toObject(); delete template._id; delete template.__v;
+  await Booking.insertMany(Array.from({ length: 124 }, (_, i) => ({ ...template, bookingId: 'LM-EARNINGS-' + i })));
+  const summary = await getEarningsSummary(String(captainA._id), fixedNow);
+  assert.equal(summary.today, 125 * 1742); assert.equal(summary.tripsToday, 125); assert.equal(summary.ledger.length, 20);
+});
+test('legacy completed records remain visible but never acquire invented dates or period earnings', async () => {
+  await load('undated', { status: 'accepted', tripStatus: 'delivered', acceptedByCaptainId: String(captainA._id) });
+  const before = await Booking.findOne({ bookingId: 'LM-INTEGRATION-undated' });
+  const summary = await getEarningsSummary(String(captainA._id), fixedNow);
+  assert.equal(summary.today, 0); assert.equal(summary.week, 0); assert.equal(summary.month, 0);
+  assert.equal(summary.unknownCompletionTrips, 1); assert.equal(summary.ledger[0].legacyEstimate, true);
+  assert.equal(summary.ledger[0].dateLabel, 'Completion date not recorded'); assert.equal(summary.ledger[0].net, 1742);
+  const after = await Booking.findById(before._id); assert.equal(after.completedAt, undefined); assert.equal(after.payoutSnapshot, undefined);
+});
+test('saved payout and completion date survive unrelated record updates', async () => {
+  const record = await earned('frozen', '2026-11-02T00:00:00Z', { mode: 'return', payoutSnapshot: { fare: 1000, commissionPct: .1, commission: 100, incentive: 50, net: 950, perKm: 9.5 } });
+  await Booking.updateOne({ _id: record._id }, { $set: { agreedPrice: 99999 } });
+  const summary = await getEarningsSummary(String(captainA._id), fixedNow);
+  assert.equal(summary.today, 950); assert.equal(summary.incentiveThisWeek, 50); assert.equal(summary.ledger[0].net, 950);
+  assert.equal((await get('/api/captain/trips/' + record.bookingId)).body.data.payout.net, 950);
+});
+test('verified delivery records earnings exactly once and a failed code records nothing', async () => {
+  const record = await load('earned-once'); await accept(record);
+  await advance(record, 'enroute_pickup'); await advance(record, 'at_pickup'); await handover(record, 'picked'); await advance(record, 'enroute_drop');
+  const code = (await post('/api/bookings/' + record.bookingId + '/handover-otp', owner)).body.data.code;
+  assert.equal((await advance(record, 'delivered', code === '123456' ? '654321' : '123456')).status, 400);
+  assert.equal((await Booking.findById(record._id)).completedAt, undefined);
+  assert.equal((await get('/api/captain/earnings')).body.data.today, 0);
+  assert.equal((await advance(record, 'delivered', code)).status, 200);
+  const completed = await Booking.findById(record._id);
+  assert.ok(completed.completedAt instanceof Date); assert.equal(completed.payoutSnapshot.net, 1742);
+  assert.equal((await advance(record, 'delivered', code)).status, 409);
+  const summary = (await get('/api/captain/earnings')).body.data;
+  assert.equal(summary.today, 1742); assert.equal(summary.tripsToday, 1);
+  assert.equal(+(await Booking.findById(record._id)).completedAt, +completed.completedAt);
+});
+test('earnings HTTP reads enforce roles, disable caching and start empty for a new captain', async () => {
+  assert.equal((await get('/api/captain/earnings', null)).status, 401);
+  assert.equal((await get('/api/captain/earnings', owner)).status, 403);
+  const response = await get('/api/captain/earnings', captainB);
+  assert.equal(response.status, 200); assert.equal(response.cache, 'no-store'); assert.equal(response.body.data.today, 0);
+  assert.deepEqual(response.body.data.ledger, []); assert.equal(response.body.data.weekly.length, 7);
+});
+test('earnings database failure returns a controlled error rather than fake zero totals', async () => {
+  const aggregate = Booking.aggregate;
+  Booking.aggregate = () => { throw new Error('isolated database outage'); };
+  try { const response = await get('/api/captain/earnings'); assert.equal(response.status, 500); assert.deepEqual(response.body, { error: 'Internal server error' }); }
+  finally { Booking.aggregate = aggregate; }
+});
+
+async function vehicle(user, body) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (user) headers.Authorization = 'Bearer ' + signToken({ userId: String(user._id), role: user.role });
+  const response = await fetch(base + '/api/captain/vehicle', { method: 'PATCH', headers, body: JSON.stringify(body) });
+  return { status: response.status, cache: response.headers.get('cache-control'), body: await response.json() };
+}
+const registration = { vehicleNumber: ' ts-09 ab 9876 ', truckTypeId: 'pickup8', city: ' Hyderabad ' };
+test('vehicle registration persists normalized details only for the signed-in captain', async () => {
+  const saved = await vehicle(captainA, registration);
+  assert.equal(saved.status, 200); assert.equal(saved.cache, 'no-store');
+  assert.equal(saved.body.data.vehicleNumber, 'TS09AB9876'); assert.equal(saved.body.data.kycVerified, false);
+  assert.equal(saved.body.data.city, 'Hyderabad');
+  const profile = await get('/api/captain/me');
+  assert.equal(profile.cache, 'no-store'); assert.equal(profile.body.data.id, String(captainA._id));
+  assert.equal(profile.body.data.name, 'Captain A'); assert.equal(profile.body.data.phoneMasked, '••••••0001');
+  assert.equal(profile.body.data.vehicleNumber, 'TS09AB9876'); assert.equal(profile.body.data.truckTypeId, 'pickup8');
+  assert.equal((await User.findById(captainB._id)).vehicle.vehicleNumber, 'TS09AB1234');
+  assert.equal(profile.body.data.email, undefined); assert.equal(profile.body.data.phone, undefined);
+});
+test('vehicle endpoints reject anonymous, shipper and deleted accounts', async () => {
+  for (const [user, status] of [[null, 401], [owner, 403]]) {
+    assert.equal((await vehicle(user, registration)).status, status);
+    assert.equal((await get('/api/captain/me', user)).status, status);
+  }
+  await User.deleteOne({ _id: captainA._id });
+  assert.equal((await vehicle(captainA, registration)).status, 401);
+  assert.equal((await get('/api/captain/me')).status, 401);
+});
+test('invalid registration and forged verification or owner fields never change the profile', async () => {
+  const invalid = [
+    { ...registration, truckTypeId: 'unknown' }, { ...registration, vehicleNumber: '123456' },
+    { ...registration, vehicleNumber: 'ABCDEF' }, { ...registration, vehicleNumber: '<script>' },
+    { ...registration, city: ' ' }, { ...registration, city: 'A'.repeat(81) },
+    { ...registration, kycVerified: true }, { ...registration, id: String(captainB._id) },
+    { ...registration, rating: 5 },
+  ];
+  for (const payload of invalid) assert.equal((await vehicle(captainA, payload)).status, 400);
+  assert.equal((await User.findById(captainA._id)).vehicle.vehicleNumber, 'TS09AB1234');
+});
+test('unregistered captains see no offers and cannot claim loads', async () => {
+  await User.updateOne({ _id: captainA._id }, { $unset: { vehicle: 1 } });
+  const booking = await load('no-vehicle');
+  const result = await accept(booking); assert.equal(result.status, 409); assert.equal(result.body.code, 'VEHICLE_REQUIRED');
+  assert.deepEqual((await get('/api/captain/requests')).body.data, []);
+  assert.equal((await Booking.findById(booking._id)).status, 'open');
+  assert.equal((await get('/api/captain/me')).body.data.vehicleNumber, 'Not registered');
+});
+test('offers and atomic acceptance enforce truck type and weight capacity', async () => {
+  const compatible = await load('compatible');
+  const wrong = await load('wrong', { truckTypeId: 'pickup8', truckTypeName: 'Pickup 8 ft' });
+  const overweight = await load('overweight', { loadWeightKg: 751 });
+  const invalidWeight = await load('invalid-weight', { loadWeightKg: 0 });
+  const offers = await get('/api/captain/requests'); assert.equal(offers.cache, 'no-store');
+  assert.deepEqual(offers.body.data.map(b => b.id), [compatible.bookingId]);
+  for (const booking of [wrong, overweight, invalidWeight]) assert.equal((await accept(booking)).status, 409);
+  assert.equal((await accept(compatible)).status, 201);
+});
+test('changing a vehicle invalidates stale offers while preserving accepted vehicle snapshots', async () => {
+  const old = await load('stale'); const assigned = await load('assigned');
+  assert.equal((await accept(assigned)).status, 201);
+  const snapshot = (await Booking.findById(assigned._id)).captain.toObject();
+  assert.equal(snapshot.vehicleNumber, 'TS09AB1234'); assert.equal(snapshot.truckTypeId, 'ace');
+  assert.equal(snapshot.phoneMasked, '••••••0001'); assert.deepEqual(snapshot.badges, []);
+  assert.equal((await vehicle(captainA, registration)).status, 200);
+  assert.deepEqual((await Booking.findById(assigned._id)).captain.toObject(), snapshot);
+  assert.equal((await advance(assigned, 'cancelled')).status, 200);
+  assert.equal((await accept(old)).status, 409);
+  const next = await load('new-vehicle', { truckTypeId: 'pickup8', loadWeightKg: 1200 });
+  assert.equal((await accept(next)).status, 201);
+  assert.equal((await Booking.findById(next._id)).captain.vehicleNumber, 'TS09AB9876');
+});
+test('legacy captains can finish existing trips without registering a vehicle again', async () => {
+  const booking = await load('existing'); await accept(booking);
+  await User.updateOne({ _id: captainA._id }, { $unset: { vehicle: 1 } });
+  assert.equal((await advance(booking, 'enroute_pickup')).status, 200);
+  assert.equal((await get('/api/captain/trips/' + booking.bookingId)).status, 200);
+});
+test('captain profile counts only their completed deliveries and never grants verification', async () => {
+  await load('complete-a', { acceptedByCaptainId: String(captainA._id), status: 'accepted', tripStatus: 'delivered' });
+  await load('cancelled-a', { acceptedByCaptainId: String(captainA._id), status: 'cancelled', tripStatus: 'cancelled' });
+  await load('complete-b', { acceptedByCaptainId: String(captainB._id), status: 'accepted', tripStatus: 'delivered' });
+  const result = await get('/api/captain/me');
+  assert.equal(result.body.data.trips, 1); assert.equal(result.body.data.rating, 0); assert.equal(result.body.data.kycVerified, false);
 });

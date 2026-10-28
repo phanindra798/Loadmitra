@@ -48,11 +48,12 @@ Shared by both portals. Pure compute over the rate card in `data/trucks.ts` — 
 
 ## Captain API (Phase 2)
 
-All endpoints require a captain session. Load offers and trip history come from MongoDB; profile and earnings still contain demo data and need further persistence work.
+All endpoints require a captain session. Load offers and trip history come from MongoDB; the legacy profile endpoint still contains demo data. Earnings now use saved delivery estimates, as described below.
 
 | Method | Path | Body | Notes |
 |--------|------|------|-------|
-| GET | `/api/captain/me` | — | captain profile |
+| GET | `/api/captain/me` | — | authenticated captain profile and completed-delivery count |
+| PATCH | `/api/captain/vehicle` | `{ vehicleNumber, truckTypeId, city }` | save own self-reported vehicle |
 | GET | `/api/captain/requests` | — | load offers (job board) |
 | POST | `/api/captain/requests/:id/accept` | — | accept an offer → started `Trip` (201) |
 | GET | `/api/captain/trips` | — | latest 100 trips plus a separate active trip |
@@ -74,7 +75,7 @@ The customer fare uses the **same** market-range formula on both sides (shared `
 
 `POST /api/bookings/:id/cancel` cancels an owned booking before pickup. Captain acceptance claims only an open, owned booking atomically; unavailable loads return 409. Trip status changes require the assigned captain and a valid transition. `GET /api/captain/trips` now returns that captain's stored trips. Ownerless legacy demo bookings are intentionally excluded; no migration or deletion is performed.
 
-The earlier seed-data roadmap above is historical. The job board now contains only persisted loads. Captain vehicle onboarding remains unfinished. One-active-trip enforcement is described below. Shipper history restoration is described below. Do not treat these changes as production readiness.
+The earlier seed-data roadmap above is historical. The job board now contains only persisted loads. Self-reported captain vehicle registration is described below; document verification remains unfinished. One-active-trip enforcement is described below. Shipper history restoration is described below. Do not treat these changes as production readiness.
 
 ## Shipment handover verification — 26 October 2026
 
@@ -141,7 +142,7 @@ On Linux/macOS, put `mongod` on PATH or set `MONGOD_BINARY` to its absolute path
 - The recent-history endpoint keeps the compatible `data` array (at most 100 records) and adds `activeTrip`, even if its booking was created before the current history window. A compound captain/creation-date index supports history reads. The new owner-scoped detail endpoint lets saved links recover older trips directly. Both responses use `Cache-Control: no-store` and exclude ownership internals and handover secrets.
 - Trip responses include creation/update timestamps. List, detail and successful mutation records merge without undoing newer progress. When concurrent history/active reads return different stages, the newer record wins. Lifecycle mutations now return the full saved trip rather than only its ID/status; the client refreshes both caches from that response.
 - The trip page distinguishes loading, missing/unauthorized and temporary failure states, and resets OTP input when the trip/stage changes. Actions target the visible trip ID. Dashboard offers wait until initial trip recovery completes.
-- The captain name comes from the signed-in account. Phone-derived demo vehicles, ratings and KYC badges are no longer used by the captain context; unknown vehicle/KYC values remain unregistered/unverified. Full onboarding and persistent earnings are separate unfinished work. The earnings API still returns demo estimates, and session earnings are not a payment ledger. Token storage and server-side session revocation still need further hardening.
+- The captain name comes from the signed-in account. Phone-derived demo vehicles, ratings and KYC badges are no longer used by the captain context; unknown vehicle/KYC values remain unregistered/unverified. Later sections describe saved vehicle registration and persisted delivery estimates; document verification and payment settlement remain unfinished. Token storage and server-side session revocation still need further hardening.
 
 Current checks: 69 backend regression tests, 16 real-MongoDB API integration tests, and 16 captain frontend record/session tests (`cd captain/frontend` then `npm test`). Captain TypeScript and production builds pass. Focused lint has no errors and two Fast Refresh export warnings. These checks do not cover complete browser journeys or a production deployment.
 
@@ -153,3 +154,31 @@ Roll out the updated API before or together with this captain frontend: it needs
 `npm run test:browser` now verifies captain recovery through an installed Chrome/Edge browser, the local API and isolated MongoDB. The scenario passed refresh recovery, a persisted lifecycle action, shipper cancellation, account switching in one and two tabs, old direct links, logout, and retry after a simulated API failure. It recorded zero uncaught browser exceptions.
 
 The first run revealed missing pickup/drop-off details on the active-trip screen. The screen now shows the saved addresses and booking ID. See [BROWSER_VERIFICATION.md](BROWSER_VERIFICATION.md) for evidence, reproduction commands and coverage limits. These local browser checks replace the earlier outstanding recovery/account-switch checks; SMS login and production deployment validation remain pending. Changes remain uncommitted and unpushed.
+
+
+## Saved captain earnings estimates — 28 October 2026
+
+`GET /api/captain/earnings` is now asynchronous, owner-scoped and uncached. It includes only that captain's delivered, non-cancelled bookings. The response keeps `today`, `week`, `month`, `tripsToday`, `incentiveThisWeek` and `ledger`, and adds `timeZone`, `weekly` (seven daily values), and `unknownCompletionTrips`. Online hours and acceptance rate return `null` because they are not measured.
+
+A successful delivery-code verification writes `completedAt` and `payoutSnapshot` in the same conditional update that changes the trip to delivered and consumes the code. Failed verification and repeated completion cannot create earnings. Periods use the saved completion date, never `updatedAt`: today, Monday–Sunday and the calendar month are calculated in `Asia/Kolkata`. Later record changes do not alter a saved payout. Values are estimates, not a payment balance or proof of settlement.
+
+The summary aggregates all qualifying deliveries, independent of the 100-trip history limit, with bounded daily groups and the latest 20 ledger entries. A compound owner/lifecycle/completion-date index supports the query, and aggregation has a five-second execution limit. Database failures produce an error rather than fabricated zero totals.
+
+Existing delivered records are not backdated or rewritten. If a completion date or payout snapshot was never saved, the record is excluded from dated totals and counted in `unknownCompletionTrips`. Recent legacy entries remain visible; where a snapshot is absent, their estimate is explicitly labelled as calculated using current payout rules. Completion time cannot be reliably reconstructed from a general modification timestamp.
+
+Fare, commission and incentives are rounded to whole rupees before net is calculated, so displayed components add up exactly. For example, a ₹2,050 full-load fare has ₹308 commission and ₹1,742 estimated net. Commission/incentive percentages are unchanged, and already saved payout snapshots remain authoritative.
+
+The captain UI uses server totals without adding session-only earnings. It refreshes after delivery, on focus, and periodically, with loading/error/retry states. It replaces sample chart data, the fixed `+12%` badge and the unimplemented ₹500 bonus offer with saved estimates. Untracked statistics are labelled accordingly. Deploy the updated API before or with this frontend; only subsequent verified deliveries gain completion metadata automatically.
+
+Validation: 75 backend regression tests, 24 isolated MongoDB integration tests and 18 frontend tests pass, covering rounding, IST boundaries, owner isolation, more than 100 completed records, legacy data and exactly-once delivery recording. The browser suite also exercises delivery verification and saved earnings across refresh/account changes; see `BROWSER_VERIFICATION.md` for its final result. Changes in this earnings batch remain local and uncommitted.
+
+
+## Captain vehicle registration — 28 October 2026
+
+- `GET /api/captain/me` reads the signed-in captain from MongoDB instead of returning a sample profile. It includes masked phone, joined month and owner-scoped completed-delivery count. Ratings are untracked and KYC remains false.
+- `PATCH /api/captain/vehicle` accepts only `vehicleNumber`, `truckTypeId` and `city`. The number is uppercased and spaces/hyphens removed, then checked for 6–15 alphanumeric characters containing a letter and digit. This is format validation, not a government registration check. Truck types come from the shared catalogue; operating city is stored as self-reported text and does not provide geographic matching. Unknown fields, including identity and verification claims, are rejected. Writes are captain-only, owner-scoped and rate-limited.
+- The Account page saves these fields, restores them after reload and offers retry states for profile/catalogue failures. Documents show **Not submitted**; document upload and verification are not yet available.
+- Unregistered captains see no offers and receive `409 VEHICLE_REQUIRED` when attempting acceptance. Both the offer query and atomic booking claim require the exact booked truck type and a positive load weight within its catalogue capacity. A forged or stale offer cannot bypass those checks.
+- Each accepted booking snapshots the vehicle read for that assignment. Subsequent profile edits apply to future assignments and do not rewrite existing trips. Existing trips remain recoverable and can progress without registering again. Vehicle ownership/uniqueness is not verified by this flow.
+- Deployment: release the updated API before/with the captain frontend. Existing users need to register a vehicle before accepting new loads. No backfill of vehicle or KYC data is performed. These changes remain local pending commit/push review.
+- Validation: 75 backend regression tests, 32 isolated MongoDB integration tests, 18 frontend tests and a browser scenario with 13 checkpoints passed. The browser saves a vehicle, reloads, checks MongoDB and historical trip snapshots, and switches accounts. TypeScript and the captain production build pass. Focused correctness lint has no errors and two existing Fast Refresh warnings; formatting is checked for the new component, while existing files retain their formatting.

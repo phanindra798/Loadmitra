@@ -26,7 +26,7 @@ function CaptainDashboard() {
   const navigate = useNavigate();
   const {
     online, requests, activeTrip, earnings, profile, requestPool,
-    addRequest, acceptRequest, declineRequest, tripsLoading, tripsError, authenticated,
+    addRequest, acceptRequest, declineRequest, tripsLoading, tripsError, authenticated, earningsLoading, earningsError, profileLoading, profileError, refreshProfile,
   } = useCaptain();
 
   // Live location for the captain (real GPS via the browser).
@@ -136,6 +136,9 @@ function CaptainDashboard() {
       <div className="absolute inset-x-0 bottom-16 z-20 px-2 sm:px-4 lg:inset-auto lg:bottom-auto lg:left-6 lg:top-20 lg:w-[420px] lg:px-0">
         <div className="mx-auto max-h-[76vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl lm-no-scrollbar lg:max-h-[calc(100vh-7rem)]">
           <TripSyncStatus />
+          {authenticated && !profileLoading && (profileError ?
+            <div role="alert" className="mb-3 rounded-xl border border-border p-3 text-sm">Could not load your vehicle. <button onClick={refreshProfile} className="underline">Retry profile</button></div> : !profile.truckTypeId &&
+            <Link to="/app/account" className="mb-3 block rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm font-semibold">Register your vehicle to receive and accept matching loads →</Link>)}
           {/* Active trip banner */}
           {activeTrip && (
             <Link
@@ -163,7 +166,7 @@ function CaptainDashboard() {
                 Hi {profile.name.split(" ")[0]} 👋
               </h2>
               <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Star className="h-3.5 w-3.5 fill-current text-savings" /> {profile.rating} ·{" "}
+                <Star className="h-3.5 w-3.5 fill-current text-savings" /> {profile.rating > 0 ? profile.rating : "Not rated"} ·{" "}
                 {profile.vehicleNumber}
               </p>
             </div>
@@ -172,19 +175,19 @@ function CaptainDashboard() {
               className="shrink-0 rounded-2xl border border-border bg-background px-3 py-2 text-right hover:border-primary/40"
             >
               <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Today
+                Estimated today
               </span>
               <span className="block text-lg font-extrabold tracking-tight text-foreground">
-                {inr(earnings.today)}
+                {!authenticated || earningsLoading || earningsError ? "—" : inr(earnings.today)}
               </span>
             </Link>
           </div>
 
           {/* Mini stats */}
           <div className="mt-3 grid grid-cols-3 gap-2">
-            <Stat label="Trips today" value={String(earnings.tripsToday)} />
-            <Stat label="Online hrs" value={`${earnings.onlineHoursToday}`} />
-            <Stat label="Accept rate" value={`${Math.round(earnings.acceptanceRate * 100)}%`} />
+            <Stat label="Deliveries today" value={!authenticated || earningsLoading || earningsError ? "—" : String(earnings.tripsToday)} />
+            <Stat label="Online hrs" value={earnings.onlineHoursToday == null ? "Not tracked" : String(earnings.onlineHoursToday)} />
+            <Stat label="Accept rate" value={earnings.acceptanceRate == null ? "Not tracked" : `${Math.round(earnings.acceptanceRate * 100)}%`} />
           </div>
 
           {/* Offline state */}

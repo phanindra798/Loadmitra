@@ -94,3 +94,24 @@ Next priorities: persistent captain earnings, real vehicle/KYC onboarding, produ
 - Found and fixed missing pickup/drop-off addresses on the trip screen. The saved route and booking ID now appear in a labelled section, with wrapping for full addresses. TypeScript and focused lint passed for the change.
 - Evidence and reproduction instructions are in `server/BROWSER_VERIFICATION.md`. Production SMS login, mobile layout coverage, mapping, payments/KYC, earnings persistence and deployment validation are still separate work.
 - All current improvements remain local and uncommitted; nothing was pushed or deployed.
+
+
+## 28 October 2026 — Saved captain earnings estimates
+
+- Confirmed both Vercel deployments for the previous pushed commit `63cd100` succeeded. This does not verify the backend deployment.
+- Replaced the earnings API's demo totals with owner-scoped completed-trip estimates. Verified delivery now saves its completion timestamp and payout snapshot atomically; failed/repeated handover codes cannot add earnings. Totals survive refresh/account changes and are not limited to the recent 100 trips.
+- Today/week/month and the daily chart use India time; weeks start Monday. The latest 20 completed trips form the ledger. Older records lacking completion metadata remain unchanged, are labelled clearly and are excluded from dated totals.
+- Removed session-only earnings increments, the sample weekly chart, fixed growth percentage and unimplemented bonus offer. Earnings have loading/error/retry states. Online hours and acceptance rate are marked untracked; amounts are estimates, not settlement confirmations.
+- Corrected whole-rupee payout rounding so displayed components equal the displayed net. Percentages are unchanged; saved snapshots remain authoritative.
+- Validation: 75 backend tests, 24 real-MongoDB integration tests, 18 frontend tests and the expanded browser journey passed. The browser verified delivery OTP entry, saved earnings after reload, cross-tab account isolation, legacy labels and earnings error recovery with zero uncaught exceptions. Type checking and focused lint passed (two existing Fast Refresh warnings).
+- Changes remain local, uncommitted and unpushed. The API must be deployed before/with this frontend; only subsequent verified deliveries gain completion metadata. Production SMS, vehicle/KYC onboarding, payment settlement, further session hardening and deployment validation remain separate work.
+
+
+## 28 October 2026 — Captain vehicle registration and matching
+
+- Added saved vehicle registration number, catalogue truck type and operating city. The authenticated captain profile now comes from MongoDB with masked phone, joined date and actual completed-delivery count.
+- Replaced false document verification badges with **Not submitted** and explained that document verification is not implemented. Vehicle registration is self-reported, not KYC approval.
+- Restricted both offers and atomic acceptance to the registered truck type and capacity. Missing registration returns an actionable error; identity/KYC spoofing fields are rejected. Existing trips retain their assigned vehicle snapshot and remain accessible.
+- Account form includes loading, retry and save errors; the dashboard links unregistered captains to registration. Registration survives reload and account changes without leaking another captain’s vehicle.
+- Validation: 75 backend regression tests, 32 real-MongoDB integration tests and 18 frontend tests passed. Browser verification passed all 13 checkpoints with zero uncaught exceptions, including persisted vehicle edits and unchanged historical booking details. TypeScript and the captain production build passed. Focused correctness lint passed with two existing Fast Refresh warnings; existing formatting differences remain outside that lint check.
+- Earnings and vehicle improvements remain local, uncommitted and unpushed. Deploy the updated API before/with the captain frontend; existing captains must register before accepting new loads. Production SMS, document verification, payments, real mapping and AWS deployment remain future work.

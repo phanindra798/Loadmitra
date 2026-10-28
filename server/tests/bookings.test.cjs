@@ -14,10 +14,10 @@ const req=(userId='owner',body=payload)=>({auth:{userId,role:'shipper'},body,par
 function res(){return {code:200,setHeader(){},status(n){this.code=n;return this},json(v){this.body=v;return this}}}
 function matches(q){return row && Object.entries(q).every(([k,v])=>{
  if(k==='$or')return v.some(matches);
- if(typeof v==='object'&&v!==null){if('$exists' in v)return (row[k]!==undefined)===v.$exists;if('$in' in v)return v.$in.includes(row[k]);throw new Error('unsupported test query')}
+ if(typeof v==='object'&&v!==null){if('$exists' in v)return (row[k]!==undefined)===v.$exists;if('$lte' in v)return row[k]<=v.$lte && row[k]>v.$gt;if('$in' in v)return v.$in.includes(row[k]);throw new Error('unsupported test query')}
  return row[k]===v;
 })}
-User.findById=async id=>({_id:id,name:'Registered '+id});
+User.findById=async id=>({_id:id,name:'Registered '+id,phone:'9000000001',vehicle:{vehicleNumber:'TS09AB1234',truckTypeId:'ace',city:'Hyderabad'}});
 Booking.findOne=async q=>matches(q)?{...row}:null;
 Booking.findOneAndUpdate=async(q,u)=>{
  if(u.$setOnInsert){

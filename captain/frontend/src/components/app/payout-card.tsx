@@ -37,13 +37,13 @@ export function PayoutCard({
       <div className="flex items-end justify-between gap-3">
         <div className="min-w-0">
           <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            <Wallet className="h-3.5 w-3.5" /> You earn
+            <Wallet className="h-3.5 w-3.5" /> Estimated net
           </p>
           <p className="mt-0.5 text-3xl font-extrabold tracking-tight text-foreground">
             {inr(payout.net)}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {inr(payout.perKm)}/km · settled offline
+            {inr(payout.perKm)}/km · payment status not recorded
           </p>
         </div>
         {meta.badge && (

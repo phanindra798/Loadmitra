@@ -5,7 +5,7 @@ import { requireAuth, requireRole, type AuthedRequest } from "../middleware/auth
 import { rateLimit } from "../middleware/rate-limit";
 import { listTrucks } from "../controllers/trucks.controller";
 import { postEstimate } from "../controllers/pricing.controller";
-import { getMe } from "../controllers/captain.controller";
+import { getMe, updateVehicle } from "../controllers/captain.controller";
 import { listRequests } from "../controllers/requests.controller";
 import { acceptRequest, listTrips, getTrip, updateTripStatus } from "../controllers/trips.controller";
 import { getEarnings, postQuote } from "../controllers/earnings.controller";
@@ -54,7 +54,8 @@ router.post("/api/bookings/:id/handover-otp", requireAuth, requireRole("shipper"
 const captainOnly = [requireAuth, requireRole("captain")] as const;
 
 // Captain profile
-router.get("/api/captain/me", ...captainOnly, getMe);
+router.get("/api/captain/me", ...captainOnly, asyncHandler(getMe));
+router.patch("/api/captain/vehicle", ...captainOnly, rateLimit({ windowMs: 60000, max: 20, key: (req: AuthedRequest) => req.auth!.userId }), asyncHandler(updateVehicle));
 
 // Load requests (job board) + accept
 router.get("/api/captain/requests", ...captainOnly, asyncHandler(listRequests));
@@ -66,7 +67,7 @@ router.get("/api/captain/trips/:id", ...captainOnly, asyncHandler(getTrip));
 router.post("/api/captain/trips/:id/status", ...captainOnly, asyncHandler(updateTripStatus));
 
 // Earnings: summary + per-load quote
-router.get("/api/captain/earnings", ...captainOnly, getEarnings);
+router.get("/api/captain/earnings", ...captainOnly, asyncHandler(getEarnings));
 router.post("/api/captain/earnings/quote", ...captainOnly, postQuote);
 
 export default router;

@@ -10,6 +10,11 @@ const userSchema = new Schema(
     name: { type: String, required: true, trim: true },
     email: { type: String, trim: true, lowercase: true, default: "" },
     phone: { type: String, required: true, trim: true }, // 10-digit, no country code
+    vehicle: { type: new Schema({
+      vehicleNumber: { type: String, required: true },
+      truckTypeId: { type: String, required: true },
+      city: { type: String, required: true },
+    }, { _id: false }), default: undefined },
     dialCode: { type: String, default: "+91" },
   },
   { timestamps: true },

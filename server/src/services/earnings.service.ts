@@ -24,11 +24,12 @@ export function estimateFare(opts: {
 }
 
 export function captainPayout(fare: number, mode: LoadMode, distanceKm: number): Payout {
-  const commission = fare * COMMISSION_PCT;
+  const roundedFare = Math.round(fare);
+  const commission = Math.round(roundedFare * COMMISSION_PCT);
   const incentivePct =
     mode === "return" ? RETURN_INCENTIVE_PCT : mode === "shared" ? SHARED_INCENTIVE_PCT : 0;
-  const incentive = fare * incentivePct;
-  const net = fare - commission + incentive;
+  const incentive = Math.round(roundedFare * incentivePct);
+  const net = roundedFare - commission + incentive;
   return {
     fare: Math.round(fare),
     commissionPct: COMMISSION_PCT,

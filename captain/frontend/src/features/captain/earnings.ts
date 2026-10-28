@@ -46,11 +46,12 @@ export function estimateFare({ truck, distanceKm, mode, loadWeightKg }: FareInpu
 /** Break a fare down into what the captain actually keeps. */
 export function captainPayout(fare: number, mode: LoadMode, distanceKm: number): Payout {
   const cfg = EARNINGS_CONFIG;
-  const commission = fare * cfg.commissionPct;
+  const roundedFare = Math.round(fare);
+  const commission = Math.round(roundedFare * cfg.commissionPct);
   const incentivePct =
     mode === "return" ? cfg.returnIncentivePct : mode === "shared" ? cfg.sharedIncentivePct : 0;
-  const incentive = fare * incentivePct;
-  const net = fare - commission + incentive;
+  const incentive = Math.round(roundedFare * incentivePct);
+  const net = roundedFare - commission + incentive;
   return {
     fare: Math.round(fare),
     commissionPct: cfg.commissionPct,

@@ -38,6 +38,12 @@ const priceSnapshotSchema = new Schema<PriceBreakdown>({
   perTon: Number, perTonLow: Number, perTonHigh: Number, savings: Number, co2SavedKg: Number,
 }, { _id: false });
 
+const payoutSnapshotSchema = new Schema<Payout>({
+  fare: { type: Number, required: true }, commissionPct: { type: Number, required: true },
+  commission: { type: Number, required: true }, incentive: { type: Number, required: true },
+  net: { type: Number, required: true }, perKm: { type: Number, required: true },
+}, { _id: false });
+
 const bookingSchema = new Schema(
   {
     bookingId: { type: String, required: true, unique: true }, // human id from the shipper, e.g. LM-AB12CD
@@ -56,6 +62,9 @@ const bookingSchema = new Schema(
     agreedPrice: { type: Number, default: 0 },
     priceSnapshot: { type: priceSnapshotSchema, default: undefined },
     createdLabel: { type: String, default: "Just now" },
+    // Written atomically only when delivery is verified. Neither is client input.
+    completedAt: { type: Date, default: undefined },
+    payoutSnapshot: { type: payoutSnapshotSchema, default: undefined },
     status: { type: String, enum: ["open", "accepted", "cancelled"], default: "open", index: true },
     acceptedByCaptainId: { type: String },
     captain: { type: acceptedCaptainSchema, default: undefined }, // set when a captain accepts
@@ -96,11 +105,12 @@ bookingSchema.index({ acceptedByCaptainId: 1 }, ACTIVE_TRIP_INDEX_OPTIONS);
 export type BookingDoc = InferSchemaType<typeof bookingSchema>;
 bookingSchema.index({ shipperId: 1, _id: -1 });
 bookingSchema.index({ acceptedByCaptainId: 1, createdAt: -1, _id: -1 });
+bookingSchema.index({ acceptedByCaptainId: 1, tripStatus: 1, status: 1, completedAt: -1, _id: -1 });
 export const Booking = model("Booking", bookingSchema);
 
 /** Captain payout for a booking — same economics as the seed (earnings.service). */
 function payoutFor(b: BookingDoc): Payout {
-  return captainPayout(b.agreedPrice || 0, b.mode, b.distanceKm);
+  return b.payoutSnapshot ?? captainPayout(b.agreedPrice || 0, b.mode, b.distanceKm);
 }
 
 /** Map a stored booking to the captain job-board `LoadRequest` shape. */
