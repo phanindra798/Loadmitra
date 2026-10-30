@@ -182,3 +182,9 @@ Validation: 75 backend regression tests, 24 isolated MongoDB integration tests a
 - Each accepted booking snapshots the vehicle read for that assignment. Subsequent profile edits apply to future assignments and do not rewrite existing trips. Existing trips remain recoverable and can progress without registering again. Vehicle ownership/uniqueness is not verified by this flow.
 - Deployment: release the updated API before/with the captain frontend. Existing users need to register a vehicle before accepting new loads. No backfill of vehicle or KYC data is performed. These changes remain local pending commit/push review.
 - Validation: 75 backend regression tests, 32 isolated MongoDB integration tests, 18 frontend tests and a browser scenario with 13 checkpoints passed. The browser saves a vehicle, reloads, checks MongoDB and historical trip snapshots, and switches accounts. TypeScript and the captain production build pass. Focused correctness lint has no errors and two existing Fast Refresh warnings; formatting is checked for the new component, while existing files retain their formatting.
+
+## Token validation — 30 October 2026
+
+Protected API routes now reject signed tokens missing a nonempty account ID, a supported role or an expiry. Verification accepts only HS256, matching application-issued tokens. Only account ID and role are attached to the request, and protected responses use `Cache-Control: no-store`, including authentication failures. Existing application-issued bearer and cookie tokens remain compatible; an invalid bearer cannot fall back to a valid cookie.
+
+Validation: 84 backend regression tests (including nine new token tests) and 32 isolated MongoDB integration tests passed. This does not implement token revocation or production SMS delivery. Changes are local pending review and are not deployed.

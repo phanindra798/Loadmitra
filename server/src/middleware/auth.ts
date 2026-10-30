@@ -28,17 +28,25 @@ function readToken(req: Request): string | null {
 
 /** Gate a route: 401 unless a valid token is present. Attaches `req.auth`. */
 export function requireAuth(req: AuthedRequest, res: Response, next: NextFunction): void {
+  res.setHeader("Cache-Control", "no-store");
   const token = readToken(req);
   if (!token) {
     res.status(401).json({ error: "Not authenticated" });
     return;
   }
   try {
-    req.auth = jwt.verify(token, env.JWT_SECRET) as AuthPayload;
-    next();
+    const payload = jwt.verify(token, env.JWT_SECRET, { algorithms: ["HS256"] });
+    if (typeof payload === "string" || typeof payload.userId !== "string" ||
+        !payload.userId.trim() || payload.userId.length > 128 ||
+        (payload.role !== "shipper" && payload.role !== "captain") ||
+        typeof payload.exp !== "number" || !Number.isFinite(payload.exp)) {
+      res.status(401).json({ error: "Invalid or expired token" }); return;
+    }
+    req.auth = { userId: payload.userId, role: payload.role };
   } catch {
-    res.status(401).json({ error: "Invalid or expired token" });
+    res.status(401).json({ error: "Invalid or expired token" }); return;
   }
+  next();
 }
 
 /**
