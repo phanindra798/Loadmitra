@@ -188,3 +188,11 @@ Validation: 75 backend regression tests, 24 isolated MongoDB integration tests a
 Protected API routes now reject signed tokens missing a nonempty account ID, a supported role or an expiry. Verification accepts only HS256, matching application-issued tokens. Only account ID and role are attached to the request, and protected responses use `Cache-Control: no-store`, including authentication failures. Existing application-issued bearer and cookie tokens remain compatible; an invalid bearer cannot fall back to a valid cookie.
 
 Validation: 84 backend regression tests (including nine new token tests) and 32 isolated MongoDB integration tests passed. This does not implement token revocation or production SMS delivery. Changes are local pending review and are not deployed.
+
+## Review fixes — 30 October 2026
+
+- Shipper cancellation now also accepts legacy accepted bookings whose `tripStatus` is stored as `null`. The active-trip index already counted these as active, so before this fix such a captain stayed blocked until the captain cancelled.
+- `distanceKm` is capped at 5,000 km on booking creation, the shipper estimate and the captain quote. Before this fix a client could store an arbitrarily large distance and fare.
+- Both portals' ESLint configs now ignore `.vercel`, `.tanstack` and `.nitro` build output. Before this, `npm run lint` hung for more than 10 minutes on bundled files.
+
+Validation: 85 backend regression tests, 33 isolated MongoDB integration tests and 27 frontend tests pass. Frontend lint has no errors.

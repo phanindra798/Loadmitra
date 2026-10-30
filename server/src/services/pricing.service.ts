@@ -5,6 +5,9 @@ import type { BookingMode, PriceBreakdown, TruckType } from "../types";
 // Re-exported so controllers have a single import surface for pricing.
 export { estimateDistanceKm, truckById };
 
+/** Longest road distance accepted for a single load (well above any intra-India route). */
+export const MAX_DISTANCE_KM = 5000;
+
 /**
  * Market-range pricing estimator. Kept byte-for-byte equivalent to the shipper
  * frontend `pricing.ts` so estimates match on both sides.

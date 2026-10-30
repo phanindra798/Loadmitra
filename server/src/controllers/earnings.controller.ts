@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { AuthedRequest } from "../middleware/auth";
 import { getEarningsSummary } from "../services/earnings-summary.service";
 import { estimateDistanceKm, quotePayout, truckById } from "../services/earnings.service";
+import { MAX_DISTANCE_KM } from "../services/pricing.service";
 
 /** GET /api/captain/earnings — earnings summary + ledger. */
 export async function getEarnings(req: AuthedRequest, res: Response): Promise<void> {
@@ -14,7 +15,7 @@ const QuoteSchema = z
   .object({
     truckTypeId: z.string().min(1),
     mode: z.enum(["full", "shared", "return"]),
-    distanceKm: z.number().positive().optional(),
+    distanceKm: z.number().positive().max(MAX_DISTANCE_KM).optional(),
     pickupCity: z.string().optional(),
     dropCity: z.string().optional(),
     loadWeightKg: z.number().positive().optional(),

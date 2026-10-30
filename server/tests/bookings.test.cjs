@@ -68,3 +68,7 @@ test('shipper cancellation requires ownership and rejects loaded trips',async()=
  r=res();await cancelBooking(req(),r);assert.equal(r.code,200);assert.equal(row.status,'cancelled');assert.equal((await accept('captain-a')).code,409);
  row=null;await create();await accept('captain-a');row.tripStatus='picked';r=res();await cancelBooking(req(),r);assert.equal(r.code,409);assert.equal(row.tripStatus,'picked');
 });
+test('bookings reject implausible distances before pricing them',async()=>{
+ row=null;const r=await create('owner',{...payload,distanceKm:1e9});assert.equal(r.code,400);assert.equal(row,null);
+ assert.equal((await create('owner',{...payload,distanceKm:5000})).code,201);
+});

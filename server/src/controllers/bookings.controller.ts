@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { AuthedRequest } from "../middleware/auth";
 import { User } from "../models/user.model";
-import { estimatePrice, truckById } from "../services/pricing.service";
+import { estimatePrice, truckById, MAX_DISTANCE_KM } from "../services/pricing.service";
 import type { Response } from "express";
 import { z } from "zod";
 import { Types } from "mongoose";
@@ -20,7 +20,8 @@ const createBookingSchema = z.object({
   mode: z.enum(["full", "shared", "return"]),
   pickup: placeSchema,
   drop: placeSchema,
-  distanceKm: z.number().positive(),
+  // Bounded so a client cannot store an absurd distance (and fare) on a booking.
+  distanceKm: z.number().positive().max(MAX_DISTANCE_KM),
   truckTypeId: z.string().min(1),
   truckTypeName: z.string().min(1),
   loadWeightKg: z.number().positive(),
@@ -109,7 +110,8 @@ export async function cancelBooking(req: AuthedRequest, res: Response): Promise<
   const booking = await Booking.findOneAndUpdate({
     bookingId: req.params.id, shipperId: req.auth!.userId,
     status: { $in: ["open", "accepted"] },
-    $or: [{ tripStatus: { $exists: false } }, { tripStatus: { $in: ["accepted", "enroute_pickup", "at_pickup"] } }],
+    // null matches legacy accepted bookings, which the active-trip index also treats as active.
+    $or: [{ tripStatus: { $exists: false } }, { tripStatus: { $in: [null, "accepted", "enroute_pickup", "at_pickup"] } }],
   }, { $set: { status: "cancelled", tripStatus: "cancelled" }, $unset: { handoverOtp: 1 } }, { new: true });
   if (!booking) { res.status(409).json({ error: "Booking cannot be cancelled" }); return; }
   res.setHeader("Cache-Control", "no-store");

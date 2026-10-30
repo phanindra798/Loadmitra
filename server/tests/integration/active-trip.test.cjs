@@ -138,6 +138,14 @@ test('legacy accepted trips with missing or null lifecycle still occupy a slot',
     const next = await load('next'); assert.equal((await accept(next)).status, 409);
   }
 });
+test('shipper can cancel legacy accepted trips with missing or null lifecycle and free the slot', async () => {
+  for (const state of [undefined, null]) {
+    await Booking.deleteMany({});
+    const legacy = await load('legacy-cancel', { status: 'accepted', acceptedByCaptainId: String(captainA._id), tripStatus: state });
+    assert.equal((await post(`/api/bookings/${legacy.bookingId}/cancel`, owner)).status, 200);
+    const next = await load('next'); assert.equal((await accept(next)).status, 201);
+  }
+});
 test('terminal history and unassigned accepted legacy records do not occupy a slot', async () => {
   for (const tripStatus of ['delivered', 'cancelled']) {
     await load(tripStatus, { status: 'accepted', acceptedByCaptainId: String(captainA._id), tripStatus });
