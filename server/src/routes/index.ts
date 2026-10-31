@@ -27,7 +27,7 @@ router.post("/api/auth/send-otp", sendOtpLimiter, asyncHandler(sendOtp));
 router.post("/api/auth/verify-otp", verifyOtpLimiter, asyncHandler(verifyOtp));
 router.get("/api/auth/me", requireAuth, asyncHandler(me));
 router.patch("/api/auth/me", requireAuth, asyncHandler(updateMe));
-router.post("/api/auth/logout", logout);
+router.post("/api/auth/logout", asyncHandler(logout));
 
 // Shared truck catalogue + shipper pricing
 router.get("/api/trucks", listTrucks);

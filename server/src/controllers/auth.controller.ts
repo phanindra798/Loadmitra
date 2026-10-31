@@ -4,7 +4,8 @@ import type { Request, Response } from "express";
 import { z } from "zod";
 import { env } from "../config/env";
 import { User, publicUser, type UserDoc } from "../models/user.model";
-import { signToken, AUTH_COOKIE, type AuthedRequest } from "../middleware/auth";
+import { signToken, readToken, verifyToken, AUTH_COOKIE, type AuthedRequest } from "../middleware/auth";
+import { RevokedToken } from "../models/revoked-token.model";
 
 const roleSchema = z.enum(["shipper", "captain"]);
 const phoneSchema = z.string().regex(/^\d{6,15}$/, "Enter a valid phone number");
@@ -137,8 +138,14 @@ export async function updateMe(req: AuthedRequest, res: Response): Promise<void>
   res.json({ user: publicUser(user as UserDoc & { _id: unknown }) });
 }
 
-/** POST /api/auth/logout — clear the cookie. */
-export function logout(_req: Request, res: Response): void {
+/** POST /api/auth/logout — revoke the presented token (if valid) and clear the cookie. */
+export async function logout(req: Request, res: Response): Promise<void> {
+  const token = readToken(req);
+  const verified = token ? verifyToken(token) : null;
+  if (verified) {
+    await RevokedToken.updateOne({ jti: verified.jti },
+      { $setOnInsert: { jti: verified.jti, expiresAt: new Date(verified.exp * 1000) } }, { upsert: true });
+  }
   res.clearCookie(AUTH_COOKIE, { sameSite: env.isProd ? "none" : "lax", secure: env.isProd });
   res.json({ ok: true });
 }

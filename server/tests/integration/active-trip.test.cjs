@@ -397,3 +397,12 @@ test('captain profile counts only their completed deliveries and never grants ve
   const result = await get('/api/captain/me');
   assert.equal(result.body.data.trips, 1); assert.equal(result.body.data.rating, 0); assert.equal(result.body.data.kycVerified, false);
 });
+test('logout revokes the session in MongoDB while other sessions keep working', async () => {
+  const ended = signToken({ userId: String(captainA._id), role: 'captain' });
+  const other = signToken({ userId: String(captainA._id), role: 'captain' });
+  const call = (token, path, method = 'GET') => fetch(base + path, { method, headers: { Authorization: 'Bearer ' + token } });
+  assert.equal((await call(ended, '/api/captain/trips')).status, 200);
+  assert.equal((await call(ended, '/api/auth/logout', 'POST')).status, 200);
+  assert.equal((await call(ended, '/api/captain/trips')).status, 401);
+  assert.equal((await call(other, '/api/captain/trips')).status, 200);
+});

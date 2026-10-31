@@ -202,3 +202,9 @@ Validation: 85 backend regression tests, 33 isolated MongoDB integration tests a
 `POST /api/bookings` now derives `distanceKm` on the server from the pickup and drop places (city, falling back to label), using the same deterministic estimate the shipper app shows. A client-supplied `distanceKm` is accepted for older clients but ignored, so a shipper can no longer shorten the route to lower the fare. Real geocoding is still pending.
 
 Validation: backend regression tests cover client distances of 1 km, 1e9 km and none, plus the label fallback.
+
+## Logout revokes the session — 30 October 2026
+
+every new login token carries a unique `jti`. `POST /api/auth/logout` records it in the `revokedtokens` collection until the token would have expired (TTL index), and `requireAuth` rejects revoked tokens. Other sessions of the same account keep working. If the revocation check cannot reach the database, the request gets 503 rather than skipping the check. Tokens issued before this change have no `jti` and must sign in again once. Both portals now send the token with the logout request; before, they cleared it first, so the server never knew which session ended.
+
+Validation: token tests cover revocation, other sessions, legacy tokens and database outages; an isolated MongoDB integration test verifies revocation end to end.

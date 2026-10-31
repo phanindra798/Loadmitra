@@ -27,6 +27,7 @@ export async function fetchProfile(): Promise<Profile | null> {
 
 /** Drop the token immediately; best-effort server-side logout in the background. */
 export function clearSession(): void {
+  const token = getToken();
   clearToken();
-  api.logout().catch(() => {});
+  api.logout(token).catch(() => {});
 }

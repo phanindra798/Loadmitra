@@ -92,7 +92,12 @@ export const api = {
   me: () => request<{ user: ApiUser }>("/api/auth/me"),
   updateMe: (payload: { name?: string; email?: string }) =>
     request<{ user: ApiUser }>("/api/auth/me", { method: "PATCH", body: JSON.stringify(payload) }),
-  logout: () => request<{ ok: boolean }>("/api/auth/logout", { method: "POST" }),
+  // Pass the token explicitly: callers clear it locally before this request runs.
+  logout: (token?: string | null) =>
+    request<{ ok: boolean }>("/api/auth/logout", {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    }),
 };
 
 /**

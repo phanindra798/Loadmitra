@@ -3,6 +3,9 @@ const assert = require('node:assert/strict');
 process.env.NODE_ENV = 'test';
 process.env.MONGODB_URI = 'mongodb://127.0.0.1:1/isolated';
 process.env.JWT_SECRET = 'isolated-tests-only-secret-not-for-production';
+const { RevokedToken } = require('../dist/models/revoked-token.model');
+// No database in this suite: no session has been revoked.
+RevokedToken.exists = async () => null;
 const { Booking, bookingToTrip, bookingToRequest } = require('../dist/models/booking.model');
 const { issueHandoverOtp, getBooking, cancelBooking } = require('../dist/controllers/bookings.controller');
 const { updateTripStatus } = require('../dist/controllers/trips.controller');
