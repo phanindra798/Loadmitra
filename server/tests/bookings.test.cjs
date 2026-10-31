@@ -9,7 +9,7 @@ const {createApp}=require('../dist/app');
 // This suite stubs persistence; real index enforcement is covered by integration tests.
 Booking.collection.createIndex = async () => 'one_active_trip_per_captain';
 let row;
-const payload={bookingId:'LM-TEST-123456',mode:'full',pickup:{label:'A'},drop:{label:'B'},distanceKm:100,truckTypeId:'ace',truckTypeName:'Spoofed',loadWeightKg:500,agreedPrice:1};
+const payload={bookingId:'LM-TEST-123456',mode:'full',pickup:{label:'A',city:'Hyderabad'},drop:{label:'B',city:'Warangal'},distanceKm:100,truckTypeId:'ace',truckTypeName:'Spoofed',loadWeightKg:500,agreedPrice:1};
 const req=(userId='owner',body=payload)=>({auth:{userId,role:'shipper'},body,params:{id:payload.bookingId}});
 function res(){return {code:200,setHeader(){},status(n){this.code=n;return this},json(v){this.body=v;return this}}}
 function matches(q){return row && Object.entries(q).every(([k,v])=>{
@@ -31,11 +31,11 @@ Booking.findOneAndUpdate=async(q,u)=>{
 async function create(user='owner',body=payload){const r=res();await createBooking(req(user,body),r);return r}
 async function accept(user){const r=res();await acceptRequest(req(user,{captain:{id:'forged',name:'Forged',badges:['verified']}}),r);return r}
 test('booking ownership and fare derive from authenticated account and catalogue',async()=>{
- row=null;const r=await create();assert.equal(r.code,201);assert.equal(row.shipperId,'owner');assert.equal(row.customerName,'Registered owner');assert.equal(row.truckTypeName,'Tata Ace');assert.equal(row.agreedPrice,2050);
- assert.equal(row.priceSnapshot.estimate,2050);assert.equal(row.priceSnapshot.ratePerKm,18);assert.equal(r.body.data.pickup.label,'A');
+ row=null;const r=await create();assert.equal(r.code,201);assert.equal(row.shipperId,'owner');assert.equal(row.customerName,'Registered owner');assert.equal(row.truckTypeName,'Tata Ace');assert.equal(row.agreedPrice,2860);
+ assert.equal(row.priceSnapshot.estimate,2860);assert.equal(row.priceSnapshot.ratePerKm,18);assert.equal(r.body.data.pickup.label,'A');
 });
 test('retry cannot reopen or reprice an accepted booking',async()=>{
- row=null;await create();const snapshot=structuredClone(row.priceSnapshot);await accept('captain-a');await create('owner',{...payload,agreedPrice:999999,priceSnapshot:{estimate:1}});assert.equal(row.status,'accepted');assert.equal(row.acceptedByCaptainId,'captain-a');assert.equal(row.agreedPrice,2050);assert.deepEqual(row.priceSnapshot,snapshot);
+ row=null;await create();const snapshot=structuredClone(row.priceSnapshot);await accept('captain-a');await create('owner',{...payload,agreedPrice:999999,priceSnapshot:{estimate:1}});assert.equal(row.status,'accepted');assert.equal(row.acceptedByCaptainId,'captain-a');assert.equal(row.agreedPrice,2860);assert.deepEqual(row.priceSnapshot,snapshot);
 });
 test('same ID with another owner or different load returns conflict',async()=>{
  row=null;await create();assert.equal((await create('intruder')).code,409);assert.equal((await create('owner',{...payload,loadWeightKg:600})).code,409);
@@ -68,7 +68,11 @@ test('shipper cancellation requires ownership and rejects loaded trips',async()=
  r=res();await cancelBooking(req(),r);assert.equal(r.code,200);assert.equal(row.status,'cancelled');assert.equal((await accept('captain-a')).code,409);
  row=null;await create();await accept('captain-a');row.tripStatus='picked';r=res();await cancelBooking(req(),r);assert.equal(r.code,409);assert.equal(row.tripStatus,'picked');
 });
-test('bookings reject implausible distances before pricing them',async()=>{
- row=null;const r=await create('owner',{...payload,distanceKm:1e9});assert.equal(r.code,400);assert.equal(row,null);
- assert.equal((await create('owner',{...payload,distanceKm:5000})).code,201);
+test('server derives distance from the places and ignores the client distance',async()=>{
+ for(const distanceKm of [1,1e9,undefined]){
+  row=null;const r=await create('owner',{...payload,distanceKm});assert.equal(r.code,201);
+  assert.equal(row.distanceKm,145);assert.equal(row.agreedPrice,2860);assert.equal(row.priceSnapshot.distanceKm,145);
+ }
+ row=null;await create('owner',{...payload,pickup:{label:'Ameerpet',city:''},drop:{label:'Kukatpally',city:''}});
+ assert.ok(row.distanceKm>0,'city falls back to label');
 });

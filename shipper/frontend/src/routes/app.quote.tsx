@@ -32,7 +32,7 @@ function QuotePage() {
   const { draft, setMode, setTruck, setWeight, setGoods, createBooking } = useBooking();
 
   const distanceKm = useMemo(
-    () => estimateDistanceKm(draft.pickup?.city ?? draft.pickup?.label, draft.drop?.city ?? draft.drop?.label),
+    () => estimateDistanceKm(draft.pickup?.city || draft.pickup?.label, draft.drop?.city || draft.drop?.label),
     [draft.pickup, draft.drop],
   );
 

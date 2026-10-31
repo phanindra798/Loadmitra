@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { AuthedRequest } from "../middleware/auth";
 import { User } from "../models/user.model";
-import { estimatePrice, truckById, MAX_DISTANCE_KM } from "../services/pricing.service";
+import { estimateDistanceKm, estimatePrice, truckById, MAX_DISTANCE_KM } from "../services/pricing.service";
 import type { Response } from "express";
 import { z } from "zod";
 import { Types } from "mongoose";
@@ -20,8 +20,9 @@ const createBookingSchema = z.object({
   mode: z.enum(["full", "shared", "return"]),
   pickup: placeSchema,
   drop: placeSchema,
-  // Bounded so a client cannot store an absurd distance (and fare) on a booking.
-  distanceKm: z.number().positive().max(MAX_DISTANCE_KM),
+  // Accepted from older clients but ignored: the server derives distance from the
+  // places so a client cannot shorten the route to lower the fare.
+  distanceKm: z.number().optional(),
   truckTypeId: z.string().min(1),
   truckTypeName: z.string().min(1),
   loadWeightKg: z.number().positive(),
@@ -48,16 +49,21 @@ export async function createBooking(req: AuthedRequest, res: Response): Promise<
   }
   const shipper = await User.findById(req.auth!.userId);
   if (!shipper) { res.status(401).json({ error: "Account not found" }); return; }
-  const priceSnapshot = estimatePrice({ truck, distanceKm: d.distanceKm, mode: d.mode, loadWeightKg: d.loadWeightKg });
+  // Same deterministic estimate the shipper app shows (city, falling back to label).
+  const distanceKm = estimateDistanceKm(d.pickup.city || d.pickup.label, d.drop.city || d.drop.label);
+  if (!distanceKm || distanceKm > MAX_DISTANCE_KM) {
+    res.status(400).json({ error: "Choose valid pickup and drop locations" }); return;
+  }
+  const priceSnapshot = estimatePrice({ truck, distanceKm, mode: d.mode, loadWeightKg: d.loadWeightKg });
   const agreedPrice = priceSnapshot.estimate;
   const fingerprint = createHash("sha256").update(JSON.stringify({
-    mode: d.mode, pickup: d.pickup, drop: d.drop, distanceKm: d.distanceKm,
+    mode: d.mode, pickup: d.pickup, drop: d.drop, distanceKm,
     truckTypeId: d.truckTypeId, loadWeightKg: d.loadWeightKg, goodsType: d.goodsType,
   })).digest("hex");
   try {
     const booking = await Booking.findOneAndUpdate(
       { bookingId: d.bookingId, shipperId: req.auth!.userId, requestFingerprint: fingerprint },
-      { $setOnInsert: { ...d, shipperId: req.auth!.userId, requestFingerprint: fingerprint,
+      { $setOnInsert: { ...d, distanceKm, shipperId: req.auth!.userId, requestFingerprint: fingerprint,
         agreedPrice, priceSnapshot, truckTypeName: truck.name, customerName: shipper.name, status: "open" } },
       { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true },
     );

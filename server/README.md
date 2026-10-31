@@ -196,3 +196,9 @@ Validation: 84 backend regression tests (including nine new token tests) and 32 
 - Both portals' ESLint configs now ignore `.vercel`, `.tanstack` and `.nitro` build output. Before this, `npm run lint` hung for more than 10 minutes on bundled files.
 
 Validation: 85 backend regression tests, 33 isolated MongoDB integration tests and 27 frontend tests pass. Frontend lint has no errors.
+
+## Server-side booking distance — 30 October 2026
+
+`POST /api/bookings` now derives `distanceKm` on the server from the pickup and drop places (city, falling back to label), using the same deterministic estimate the shipper app shows. A client-supplied `distanceKm` is accepted for older clients but ignored, so a shipper can no longer shorten the route to lower the fare. Real geocoding is still pending.
+
+Validation: backend regression tests cover client distances of 1 km, 1e9 km and none, plus the label fallback.
