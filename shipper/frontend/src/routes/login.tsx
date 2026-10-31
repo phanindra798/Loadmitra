@@ -63,7 +63,7 @@ function LoginPage() {
     setBusy(true);
     setError(null);
     try {
-      const result = await api.sendOtp(phone, "shipper");
+      const result = await api.sendOtp(phone, "shipper", dialCode);
       setDevOtp(result.devOtp);
       // The development API displays a real expiring challenge for local testing.
       setOtp("");

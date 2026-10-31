@@ -406,3 +406,19 @@ test('logout revokes the session in MongoDB while other sessions keep working', 
   assert.equal((await call(ended, '/api/captain/trips')).status, 401);
   assert.equal((await call(other, '/api/captain/trips')).status, 200);
 });
+test('identity migration keeps legacy accounts and allows the same digits in another country', async () => {
+  const { ensureIdentityIndexes } = require('../../dist/services/identity-index.service');
+  const { IDENTITY_INDEX, LEGACY_IDENTITY_INDEX } = require('../../dist/models/user.model');
+  // Recreate the pre-country-code state: old unique index and an account without dialCode.
+  await User.collection.dropIndex(IDENTITY_INDEX).catch(() => {});
+  await User.collection.createIndex({ phone: 1, role: 1 }, { unique: true, name: LEGACY_IDENTITY_INDEX });
+  await User.collection.insertOne({ role: 'shipper', name: 'Legacy', phone: '9888888888', email: '' });
+  await ensureIdentityIndexes();
+  await ensureIdentityIndexes(); // idempotent on every start
+  const names = (await User.collection.indexes()).map(i => i.name);
+  assert.ok(names.includes(IDENTITY_INDEX)); assert.equal(names.includes(LEGACY_IDENTITY_INDEX), false);
+  assert.equal((await User.collection.findOne({ phone: '9888888888' })).dialCode, '+91');
+  await User.create({ role: 'shipper', name: 'UK', phone: '9888888888', dialCode: '+44' });
+  await assert.rejects(User.create({ role: 'shipper', name: 'Duplicate', phone: '9888888888', dialCode: '+91' }), { code: 11000 });
+  await User.deleteMany({ phone: '9888888888' });
+});

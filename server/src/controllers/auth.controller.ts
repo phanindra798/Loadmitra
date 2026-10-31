@@ -8,17 +8,26 @@ import { signToken, readToken, verifyToken, AUTH_COOKIE, type AuthedRequest } fr
 import { RevokedToken } from "../models/revoked-token.model";
 
 const roleSchema = z.enum(["shipper", "captain"]);
-const phoneSchema = z.string().regex(/^\d{6,15}$/, "Enter a valid phone number");
 
-const sendOtpSchema = z.object({ phone: phoneSchema, role: roleSchema });
-const verifyOtpSchema = z.object({
-  phone: phoneSchema,
+// An account is identified by country code + national number + role, so the same
+// digits in two countries are two different people. Matches the login screens' list.
+export const DIAL_CODES = ["+91", "+1", "+44", "+971", "+65", "+61", "+966"] as const;
+const identitySchema = z.object({
+  phone: z.string(),
   role: roleSchema,
+  // Older clients never sent a code; every account so far is Indian.
+  dialCode: z.enum(DIAL_CODES).default("+91"),
+});
+const validPhone = ({ phone, dialCode }: { phone: string; dialCode: string }) =>
+  dialCode === "+91" ? /^[6-9]\d{9}$/.test(phone) : /^\d{6,14}$/.test(phone);
+const phoneIssue = { message: "Enter a valid phone number", path: ["phone"] };
+
+const sendOtpSchema = identitySchema.refine(validPhone, phoneIssue);
+const verifyOtpSchema = identitySchema.extend({
   otp: z.string().regex(/^\d{6}$/, "OTP must be 6 digits"),
   name: z.string().trim().min(2).optional(),
   email: z.string().trim().email().optional().or(z.literal("")),
-  dialCode: z.string().optional(),
-});
+}).refine(validPhone, phoneIssue);
 const updateMeSchema = z.object({
   name: z.string().trim().min(2).optional(),
   email: z.string().trim().email().optional().or(z.literal("")),
@@ -54,10 +63,10 @@ export async function sendOtp(req: Request, res: Response): Promise<void> {
     res.status(400).json({ error: "Invalid request", details: parsed.error.flatten().fieldErrors });
     return;
   }
-  const { phone, role } = parsed.data;
+  const { phone, role, dialCode } = parsed.data;
   const code = String(randomInt(100000, 1000000));
-  await Otp.findOneAndUpdate({ phone, role }, {
-    $set: { codeHash: hashOtp(phone, role, code), attempts: 0,
+  await Otp.findOneAndUpdate({ dialCode, phone, role }, {
+    $set: { codeHash: hashOtp(dialCode + phone, role, code), attempts: 0,
       expiresAt: new Date(Date.now() + env.OTP_TTL_SECONDS * 1000) },
     $unset: { code: 1 },
   }, { upsert: true, new: true });
@@ -75,15 +84,15 @@ export async function verifyOtp(req: Request, res: Response): Promise<void> {
   const { phone, role, name, email, dialCode } = parsed.data;
 
   const challenge = await Otp.findOneAndUpdate(
-    { phone, role, expiresAt: { $gt: new Date() }, attempts: { $lt: 5 } },
+    { dialCode, phone, role, expiresAt: { $gt: new Date() }, attempts: { $lt: 5 } },
     { $inc: { attempts: 1 } }, { new: true },
   );
-  const codeHash = hashOtp(phone, role, parsed.data.otp);
+  const codeHash = hashOtp(dialCode + phone, role, parsed.data.otp);
   if (!challenge || challenge.codeHash !== codeHash) {
     res.status(401).json({ error: "Invalid or expired OTP. Request a new code if needed." });
     return;
   }
-  let user = await User.findOne({ phone, role });
+  let user = await User.findOne({ dialCode, phone, role });
   if (!user && !name) {
     res.status(409).json({ error: "registration_required" });
     return;
@@ -97,7 +106,7 @@ export async function verifyOtp(req: Request, res: Response): Promise<void> {
     return;
   }
   if (!user) {
-    user = await User.create({ phone, role, name, email: email || "", dialCode: dialCode || "+91" });
+    user = await User.create({ phone, role, name, email: email || "", dialCode });
   } else if (name || email) {
     // Returning user who supplied fresh details (e.g. completing a profile).
     if (name) user.name = name;

@@ -208,3 +208,9 @@ Validation: backend regression tests cover client distances of 1 km, 1e9 km and 
 every new login token carries a unique `jti`. `POST /api/auth/logout` records it in the `revokedtokens` collection until the token would have expired (TTL index), and `requireAuth` rejects revoked tokens. Other sessions of the same account keep working. If the revocation check cannot reach the database, the request gets 503 rather than skipping the check. Tokens issued before this change have no `jti` and must sign in again once. Both portals now send the token with the logout request; before, they cleared it first, so the server never knew which session ended.
 
 Validation: token tests cover revocation, other sessions, legacy tokens and database outages; an isolated MongoDB integration test verifies revocation end to end.
+
+## Country code is part of the account — 30 October 2026
+
+accounts and OTP challenges are keyed by `(dialCode, phone, role)`. `send-otp` now receives `dialCode` (one of +91, +1, +44, +971, +65, +61, +966; default `+91` for older clients), and Indian numbers must match `^[6-9]\d{9}$`. Before, the same digits in two countries were treated as the same account, and the OTP request carried no country at all. At startup, `ensureIdentityIndexes` backfills `+91` on records without a code, builds the `identity_dial_phone_role` unique index, then drops the old `phone_1_role_1` index. The new index is always built first, so phone uniqueness is enforced throughout. The database account needs index-management permission. Outstanding login codes from before the deploy stop working; request a new one.
+
+Validation after all three changes: 93 backend regression tests, 35 isolated MongoDB integration tests (including the index migration on legacy data), 27 frontend tests and the captain browser journey (13 checkpoints) pass. Deploy the API and both portals together.

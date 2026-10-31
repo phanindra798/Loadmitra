@@ -87,10 +87,10 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 type Role = "shipper" | "captain";
 
 export const api = {
-  sendOtp: (phone: string, role: Role) =>
+  sendOtp: (phone: string, role: Role, dialCode: string) =>
     request<{ sent: boolean; devOtp?: string }>("/api/auth/send-otp", {
       method: "POST",
-      body: JSON.stringify({ phone, role }),
+      body: JSON.stringify({ phone, role, dialCode }),
     }),
   verifyOtp: (payload: {
     phone: string;
