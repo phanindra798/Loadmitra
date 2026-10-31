@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "npm run build && node --test tests/*.test.cjs",
     "test:integration": "npm run build && node --test tests/integration/*.test.cjs",
-    "test:browser": "npm run build && node --test tests/browser/*.test.cjs"
+    "test:browser": "npm run build && node --test --test-concurrency=1 tests/browser/*.test.cjs"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",

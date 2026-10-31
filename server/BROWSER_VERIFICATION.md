@@ -56,3 +56,21 @@ Accounts and signed sessions were seeded specifically for this isolated test. Th
 ## Earnings implementation checks
 
 75 backend regression tests, 32 real-MongoDB integration tests and 18 frontend tests passed. Tests cover IST midnight, Monday/week/month/year boundaries, totals beyond the history-page limit, rounding consistency, rejected/repeated delivery codes, preserved snapshots, missing historical metadata, authorization and database failures. The two existing Fast Refresh export warnings remain; focused correctness lint has no errors with the formatting rule excluded for existing files. The new vehicle component is formatted.
+
+## Shipper journey — 31 October 2026
+
+`npm run test:browser` now also runs `tests/browser/shipper-journey.test.cjs` against the shipper portal. Both suites share `tests/browser/harness.cjs` (isolated MongoDB, API, Vite and headless browser), and the files run one after another to keep timing stable. The shipper scenario passes nine checkpoints:
+
+1. The quote for Gachibowli → Warangal shows 145 km and the ₹2,630–₹3,090 range.
+2. Booking saves the server-computed distance (145 km) and the same ₹2,860 fare.
+3. Captain acceptance appears on the matching screen with the captain's name.
+4. A pickup code generated on the tracking screen verifies the captain's pickup.
+5. A new delivery code verifies the drop, and the shipper sees "Delivered".
+6. The delivered trip survives a reload and appears in booking history.
+7. The shipper can cancel a request while it is searching.
+8. Logging out in the browser revokes the session in MongoDB; the old token gets 401.
+9. No uncaught browser exceptions.
+
+Artifacts for this suite are in `server/node_modules/.cache/loadmitra-browser-shipper/` (`matched.png`, `delivered.png`, `results.json`).
+
+Finding: both portals render the signed-in area as a guest on the server, then remount it once after hydration when the browser reads the session. A click made during that remount is lost. The harness waits for the page to settle; the remount itself remains an open improvement.
