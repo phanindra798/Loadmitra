@@ -218,3 +218,9 @@ Validation after all three changes: 93 backend regression tests, 35 isolated Mon
 ## Shipper browser journey test — 31 October 2026
 
 `npm run test:browser` now covers the shipper portal end to end (book → match → handover codes → delivered → cancel → logout revocation) in addition to the captain journey. See [BROWSER_VERIFICATION.md](BROWSER_VERIFICATION.md). Test-only change; no API behaviour changed.
+
+## No screen rebuild after page load — 31 October 2026
+
+Portal-only change. The server render cannot see the login cookie, so both portals hydrate as a guest and then switch to the signed-in session. Before, that switch changed the React `key` on `BookingProvider`/`CaptainProvider`, which rebuilt the whole signed-in screen right after load: early taps were lost and the first data requests ran twice. A new `useSessionKey` hook (`lib/session.ts` in each portal) treats the server's "unknown" session as the same account as the first value seen in the browser, so the screen updates in place. Login, logout, account switches and changes from another tab still get a new key and reset private state as before.
+
+Validation: the browser test harness no longer waits for the rebuild, logout is a single click, and the shipper journey checks that the account screen's button is the same element 1.5 s after load.

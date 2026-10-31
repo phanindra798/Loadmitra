@@ -74,6 +74,8 @@ test('captain recovery and account isolation through the browser, API and databa
 
 
     await navigate('/app/account'); await see('Saved vehicle: TS09AB1234');
+    // The form is disabled until the truck catalogue loads.
+    await until(() => evaluate(`document.getElementById('vehicle-number')?.matches(':enabled') ?? false`), 'vehicle form enabled');
     for (const [id, value] of [['vehicle-number', 'ts-09 xy 7654'], ['vehicle-city', 'Warangal']]) {
       assert.ok(await evaluate(`(() => { const input = document.getElementById(${JSON.stringify(id)}); input?.focus(); input?.select(); return Boolean(input); })()`));
       await cdp('Input.insertText', { text: value }, page);

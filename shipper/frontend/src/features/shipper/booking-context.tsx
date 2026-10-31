@@ -7,10 +7,10 @@ import {
   useReducer,
   useRef,
   useState,
-  useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { ApiError, getToken, shipperApi, subscribeSession } from "@/lib/api";
+import { ApiError, shipperApi } from "@/lib/api";
+import { useSessionKey } from "@/lib/session";
 import { mergeBookings } from "./booking-record";
 import type {
   Booking,
@@ -108,13 +108,11 @@ interface BookingContextValue extends State {
 
 const BookingContext = createContext<BookingContextValue | null>(null);
 
-const serverSession = () => null;
-
 export function BookingProvider({ children }: { children: ReactNode }) {
-  const session = useSyncExternalStore(subscribeSession, getToken, serverSession);
+  const { session, key } = useSessionKey();
   // Changing or clearing a session remounts all booking state and cancels its
   // pending requests. No history is reused for a different signed-in account.
-  return <BookingStore key={session ?? "guest"} authenticated={Boolean(session)}>{children}</BookingStore>;
+  return <BookingStore key={key} authenticated={Boolean(session)}>{children}</BookingStore>;
 }
 
 function BookingStore({ children, authenticated }: { children: ReactNode; authenticated: boolean }) {

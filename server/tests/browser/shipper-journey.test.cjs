@@ -4,7 +4,7 @@ const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const {
   state, Booking, User, browserErrors, mark, until, evaluate, body, see, loadPage,
-  navigate, click, clickUntil, sessionToken, tokenFor, post, screenshot, recordFailure, startStack, stopStack,
+  navigate, click, sessionToken, tokenFor, post, screenshot, recordFailure, startStack, stopStack,
 } = require('./harness.cjs');
 const { RevokedToken } = require('../../dist/models/revoked-token.model');
 let base, shipper, captain, shipperToken;
@@ -87,7 +87,14 @@ test('shipper books, is matched, tracks handovers and sees delivery after reload
     mark('Shipper can cancel a request while searching');
 
     await navigate('/app/account'); await see('Log out');
-    await clickUntil('Log out', async () => (await RevokedToken.countDocuments()) === 1, 'session revoked in MongoDB');
+    // The signed-in tree must update in place after hydration, not be replaced.
+    await evaluate(`window.__probe = [...document.querySelectorAll('button')].find(b => b.textContent.includes('Log out')); true`);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    assert.equal(await evaluate('document.contains(window.__probe)'), true, 'account screen remounted after load');
+    mark('Signed-in screen is not rebuilt after hydration');
+    // A single click: the signed-in tree no longer remounts after hydration.
+    await click('Log out');
+    await until(async () => (await RevokedToken.countDocuments()) === 1, 'session revoked in MongoDB');
     const reuse = await fetch(base + '/api/bookings', { headers: { Authorization: 'Bearer ' + shipperToken }, signal: AbortSignal.timeout(15000) });
     assert.equal(reuse.status, 401);
     assert.equal(await evaluate(`import('/src/lib/api.ts').then(api => api.getToken())`), null);

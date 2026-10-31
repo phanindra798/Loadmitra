@@ -77,14 +77,6 @@ async function loadPage(method, params, session = state.page) {
   await until(() => evaluate(`location.origin !== ${JSON.stringify(state.origin)} ||
     Object.keys(document.body ?? {}).some(key => key.startsWith('__reactFiber') || key.startsWith('__reactContainer'))
     || [...document.querySelectorAll('button')].some(el => Object.keys(el).some(key => key.startsWith('__reactProps')))`, session), 'React hydration');
-  // Both portals remount their signed-in tree once after hydration (the server
-  // renders as a guest). Wait for the DOM to go quiet so clicks hit the final tree.
-  await evaluate(`new Promise(resolve => {
-    let timer; const done = () => { observer.disconnect(); resolve(true); };
-    const observer = new MutationObserver(() => { clearTimeout(timer); timer = setTimeout(done, 400); });
-    observer.observe(document.body, { childList: true, subtree: true });
-    timer = setTimeout(done, 400); setTimeout(done, 5000);
-  })`, session);
 }
 async function navigate(path, session = state.page) { await loadPage('Page.navigate', { url: state.origin + path }, session); }
 async function click(text, session = state.page) {

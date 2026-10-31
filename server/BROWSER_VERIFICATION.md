@@ -73,4 +73,4 @@ Accounts and signed sessions were seeded specifically for this isolated test. Th
 
 Artifacts for this suite are in `server/node_modules/.cache/loadmitra-browser-shipper/` (`matched.png`, `delivered.png`, `results.json`).
 
-Finding: both portals render the signed-in area as a guest on the server, then remount it once after hydration when the browser reads the session. A click made during that remount is lost. The harness waits for the page to settle; the remount itself remains an open improvement.
+Finding: both portals render the signed-in area as a guest on the server, then remount it once after hydration when the browser reads the session. A click made during that remount is lost. Fixed the same day: `useSessionKey` keeps the provider key stable across hydration, the harness no longer waits for a settle period, and the journey asserts the account screen is not rebuilt (checkpoint "Signed-in screen is not rebuilt after hydration").

@@ -1,7 +1,8 @@
 import { toast } from "sonner";
-import { createContext, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ApiError, captainApi, getToken, subscribeSession } from "@/lib/api";
+import { ApiError, captainApi, getToken } from "@/lib/api";
+import { useSessionKey } from "@/lib/session";
 import { isActiveTrip, latestTrip, mergeTrips } from "./trip-record";
 import type { CaptainProfile, EarningsSummary, LoadRequest, Trip, TripStatus } from "./types";
 
@@ -46,8 +47,8 @@ const CaptainContext = createContext<CaptainContextValue | null>(null);
 
 /** Changing accounts replaces the entire private query cache and local UI state. */
 export function CaptainProvider({ children }: { children: ReactNode }) {
-  const session = useSyncExternalStore(subscribeSession, getToken, () => null);
-  return <CaptainSession key={session ?? "guest"} session={session}>{children}</CaptainSession>;
+  const { session, key } = useSessionKey();
+  return <CaptainSession key={key} session={session}>{children}</CaptainSession>;
 }
 function CaptainSession({ session, children }: { session: string | null; children: ReactNode }) {
   const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 0 } } }));
