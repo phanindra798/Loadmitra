@@ -11,6 +11,7 @@ import {
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError, captainApi, getToken } from "@/lib/api";
 import { useSessionKey } from "@/lib/session";
+import { useLiveEvents } from "@/lib/use-live-events";
 import { isActiveTrip, latestTrip, mergeTrips } from "./trip-record";
 import type { CaptainProfile, EarningsSummary, LoadRequest, Trip, TripStatus } from "./types";
 
@@ -47,6 +48,8 @@ const EMPTY_PROFILE: CaptainProfile = {
 
 interface CaptainContextValue {
   authenticated: boolean;
+  /** Live updates are connected, so queries only poll as a slow fallback. */
+  live: boolean;
   online: boolean;
   profile: CaptainProfile;
   profileLoading: boolean;
@@ -122,6 +125,17 @@ function CaptainStore({ session, children }: { session: string | null; children:
     [session],
   );
 
+  // Live signals refresh exactly what changed; polling stays as a slow fallback
+  // and returns to its normal pace whenever the stream is disconnected.
+  const live = useLiveEvents(session, (event) => {
+    if (event.type === "resync") void client.invalidateQueries();
+    if (event.type === "offers") void client.invalidateQueries({ queryKey: ["captain-offers"] });
+    if (event.type === "trip") {
+      void client.invalidateQueries({ queryKey: TRIPS_KEY });
+      void client.invalidateQueries({ queryKey: ["captain-earnings"] });
+    }
+  });
+
   // Trip recovery does not depend on the profile, earnings or offer endpoints.
   const tripQuery = useQuery({
     queryKey: LIST_KEY,
@@ -130,7 +144,7 @@ function CaptainStore({ session, children }: { session: string | null; children:
       const incoming = await captainApi.trips(signal);
       return mergeTrips(client.getQueryData<Trip[]>(LIST_KEY) ?? [], incoming);
     },
-    refetchInterval: 3000,
+    refetchInterval: live ? 30000 : 3000,
   });
   const records = tripQuery.data ?? EMPTY_TRIPS;
   const activeTrip = records.find(isActiveTrip) ?? null;
@@ -147,13 +161,13 @@ function CaptainStore({ session, children }: { session: string | null; children:
     enabled: authenticated,
     queryFn: ({ signal }) => captainApi.earnings(signal),
     staleTime: 10000,
-    refetchInterval: 15000,
+    refetchInterval: live ? 60000 : 15000,
   });
   const offersQuery = useQuery({
     queryKey: ["captain-offers"],
     enabled: authenticated && !tripsLoading && !activeTrip,
     queryFn: ({ signal }) => captainApi.requests(signal),
-    refetchInterval: 6000,
+    refetchInterval: live ? 30000 : 6000,
   });
   const requestPool = offersQuery.isError ? EMPTY_REQUESTS : (offersQuery.data ?? EMPTY_REQUESTS);
   const profile = profileQuery.data ?? EMPTY_PROFILE;
@@ -237,6 +251,7 @@ function CaptainStore({ session, children }: { session: string | null; children:
   );
   const value: CaptainContextValue = {
     authenticated,
+    live,
     online,
     profile,
     earnings,
@@ -277,7 +292,7 @@ export function useCaptain() {
 
 /** A direct link reads its own record, including trips older than the history page. */
 export function useStoredTrip(id: string) {
-  const { authenticated, getTrip } = useCaptain();
+  const { authenticated, live, getTrip } = useCaptain();
   const client = useQueryClient();
   const query = useQuery({
     queryKey: detailKey(id),
@@ -292,7 +307,8 @@ export function useStoredTrip(id: string) {
         [401, 403, 404].includes(query.state.error.status)
       )
         return false;
-      return query.state.data && !isActiveTrip(query.state.data) ? false : 3000;
+      if (query.state.data && !isActiveTrip(query.state.data)) return false;
+      return live ? 30000 : 3000;
     },
   });
   const unavailable =

@@ -7,6 +7,7 @@ const {
   navigate, click, sessionToken, tokenFor, post, screenshot, recordFailure, startStack, stopStack,
 } = require('./harness.cjs');
 const { RevokedToken } = require('../../dist/models/revoked-token.model');
+const live = require('../../dist/services/live-events.service');
 let base, shipper, captain, shipperToken;
 
 before(async () => {
@@ -51,8 +52,15 @@ test('shipper books, is matched, tracks handovers and sees delivery after reload
     assert.ok((await body()).includes('₹2,860'));
     mark('Booking is saved with the server-computed distance and the same fare the shipper saw');
 
+    // With the live stream open the fallback poll is 30 s, so a quick update
+    // can only have come from the live signal.
+    await until(async () => live.streamCount() >= 1, 'live stream connected');
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const acceptedAt = Date.now();
     await post(`/api/captain/requests/${booked.bookingId}/accept`, captain);
     await see('A captain accepted your request!'); await see('Journey Captain');
+    assert.ok(Date.now() - acceptedAt < 2500, `matching screen took ${Date.now() - acceptedAt} ms`);
+    mark('Live update shows the acceptance without waiting for a poll');
     await screenshot('matched');
     mark('Captain acceptance reaches the matching screen');
 

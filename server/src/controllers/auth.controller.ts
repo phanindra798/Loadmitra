@@ -6,6 +6,7 @@ import { env } from "../config/env";
 import { User, publicUser, type UserDoc } from "../models/user.model";
 import { signToken, readToken, verifyToken, AUTH_COOKIE, type AuthedRequest } from "../middleware/auth";
 import { RevokedToken } from "../models/revoked-token.model";
+import { endSession } from "../services/live-events.service";
 
 const roleSchema = z.enum(["shipper", "captain"]);
 
@@ -154,6 +155,7 @@ export async function logout(req: Request, res: Response): Promise<void> {
   if (verified) {
     await RevokedToken.updateOne({ jti: verified.jti },
       { $setOnInsert: { jti: verified.jti, expiresAt: new Date(verified.exp * 1000) } }, { upsert: true });
+    endSession(verified.jti);
   }
   res.clearCookie(AUTH_COOKIE, { sameSite: env.isProd ? "none" : "lax", secure: env.isProd });
   res.json({ ok: true });

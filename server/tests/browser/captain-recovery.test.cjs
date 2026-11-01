@@ -5,6 +5,7 @@ const {
   Booking, User, browserErrors, events, mark, until, cdp, evaluate, newPage, body, see, loadPage,
   navigate, click, sessionToken, tokenFor, post, screenshot, recordFailure, startStack, stopStack,
 } = require('./harness.cjs');
+const live = require('../../dist/services/live-events.service');
 let page, base, origin, captainA, captainB, owner, tokenA, tokenB;
 
 before(async () => {
@@ -141,6 +142,10 @@ test('captain recovery and account isolation through the browser, API and databa
     await click('Retry earnings'); await see('102 older completed trip(s)');
     assert.equal(await evaluate(`document.querySelector('[data-testid="earnings-total"]')?.textContent`), '₹0');
     mark('An earnings outage displays an error and retry recovers the saved summary');
+    // Dozens of navigations, reloads and account switches later, only this page's
+    // stream is open: leaked streams would exhaust the browser's six connections.
+    assert.equal(live.streamCount(), 1);
+    mark('Exactly one live stream stays open across navigations');
     assert.deepEqual(browserErrors, []);
     mark('No uncaught browser exceptions');
   } catch (error) {

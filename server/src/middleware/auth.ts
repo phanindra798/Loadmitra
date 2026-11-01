@@ -12,6 +12,8 @@ export interface AuthPayload {
 
 export interface AuthedRequest extends Request {
   auth?: AuthPayload;
+  /** The presented session's id and expiry (seconds), set by `requireAuth`. */
+  session?: { jti: string; exp: number };
 }
 
 const COOKIE = "lm_token";
@@ -73,6 +75,7 @@ export async function requireAuth(req: AuthedRequest, res: Response, next: NextF
     res.status(503).json({ error: "Sign-in check unavailable. Please try again." }); return;
   }
   req.auth = { userId: verified.userId, role: verified.role };
+  req.session = { jti: verified.jti, exp: verified.exp };
   next();
 }
 

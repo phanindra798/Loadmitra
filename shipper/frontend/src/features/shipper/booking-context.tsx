@@ -11,6 +11,7 @@ import {
 } from "react";
 import { ApiError, shipperApi } from "@/lib/api";
 import { useSessionKey } from "@/lib/session";
+import { useLiveEvents } from "@/lib/use-live-events";
 import { mergeBookings } from "./booking-record";
 import type { Booking, BookingDraft, BookingMode, Place } from "./types";
 
@@ -83,6 +84,8 @@ function reducer(state: State, action: Action): State {
 
 interface BookingContextValue extends State {
   authenticated: boolean;
+  /** Live updates are connected, so open screens only poll as a slow fallback. */
+  live: boolean;
   historyLoading: boolean;
   historyError: string | null;
   hasMoreBookings: boolean;
@@ -108,19 +111,14 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   // Changing or clearing a session remounts all booking state and cancels its
   // pending requests. No history is reused for a different signed-in account.
   return (
-    <BookingStore key={key} authenticated={Boolean(session)}>
+    <BookingStore key={key} session={session}>
       {children}
     </BookingStore>
   );
 }
 
-function BookingStore({
-  children,
-  authenticated,
-}: {
-  children: ReactNode;
-  authenticated: boolean;
-}) {
+function BookingStore({ children, session }: { children: ReactNode; session: string | null }) {
+  const authenticated = Boolean(session);
   const [state, dispatch] = useReducer(reducer, initialState);
   const [historyLoading, setHistoryLoading] = useState(authenticated);
   const [historyError, setHistoryError] = useState<string | null>(null);
@@ -164,6 +162,29 @@ function BookingStore({
     return () => historyRequest.current?.abort();
   }, [refreshBookings]);
 
+  // A live signal re-reads just the booking that changed; history and open
+  // booking screens both show it from the merged store.
+  const liveReads = useRef(new Set<AbortController>());
+  useEffect(() => {
+    const reads = liveReads.current;
+    return () => reads.forEach((controller) => controller.abort());
+  }, []);
+  const live = useLiveEvents(session, (event) => {
+    if (event.type === "resync") void refreshBookings();
+    if (event.type !== "booking") return;
+    const controller = new AbortController();
+    liveReads.current.add(controller);
+    shipperApi
+      .getBooking(event.id, controller.signal)
+      .then((booking) => {
+        if (!controller.signal.aborted) storeBooking(booking);
+      })
+      .catch(() => {
+        /* the fallback poll retries */
+      })
+      .finally(() => liveReads.current.delete(controller));
+  });
+
   const getBooking = useCallback(
     (id: string) => state.bookings.find((b) => b.id === id),
     [state.bookings],
@@ -173,6 +194,7 @@ function BookingStore({
     () => ({
       ...state,
       authenticated,
+      live,
       historyLoading,
       historyError,
       hasMoreBookings: nextCursor !== null,
@@ -194,6 +216,7 @@ function BookingStore({
       state,
       getBooking,
       authenticated,
+      live,
       historyLoading,
       historyError,
       nextCursor,
@@ -214,7 +237,7 @@ export function useBooking() {
 
 /** Direct links load their own record, even when it is outside the current history page. */
 export function useStoredBooking(id: string) {
-  const { getBooking, storeBooking, authenticated } = useBooking();
+  const { getBooking, storeBooking, authenticated, live } = useBooking();
   const [revision, setRevision] = useState(0);
   const [result, setResult] = useState({
     id,
@@ -255,14 +278,14 @@ export function useStoredBooking(id: string) {
         });
         again = !unavailable;
       }
-      if (again && !controller.signal.aborted) timer = setTimeout(poll, 3000);
+      if (again && !controller.signal.aborted) timer = setTimeout(poll, live ? 30000 : 3000);
     }
     void poll();
     return () => {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [id, authenticated, revision, storeBooking]);
+  }, [id, authenticated, live, revision, storeBooking]);
   return {
     booking: result.id === id && result.unavailable ? undefined : getBooking(id),
     loading: result.id !== id || result.loading,

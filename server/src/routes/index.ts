@@ -4,6 +4,7 @@ import { sendOtp, verifyOtp, me, updateMe, logout } from "../controllers/auth.co
 import { requireAuth, requireRole, type AuthedRequest } from "../middleware/auth";
 import { rateLimit } from "../middleware/rate-limit";
 import { listTrucks } from "../controllers/trucks.controller";
+import { streamEvents } from "../controllers/events.controller";
 import { postEstimate } from "../controllers/pricing.controller";
 import { getMe, updateVehicle } from "../controllers/captain.controller";
 import { listRequests } from "../controllers/requests.controller";
@@ -28,6 +29,10 @@ router.post("/api/auth/verify-otp", verifyOtpLimiter, asyncHandler(verifyOtp));
 router.get("/api/auth/me", requireAuth, asyncHandler(me));
 router.patch("/api/auth/me", requireAuth, asyncHandler(updateMe));
 router.post("/api/auth/logout", asyncHandler(logout));
+
+// Live change signals for both portals (Server-Sent Events). Bounded reconnects per account.
+router.get("/api/events", requireAuth,
+  rateLimit({ windowMs: 60 * 1000, max: 30, key: (req: AuthedRequest) => req.auth!.userId }), streamEvents);
 
 // Shared truck catalogue + shipper pricing
 router.get("/api/trucks", listTrucks);

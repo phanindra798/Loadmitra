@@ -8,6 +8,7 @@ import type { BookingMode, PriceBreakdown, TruckType } from "@/features/shipper/
 import { restoreBooking, type BookingRecord } from "@/features/shipper/booking-record";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+export const LIVE_EVENTS_URL = BASE_URL + "/api/events";
 const TOKEN_KEY = "lm-token";
 
 export const getToken = () => readStored(TOKEN_KEY);

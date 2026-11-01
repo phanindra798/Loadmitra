@@ -8,6 +8,7 @@ import { Types } from "mongoose";
 import { Booking } from "../models/booking.model";
 import { createHandoverOtp, HANDOVER_OTP_COOLDOWN_MS } from "../services/handover-otp.service";
 import { shipperBookingView } from "../services/booking-view.service";
+import { publishBookingChange } from "../services/live-events.service";
 
 const placeSchema = z.object({
   label: z.string().min(1),
@@ -67,6 +68,7 @@ export async function createBooking(req: AuthedRequest, res: Response): Promise<
         agreedPrice, priceSnapshot, truckTypeName: truck.name, customerName: shipper.name, status: "open" } },
       { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true },
     );
+    publishBookingChange(booking, { offers: true });
     res.setHeader("Cache-Control", "no-store");
     res.status(201).json({ data: shipperBookingView(booking) });
   } catch (error) {
@@ -120,6 +122,8 @@ export async function cancelBooking(req: AuthedRequest, res: Response): Promise<
     $or: [{ tripStatus: { $exists: false } }, { tripStatus: { $in: [null, "accepted", "enroute_pickup", "at_pickup"] } }],
   }, { $set: { status: "cancelled", tripStatus: "cancelled" }, $unset: { handoverOtp: 1 } }, { new: true });
   if (!booking) { res.status(409).json({ error: "Booking cannot be cancelled" }); return; }
+  // An open booking leaves the job board; an accepted one tells its captain.
+  publishBookingChange(booking, { offers: !booking.acceptedByCaptainId });
   res.setHeader("Cache-Control", "no-store");
   res.json({ data: shipperBookingView(booking) });
 }

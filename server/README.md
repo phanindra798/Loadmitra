@@ -230,3 +230,17 @@ Validation: the browser test harness no longer waits for the rebuild, logout is 
 Formatting only; no behaviour change. Both portals were run through their existing Prettier config (`npm run format`), which had never been applied, so `npm run lint` reported thousands of `prettier/prettier` errors. `.prettierignore` now also skips `.vercel`, `.tanstack` and `.nitro` build output, matching ESLint. The server has no Prettier config and is unchanged.
 
 Validation: frontend lint has 0 errors (only the existing fast-refresh warnings), both typechecks and builds pass, 27 frontend tests and both browser journeys pass.
+
+## Live updates — 1 November 2026
+
+New endpoint `GET /api/events` (signed-in, either role) is a Server-Sent Events stream of change signals:
+
+- `{ "type": "booking", "id" }`: sent to the shipper when one of their bookings changes (created, accepted, each trip step, cancelled).
+- `{ "type": "trip", "id" }`: sent to the assigned captain when their trip changes, including a cancellation by the shipper.
+- `{ "type": "offers" }`: sent to all captains when the job board changes (a booking is created, accepted, or cancelled while open).
+
+Signals carry only an id, never booking data. The portals re-read the record through the existing owner-scoped endpoints, so the stream does not widen what anyone can see. Limits: 5 streams per account (`429` beyond that), 2,000 per server (`503`), and 30 connects per minute per account. A comment ping is sent every 25 s. Streams end on logout of that session, at token expiry, and at least hourly so revocation is re-checked; clients reconnect with backoff (1 s doubling to 30 s), and reload everything after a reconnect. The event bus is in-process, the same as the rate limiter: fine for one instance, while several API instances would need a shared bus such as Redis.
+
+Portals read the stream with `fetch` (Bearer header, same as every other call) rather than `EventSource`. While connected, polling slows to a fallback (trips, bookings and offers every 30 s, earnings every 60 s); when disconnected it returns to the old 3 s / 6 s / 15 s pace. The stream is closed while a tab is hidden and when a page is left (`pagehide`), then reopened with a resync on return: browsers allow only six HTTP/1.1 connections per server, and the browser test found that Chrome kept a previous page's stream open after navigation, so after a few page loads every other API call hung. Deploy note: a reverse proxy must not buffer `/api/events` (the API sends `X-Accel-Buffering: no` for nginx) and its read timeout must exceed the 25 s ping.
+
+Validation: 6 new backend tests (auth, headers, per-user routing, cancel/accept publishing, logout ends only that session, per-account limit), 7 new frontend tests per portal (stream parsing, validation, backoff, chunked delivery, stop on 401, resumed start, reconnect + resync). The shipper browser journey now requires the acceptance to appear within 2.5 s while the fallback poll is 30 s, and the captain journey checks that exactly one stream is open after all its navigations, reloads and account switches.

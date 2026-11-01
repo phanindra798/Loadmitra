@@ -7,6 +7,7 @@ import { Booking, bookingToTrip, ACTIVE_TRIP_INDEX_OPTIONS } from "../models/boo
 import { ensureActiveTripIndex, isActiveTripConflict } from "../services/active-trip.service";
 import { captainPayout } from "../services/earnings.service";
 import { logger } from "../utils/logger";
+import { publishBookingChange } from "../services/live-events.service";
 import { HANDOVER_OTP_MAX_ATTEMPTS, matchesHandoverOtp } from "../services/handover-otp.service";
 
 /** GET /api/captain/trips — the captain's trip history. */
@@ -57,6 +58,7 @@ export async function acceptRequest(req: AuthedRequest, res: Response): Promise<
       { new: true, runValidators: true },
     );
     if (!booking) { res.status(409).json({ error: "This load is unavailable or does not match your registered vehicle." }); return; }
+    publishBookingChange(booking, { offers: true });
     res.status(201).json({ data: bookingToTrip(booking, "accepted") });
   } catch (error) {
     if (isActiveTripConflict(error)) {
@@ -137,6 +139,7 @@ export async function updateTripStatus(req: AuthedRequest, res: Response): Promi
       payoutSnapshot: booking.payoutSnapshot ?? captainPayout(booking.agreedPrice, booking.mode, booking.distanceKm),
     } : {}) }, $unset: { handoverOtp: 1 } }, { new: true });
     if (!verified) { res.status(409).json({ error: "Trip or code changed; refresh and retry" }); return; }
+    publishBookingChange(verified);
     res.json({ data: bookingToTrip(verified, next) });
     return;
   }
@@ -145,5 +148,6 @@ export async function updateTripStatus(req: AuthedRequest, res: Response): Promi
     ...(next === "cancelled" ? { $unset: { handoverOtp: 1 } } : {}),
   }, { new: true });
   if (!updated) { res.status(409).json({ error: "Trip changed; refresh and retry" }); return; }
+  publishBookingChange(updated);
   res.json({ data: bookingToTrip(updated, next) });
 }
