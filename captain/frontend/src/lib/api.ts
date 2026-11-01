@@ -19,9 +19,17 @@ const TOKEN_KEY = "lm-captain-token";
 
 export const getToken = () => readStored(TOKEN_KEY);
 const sessionEvent = "loadmitra:captain-session-changed";
-const notifySession = () => { if (typeof window !== "undefined") window.dispatchEvent(new Event(sessionEvent)); };
-export const setToken = (token: string) => { writeStored(TOKEN_KEY, token); notifySession(); };
-export const clearToken = () => { removeStored(TOKEN_KEY); notifySession(); };
+const notifySession = () => {
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(sessionEvent));
+};
+export const setToken = (token: string) => {
+  writeStored(TOKEN_KEY, token);
+  notifySession();
+};
+export const clearToken = () => {
+  removeStored(TOKEN_KEY);
+  notifySession();
+};
 export function subscribeSession(onChange: () => void) {
   const storageChanged = (event: StorageEvent) => {
     if (event.key === TOKEN_KEY || event.key === null) onChange();
@@ -67,19 +75,29 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   try {
     res = await fetch(BASE_URL + path, { ...init, headers, credentials: "include" });
   } catch (error) {
-    if (init.signal?.aborted || (error instanceof Error && error.name === "AbortError")) throw error;
+    if (init.signal?.aborted || (error instanceof Error && error.name === "AbortError"))
+      throw error;
     throw new ApiError(0, "Can't reach the server. Is the API running?");
   }
   const data = await res.json().catch((error: unknown) => {
-    if (init.signal?.aborted || (error instanceof Error && error.name === "AbortError")) throw error;
+    if (init.signal?.aborted || (error instanceof Error && error.name === "AbortError"))
+      throw error;
     return {};
   });
   // A delayed response from an old account must never enter the new session's UI.
   if (token && getToken() !== token) throw new DOMException("Session changed", "AbortError");
   if (!res.ok) {
-    if (token && (res.status === 401 || res.status === 403) &&
-        (path.startsWith("/api/captain/") || path === "/api/auth/me")) clearToken();
-    throw new ApiError(res.status, data?.error ?? "Something went wrong", data?.code ?? data?.error);
+    if (
+      token &&
+      (res.status === 401 || res.status === 403) &&
+      (path.startsWith("/api/captain/") || path === "/api/auth/me")
+    )
+      clearToken();
+    throw new ApiError(
+      res.status,
+      data?.error ?? "Something went wrong",
+      data?.code ?? data?.error,
+    );
   }
   return data as T;
 }
@@ -104,7 +122,8 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
-  me: (signal?: AbortSignal) => request<{ user: ApiUser }>("/api/auth/me", { signal, cache: "no-store" }),
+  me: (signal?: AbortSignal) =>
+    request<{ user: ApiUser }>("/api/auth/me", { signal, cache: "no-store" }),
   updateMe: (payload: { name?: string; email?: string }) =>
     request<{ user: ApiUser }>("/api/auth/me", { method: "PATCH", body: JSON.stringify(payload) }),
   // Pass the token explicitly: callers clear it locally before this request runs.
@@ -121,21 +140,49 @@ export const api = {
  * features/captain/types exactly, so server data is a drop-in for the mock seed.
  */
 export const captainApi = {
-  trucks: (signal?: AbortSignal) => request<{ data: TruckType[] }>("/api/trucks", { signal }).then(r => r.data),
-  saveVehicle: (vehicle: { vehicleNumber: string; truckTypeId: string; city: string }, signal?: AbortSignal) =>
-    request<{ data: CaptainProfile }>("/api/captain/vehicle", { method: "PATCH", body: JSON.stringify(vehicle), signal }).then(r => r.data),
-  profile: (signal?: AbortSignal) => request<{ data: CaptainProfile }>("/api/captain/me", { signal, cache: "no-store" }).then(r => r.data),
-  requests: (signal?: AbortSignal) => request<{ data: LoadRequest[] }>("/api/captain/requests", { signal, cache: "no-store" }).then(r => r.data),
-  trips: (signal?: AbortSignal) => request<{ data: Trip[]; activeTrip?: Trip | null }>("/api/captain/trips", { signal, cache: "no-store" })
-    .then(r => r.activeTrip ? mergeTrips(r.data, [r.activeTrip]) : r.data),
-  trip: (id: string, signal?: AbortSignal) => request<{ data: Trip }>(`/api/captain/trips/${encodeURIComponent(id)}`, { signal, cache: "no-store" }).then(r => r.data),
-  earnings: (signal?: AbortSignal) => request<{ data: EarningsSummary }>("/api/captain/earnings", { signal, cache: "no-store" }).then(r => r.data),
+  trucks: (signal?: AbortSignal) =>
+    request<{ data: TruckType[] }>("/api/trucks", { signal }).then((r) => r.data),
+  saveVehicle: (
+    vehicle: { vehicleNumber: string; truckTypeId: string; city: string },
+    signal?: AbortSignal,
+  ) =>
+    request<{ data: CaptainProfile }>("/api/captain/vehicle", {
+      method: "PATCH",
+      body: JSON.stringify(vehicle),
+      signal,
+    }).then((r) => r.data),
+  profile: (signal?: AbortSignal) =>
+    request<{ data: CaptainProfile }>("/api/captain/me", { signal, cache: "no-store" }).then(
+      (r) => r.data,
+    ),
+  requests: (signal?: AbortSignal) =>
+    request<{ data: LoadRequest[] }>("/api/captain/requests", { signal, cache: "no-store" }).then(
+      (r) => r.data,
+    ),
+  trips: (signal?: AbortSignal) =>
+    request<{ data: Trip[]; activeTrip?: Trip | null }>("/api/captain/trips", {
+      signal,
+      cache: "no-store",
+    }).then((r) => (r.activeTrip ? mergeTrips(r.data, [r.activeTrip]) : r.data)),
+  trip: (id: string, signal?: AbortSignal) =>
+    request<{ data: Trip }>(`/api/captain/trips/${encodeURIComponent(id)}`, {
+      signal,
+      cache: "no-store",
+    }).then((r) => r.data),
+  earnings: (signal?: AbortSignal) =>
+    request<{ data: EarningsSummary }>("/api/captain/earnings", { signal, cache: "no-store" }).then(
+      (r) => r.data,
+    ),
   accept: (id: string, signal?: AbortSignal) =>
     request<{ data: Trip }>(`/api/captain/requests/${encodeURIComponent(id)}/accept`, {
-      method: "POST", body: "{}", signal,
-    }).then(r => r.data),
+      method: "POST",
+      body: "{}",
+      signal,
+    }).then((r) => r.data),
   updateStatus: (id: string, status: TripStatus, otp?: string, signal?: AbortSignal) =>
     request<{ data: Trip }>(`/api/captain/trips/${encodeURIComponent(id)}/status`, {
-      method: "POST", signal, body: JSON.stringify({ status, ...(otp ? { otp } : {}) }),
-    }).then(r => r.data),
+      method: "POST",
+      signal,
+      body: JSON.stringify({ status, ...(otp ? { otp } : {}) }),
+    }).then((r) => r.data),
 };

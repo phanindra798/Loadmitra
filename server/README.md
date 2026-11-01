@@ -224,3 +224,9 @@ Validation after all three changes: 93 backend regression tests, 35 isolated Mon
 Portal-only change. The server render cannot see the login cookie, so both portals hydrate as a guest and then switch to the signed-in session. Before, that switch changed the React `key` on `BookingProvider`/`CaptainProvider`, which rebuilt the whole signed-in screen right after load: early taps were lost and the first data requests ran twice. A new `useSessionKey` hook (`lib/session.ts` in each portal) treats the server's "unknown" session as the same account as the first value seen in the browser, so the screen updates in place. Login, logout, account switches and changes from another tab still get a new key and reset private state as before.
 
 Validation: the browser test harness no longer waits for the rebuild, logout is a single click, and the shipper journey checks that the account screen's button is the same element 1.5 s after load.
+
+## Portal formatting pass — 31 October 2026
+
+Formatting only; no behaviour change. Both portals were run through their existing Prettier config (`npm run format`), which had never been applied, so `npm run lint` reported thousands of `prettier/prettier` errors. `.prettierignore` now also skips `.vercel`, `.tanstack` and `.nitro` build output, matching ESLint. The server has no Prettier config and is unchanged.
+
+Validation: frontend lint has 0 errors (only the existing fast-refresh warnings), both typechecks and builds pass, 27 frontend tests and both browser journeys pass.

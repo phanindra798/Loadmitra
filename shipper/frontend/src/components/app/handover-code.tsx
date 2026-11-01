@@ -5,7 +5,13 @@ import { shipperApi } from "@/lib/api";
 import { useT } from "@/features/shipper/i18n";
 
 /** Codes live only in this screen's memory; only their keyed hashes are stored by the API. */
-export function HandoverCode({ bookingId, stage }: { bookingId: string; stage: "picked" | "delivered" }) {
+export function HandoverCode({
+  bookingId,
+  stage,
+}: {
+  bookingId: string;
+  stage: "picked" | "delivered";
+}) {
   const t = useT();
   const [challenge, setChallenge] = useState<{ code: string; expiresAt: string } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -42,7 +48,10 @@ export function HandoverCode({ bookingId, stage }: { bookingId: string; stage: "
   }
 
   return (
-    <section className="mt-3 rounded-2xl border border-primary/30 bg-primary/5 p-3" aria-label="Handover verification">
+    <section
+      className="mt-3 rounded-2xl border border-primary/30 bg-primary/5 p-3"
+      aria-label="Handover verification"
+    >
       <div className="flex items-center gap-3">
         <KeyRound className="h-5 w-5 shrink-0 text-primary" />
         <div>
@@ -54,14 +63,27 @@ export function HandoverCode({ bookingId, stage }: { bookingId: string; stage: "
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
         Share only when the goods are being {stage === "picked" ? "picked up" : "delivered"}.
-        {valid ? ` Expires in ${Math.ceil((Date.parse(challenge.expiresAt) - now) / 60_000)} min.`
-          : challenge ? " This code has expired. Generate a new one." : " Generate a code when you are ready."}
+        {valid
+          ? ` Expires in ${Math.ceil((Date.parse(challenge.expiresAt) - now) / 60_000)} min.`
+          : challenge
+            ? " This code has expired. Generate a new one."
+            : " Generate a code when you are ready."}
       </p>
-      {error && <p role="alert" className="mt-2 text-sm text-destructive">{error}</p>}
+      {error && (
+        <p role="alert" className="mt-2 text-sm text-destructive">
+          {error}
+        </p>
+      )}
       <Button className="mt-3 w-full rounded-xl" onClick={generate} disabled={busy || cooldown > 0}>
-        {busy ? "Generating…" : cooldown > 0 ? `New code available in ${cooldown}s` : "Generate new code"}
+        {busy
+          ? "Generating…"
+          : cooldown > 0
+            ? `New code available in ${cooldown}s`
+            : "Generate new code"}
       </Button>
-      <p className="mt-2 text-xs text-muted-foreground">A new code replaces the previous one. Five attempts per code.</p>
+      <p className="mt-2 text-xs text-muted-foreground">
+        A new code replaces the previous one. Five attempts per code.
+      </p>
     </section>
   );
 }

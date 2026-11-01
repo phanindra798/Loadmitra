@@ -67,7 +67,10 @@ export function StatusTimeline({ status }: { status: TripStatus }) {
                 <span className="relative flex h-2.5 w-2.5">
                   <span
                     className="absolute inset-0 rounded-full"
-                    style={{ background: "var(--primary)", animation: "lm-ping-ring 1.8s ease-out infinite" }}
+                    style={{
+                      background: "var(--primary)",
+                      animation: "lm-ping-ring 1.8s ease-out infinite",
+                    }}
                   />
                   <span className="relative h-2.5 w-2.5 rounded-full bg-primary" />
                 </span>
@@ -79,7 +82,11 @@ export function StatusTimeline({ status }: { status: TripStatus }) {
               <p
                 className={cn(
                   "text-sm font-semibold",
-                  active ? "text-foreground" : done ? "text-foreground/80" : "text-muted-foreground",
+                  active
+                    ? "text-foreground"
+                    : done
+                      ? "text-foreground/80"
+                      : "text-muted-foreground",
                 )}
               >
                 {step.label}

@@ -27,30 +27,30 @@ function AppLayout() {
 
   return (
     <ProfileProvider>
-    <BookingProvider>
-      <SidebarContext.Provider value={{ open: navOpen, toggle }}>
-        <div className="min-h-[100dvh] bg-background">
-          <AppSidebar />
-          {/* Margin (not padding) so the absolutely-positioned map panels start after the sidebar. */}
-          <main className={cn("relative min-w-0", navOpen && "lg:ml-[260px]")}>
-            {/* Reopen the collapsed sidebar (desktop only). */}
-            {!navOpen && (
-              <button
-                type="button"
-                onClick={toggle}
-                aria-label="Open menu"
-                className="fixed left-3 top-3 z-50 hidden h-10 w-10 place-items-center rounded-full border border-border bg-card text-foreground shadow-sm backdrop-blur hover:bg-secondary lg:grid"
-              >
-                <PanelLeft className="h-5 w-5" />
-              </button>
-            )}
-            <Outlet />
-          </main>
-          <BottomNav />
-          <Toaster position="top-center" richColors />
-        </div>
-      </SidebarContext.Provider>
-    </BookingProvider>
+      <BookingProvider>
+        <SidebarContext.Provider value={{ open: navOpen, toggle }}>
+          <div className="min-h-[100dvh] bg-background">
+            <AppSidebar />
+            {/* Margin (not padding) so the absolutely-positioned map panels start after the sidebar. */}
+            <main className={cn("relative min-w-0", navOpen && "lg:ml-[260px]")}>
+              {/* Reopen the collapsed sidebar (desktop only). */}
+              {!navOpen && (
+                <button
+                  type="button"
+                  onClick={toggle}
+                  aria-label="Open menu"
+                  className="fixed left-3 top-3 z-50 hidden h-10 w-10 place-items-center rounded-full border border-border bg-card text-foreground shadow-sm backdrop-blur hover:bg-secondary lg:grid"
+                >
+                  <PanelLeft className="h-5 w-5" />
+                </button>
+              )}
+              <Outlet />
+            </main>
+            <BottomNav />
+            <Toaster position="top-center" richColors />
+          </div>
+        </SidebarContext.Provider>
+      </BookingProvider>
     </ProfileProvider>
   );
 }

@@ -46,10 +46,22 @@ export function MapCanvas({
         }}
       />
       {/* Decorative blocks */}
-      <div className="absolute left-[6%] top-[12%] h-16 w-24 rounded-md" style={{ background: "var(--map-block)" }} />
-      <div className="absolute right-[10%] top-[20%] h-20 w-20 rounded-md" style={{ background: "var(--map-green)" }} />
-      <div className="absolute left-[16%] bottom-[14%] h-24 w-28 rounded-lg" style={{ background: "var(--map-water)" }} />
-      <div className="absolute right-[18%] bottom-[18%] h-14 w-24 rounded-md" style={{ background: "var(--map-block)" }} />
+      <div
+        className="absolute left-[6%] top-[12%] h-16 w-24 rounded-md"
+        style={{ background: "var(--map-block)" }}
+      />
+      <div
+        className="absolute right-[10%] top-[20%] h-20 w-20 rounded-md"
+        style={{ background: "var(--map-green)" }}
+      />
+      <div
+        className="absolute left-[16%] bottom-[14%] h-24 w-28 rounded-lg"
+        style={{ background: "var(--map-water)" }}
+      />
+      <div
+        className="absolute right-[18%] bottom-[18%] h-14 w-24 rounded-md"
+        style={{ background: "var(--map-block)" }}
+      />
 
       {/* Route + markers */}
       <svg
@@ -75,9 +87,7 @@ export function MapCanvas({
               strokeDasharray={variant === "live" ? "10 8" : undefined}
               className={variant === "live" ? "lm-route-dash" : undefined}
               style={
-                variant === "live"
-                  ? { animation: "lm-dash-flow 0.9s linear infinite" }
-                  : undefined
+                variant === "live" ? { animation: "lm-dash-flow 0.9s linear infinite" } : undefined
               }
             />
             {/* Pickup */}
@@ -132,7 +142,10 @@ export function MapCanvas({
           <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <span
               className="lm-ping absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full"
-              style={{ background: "var(--primary)", animation: "lm-ping-ring 2s ease-out infinite" }}
+              style={{
+                background: "var(--primary)",
+                animation: "lm-ping-ring 2s ease-out infinite",
+              }}
             />
             <span
               className="relative block h-3.5 w-3.5 rounded-full border-2 border-white"

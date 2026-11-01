@@ -60,7 +60,8 @@ export function CaptainCard({
 
       <div className="mt-3 flex items-center justify-between gap-3">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-foreground">
-          <Clock className="h-3.5 w-3.5 text-primary" /> {t("captain.minToPickup", { min: captain.etaMins })}
+          <Clock className="h-3.5 w-3.5 text-primary" />{" "}
+          {t("captain.minToPickup", { min: captain.etaMins })}
         </span>
         {showActions && (
           <div className="flex items-center gap-2">

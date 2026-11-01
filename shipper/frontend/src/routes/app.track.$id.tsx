@@ -1,13 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import {
-  ChevronLeft,
-  ShieldAlert,
-  Share2,
-  Truck,
-  CheckCircle2,
-  Leaf,
-} from "lucide-react";
+import { ChevronLeft, ShieldAlert, Share2, Truck, CheckCircle2, Leaf } from "lucide-react";
 import { MapCanvas } from "@/components/app/map-canvas";
 import { CaptainCard } from "@/components/app/captain-card";
 import { HandoverCode } from "@/components/app/handover-code";
@@ -36,13 +29,19 @@ function headline(status: BookingStatus, etaMins: number, t: Translate) {
     case "picked":
       return { title: t("track.pickedTitle"), sub: t("track.pickedSub") };
     case "enroute_drop":
-      return { title: t("track.enrouteDropTitle", { min: etaMins }), sub: t("track.enrouteDropSub") };
+      return {
+        title: t("track.enrouteDropTitle", { min: etaMins }),
+        sub: t("track.enrouteDropSub"),
+      };
     case "delivered":
       return { title: t("track.deliveredTitle"), sub: t("track.deliveredSub") };
     case "cancelled":
       return { title: t("track.cancelledTitle"), sub: "" };
     default:
-      return { title: t("track.arrivingPickup", { min: etaMins }), sub: t("track.arrivingPickupSub") };
+      return {
+        title: t("track.arrivingPickup", { min: etaMins }),
+        sub: t("track.arrivingPickupSub"),
+      };
   }
 }
 
@@ -57,7 +56,8 @@ function TrackPage() {
   const status = booking?.status;
 
   useEffect(() => {
-    if (status === "requested") void navigate({ to: "/app/matching", search: { id }, replace: true });
+    if (status === "requested")
+      void navigate({ to: "/app/matching", search: { id }, replace: true });
   }, [status, id, navigate]);
 
   // Pop a celebratory dialog the moment the trip *becomes* delivered while the
@@ -76,9 +76,13 @@ function TrackPage() {
         <div className="flex flex-col items-center gap-3 px-6 py-24 text-center">
           <Truck className="h-8 w-8 text-muted-foreground" />
           <p role={pollError ? "alert" : "status"} className="font-semibold text-foreground">
-            {loading ? "Loading your booking…" : pollError ?? t("track.tripNotFound")}
+            {loading ? "Loading your booking…" : (pollError ?? t("track.tripNotFound"))}
           </p>
-          {pollError && <Button variant="outline" onClick={retry}>Try again</Button>}
+          {pollError && (
+            <Button variant="outline" onClick={retry}>
+              Try again
+            </Button>
+          )}
           <Link to="/login">Sign in</Link>
           <Link to="/app">
             <Button className="rounded-xl">{t("common.goHome")}</Button>
@@ -94,8 +98,12 @@ function TrackPage() {
       : (booking.captain?.etaMins ?? 8);
   const h = headline(booking.status, eta, t);
   const delivered = booking.status === "delivered";
-  const handoverStage = booking.status === "at_pickup" ? "picked"
-    : booking.status === "enroute_drop" ? "delivered" : null;
+  const handoverStage =
+    booking.status === "at_pickup"
+      ? "picked"
+      : booking.status === "enroute_drop"
+        ? "delivered"
+        : null;
 
   function shareTrip() {
     const text = `Track my LoadMitra shipment ${booking!.id}: ${booking!.pickup.label} → ${booking!.drop.label}`;
@@ -122,7 +130,10 @@ function TrackPage() {
         </button>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/95 px-3 py-2 text-xs font-bold text-foreground shadow-sm backdrop-blur">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-2 w-2 rounded-full bg-cyan-accent" style={{ animation: "lm-pulse-dot 1.4s ease-in-out infinite" }} />
+            <span
+              className="absolute inline-flex h-2 w-2 rounded-full bg-cyan-accent"
+              style={{ animation: "lm-pulse-dot 1.4s ease-in-out infinite" }}
+            />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-accent" />
           </span>
           {t("track.live")} · {booking.id}
@@ -132,7 +143,11 @@ function TrackPage() {
       {/* Tracking sheet */}
       <div className="absolute inset-x-0 bottom-16 z-20 px-2 sm:px-4 lg:inset-auto lg:bottom-6 lg:right-6 lg:top-6 lg:w-[400px] lg:px-0">
         <div className="mx-auto max-h-[78vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl lm-no-scrollbar lg:max-h-[calc(100vh-3rem)]">
-          {pollError && <p role="alert" className="mb-3 text-sm text-destructive">{pollError}. Retrying…</p>}
+          {pollError && (
+            <p role="alert" className="mb-3 text-sm text-destructive">
+              {pollError}. Retrying…
+            </p>
+          )}
           {/* Headline */}
           <div className="flex items-center gap-3">
             <span
@@ -144,28 +159,46 @@ function TrackPage() {
               {delivered ? <CheckCircle2 className="h-6 w-6" /> : <Truck className="h-6 w-6" />}
             </span>
             <div className="min-w-0">
-              <p className="truncate text-lg font-extrabold tracking-tight text-foreground">{h.title}</p>
+              <p className="truncate text-lg font-extrabold tracking-tight text-foreground">
+                {h.title}
+              </p>
               {h.sub && <p className="truncate text-sm text-muted-foreground">{h.sub}</p>}
             </div>
           </div>
 
           {/* Captain */}
-          {booking.captain && <div className="mt-3"><CaptainCard captain={booking.captain} /></div>}
+          {booking.captain && (
+            <div className="mt-3">
+              <CaptainCard captain={booking.captain} />
+            </div>
+          )}
 
           {/* OTP */}
-          {handoverStage && <HandoverCode key={`${booking.id}:${handoverStage}`} bookingId={booking.id} stage={handoverStage} />}
+          {handoverStage && (
+            <HandoverCode
+              key={`${booking.id}:${handoverStage}`}
+              bookingId={booking.id}
+              stage={handoverStage}
+            />
+          )}
 
           {/* Delivered summary */}
           {delivered && (
             <div className="mt-3 rounded-2xl border border-border bg-secondary/40 p-3 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("track.agreedPrice")}</span>
-                <span className="font-extrabold text-foreground">{inr(booking.agreedPrice ?? booking.price.estimate)}</span>
+                <span className="font-extrabold text-foreground">
+                  {inr(booking.agreedPrice ?? booking.price.estimate)}
+                </span>
               </div>
               {booking.price.co2SavedKg > 0 && (
                 <div className="mt-1 flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1 text-muted-foreground"><Leaf className="h-3.5 w-3.5 text-success" /> {t("track.co2Saved")}</span>
-                  <span className="font-semibold text-foreground">{booking.price.co2SavedKg} kg</span>
+                  <span className="inline-flex items-center gap-1 text-muted-foreground">
+                    <Leaf className="h-3.5 w-3.5 text-success" /> {t("track.co2Saved")}
+                  </span>
+                  <span className="font-semibold text-foreground">
+                    {booking.price.co2SavedKg} kg
+                  </span>
                 </div>
               )}
             </div>
@@ -200,7 +233,9 @@ function TrackPage() {
           ) : (
             <div className="mt-4 grid grid-cols-2 gap-2">
               <Link to="/app/bookings" className="col-span-1">
-                <Button variant="outline" className="h-11 w-full rounded-xl">{t("track.viewBookings")}</Button>
+                <Button variant="outline" className="h-11 w-full rounded-xl">
+                  {t("track.viewBookings")}
+                </Button>
               </Link>
               <Link to="/app" className="col-span-1">
                 <Button className="h-11 w-full rounded-xl">{t("track.bookAgain")}</Button>
@@ -218,13 +253,17 @@ function TrackPage() {
               <CheckCircle2 className="h-9 w-9" />
             </span>
             <DialogTitle className="text-xl">{t("track.deliveredTitle")}</DialogTitle>
-            <DialogDescription>{t("track.deliveredPopupSub", { place: booking.drop.label })}</DialogDescription>
+            <DialogDescription>
+              {t("track.deliveredPopupSub", { place: booking.drop.label })}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="rounded-2xl border border-border bg-secondary/40 p-3 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t("track.amount")}</span>
-              <span className="font-extrabold text-foreground">{inr(booking.agreedPrice ?? booking.price.estimate)}</span>
+              <span className="font-extrabold text-foreground">
+                {inr(booking.agreedPrice ?? booking.price.estimate)}
+              </span>
             </div>
             {booking.price.co2SavedKg > 0 && (
               <div className="mt-1 flex items-center justify-between">
@@ -238,7 +277,9 @@ function TrackPage() {
 
           <div className="grid grid-cols-2 gap-2">
             <Link to="/app/bookings">
-              <Button variant="outline" className="h-11 w-full rounded-xl">{t("track.viewBookings")}</Button>
+              <Button variant="outline" className="h-11 w-full rounded-xl">
+                {t("track.viewBookings")}
+              </Button>
             </Link>
             <Link to="/app">
               <Button className="h-11 w-full rounded-xl">{t("track.bookAgain")}</Button>

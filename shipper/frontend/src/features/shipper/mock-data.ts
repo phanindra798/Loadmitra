@@ -136,28 +136,61 @@ export const RECENT_PLACES: Place[] = [
 export const PLACE_DIRECTORY: Place[] = [
   ...SAVED_PLACES,
   ...RECENT_PLACES,
-  { id: "p1", label: "Vijayawada", address: "Benz Circle, Vijayawada", city: "Vijayawada", kind: "other" },
-  { id: "p2", label: "Visakhapatnam Port", address: "Port Area, Visakhapatnam", city: "Visakhapatnam", kind: "other" },
+  {
+    id: "p1",
+    label: "Vijayawada",
+    address: "Benz Circle, Vijayawada",
+    city: "Vijayawada",
+    kind: "other",
+  },
+  {
+    id: "p2",
+    label: "Visakhapatnam Port",
+    address: "Port Area, Visakhapatnam",
+    city: "Visakhapatnam",
+    kind: "other",
+  },
   { id: "p3", label: "Warangal", address: "Hanamkonda, Warangal", city: "Warangal", kind: "other" },
-  { id: "p4", label: "Guntur Market Yard", address: "Mirchi Yard, Guntur", city: "Guntur", kind: "other" },
-  { id: "p5", label: "Pune — Chakan MIDC", address: "Chakan Industrial Area, Pune", city: "Pune", kind: "other" },
-  { id: "p6", label: "Mumbai — Bhiwandi", address: "Bhiwandi Logistics Hub, Mumbai", city: "Mumbai", kind: "other" },
-  { id: "p7", label: "Chennai — Ambattur", address: "Ambattur Industrial Estate, Chennai", city: "Chennai", kind: "other" },
+  {
+    id: "p4",
+    label: "Guntur Market Yard",
+    address: "Mirchi Yard, Guntur",
+    city: "Guntur",
+    kind: "other",
+  },
+  {
+    id: "p5",
+    label: "Pune — Chakan MIDC",
+    address: "Chakan Industrial Area, Pune",
+    city: "Pune",
+    kind: "other",
+  },
+  {
+    id: "p6",
+    label: "Mumbai — Bhiwandi",
+    address: "Bhiwandi Logistics Hub, Mumbai",
+    city: "Mumbai",
+    kind: "other",
+  },
+  {
+    id: "p7",
+    label: "Chennai — Ambattur",
+    address: "Ambattur Industrial Estate, Chennai",
+    city: "Chennai",
+    kind: "other",
+  },
 ];
 
-const CAPTAIN_NAMES = [
-  "Ravi Kumar",
-  "Suresh Babu",
-  "Imran Khan",
-  "Mahesh Reddy",
-  "Anil Yadav",
-];
+const CAPTAIN_NAMES = ["Ravi Kumar", "Suresh Babu", "Imran Khan", "Mahesh Reddy", "Anil Yadav"];
 
 const PLATE_PREFIX = ["TS09", "TS07", "AP16", "KA05", "TS10"];
 
 /** Deterministic captain for a given truck type (used by the matching screen). */
 export function captainForTruck(truckTypeId: string): Captain {
-  const idx = Math.max(0, TRUCK_TYPES.findIndex((t) => t.id === truckTypeId));
+  const idx = Math.max(
+    0,
+    TRUCK_TYPES.findIndex((t) => t.id === truckTypeId),
+  );
   const truck = TRUCK_TYPES[idx] ?? TRUCK_TYPES[0];
   return {
     id: `cap-${truckTypeId}`,

@@ -148,10 +148,17 @@ function AccountPage() {
                   onClick={() => setLang(l.code)}
                   className={[
                     "flex flex-col items-start rounded-xl border px-3 py-2.5 text-left transition-colors",
-                    active ? "border-primary bg-primary/10" : "border-border bg-background hover:border-primary/40",
+                    active
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-background hover:border-primary/40",
                   ].join(" ")}
                 >
-                  <span className={["text-sm font-bold", active ? "text-primary" : "text-foreground"].join(" ")}>
+                  <span
+                    className={[
+                      "text-sm font-bold",
+                      active ? "text-primary" : "text-foreground",
+                    ].join(" ")}
+                  >
                     {l.native}
                   </span>
                   <span className="text-[11px] text-muted-foreground">{l.label}</span>
@@ -217,13 +224,20 @@ function AccountPage() {
           {SAVED_PLACES.map((p) => (
             <div key={p.id} className="flex items-center gap-3 py-2.5">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-primary">
-                {p.kind === "home" ? <HomeIcon className="h-4 w-4" /> : <Briefcase className="h-4 w-4" />}
+                {p.kind === "home" ? (
+                  <HomeIcon className="h-4 w-4" />
+                ) : (
+                  <Briefcase className="h-4 w-4" />
+                )}
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-foreground">{p.label}</p>
                 <p className="truncate text-xs text-muted-foreground">{p.address}</p>
               </div>
-              <button aria-label={`Edit ${p.label}`} className="text-muted-foreground hover:text-foreground">
+              <button
+                aria-label={`Edit ${p.label}`}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <Pencil className="h-4 w-4" />
               </button>
             </div>
@@ -249,7 +263,9 @@ function AccountPage() {
           <LogOut className="h-4 w-4" /> {t("account.logout")}
         </button>
 
-        <p className="pb-2 text-center text-[11px] text-muted-foreground">LoadMitra · v0.1 · Made in India 🇮🇳</p>
+        <p className="pb-2 text-center text-[11px] text-muted-foreground">
+          LoadMitra · v0.1 · Made in India 🇮🇳
+        </p>
       </div>
 
       {/* Edit profile */}
@@ -322,7 +338,9 @@ function Section({
       <h2 className="mb-2 flex items-center gap-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {Icon && <Icon className="h-4 w-4" />} {title}
       </h2>
-      <div className="rounded-2xl border border-border bg-card p-3 shadow-sm sm:p-4">{children}</div>
+      <div className="rounded-2xl border border-border bg-card p-3 shadow-sm sm:p-4">
+        {children}
+      </div>
     </section>
   );
 }
@@ -361,7 +379,10 @@ function LinkRow({
   onClick?: () => void;
 }) {
   return (
-    <button onClick={onClick} className="flex w-full items-center gap-3 py-2.5 text-left hover:opacity-80">
+    <button
+      onClick={onClick}
+      className="flex w-full items-center gap-3 py-2.5 text-left hover:opacity-80"
+    >
       <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-primary">
         <Icon className="h-4 w-4" />
       </span>
@@ -417,7 +438,10 @@ function EditProfileDialog({
           }}
         >
           <div>
-            <label htmlFor="edit-name" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <label
+              htmlFor="edit-name"
+              className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            >
               {t("login.fullName")}
             </label>
             <input
@@ -429,7 +453,10 @@ function EditProfileDialog({
             />
           </div>
           <div>
-            <label htmlFor="edit-email" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <label
+              htmlFor="edit-email"
+              className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            >
               {t("login.email")}
             </label>
             <input
@@ -517,7 +544,13 @@ function HelpDialog({
 }
 
 /* ============ About LoadMitra ============ */
-function AboutDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+function AboutDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
   const t = useT();
   const features = [
     { icon: Truck, key: "about.f1" as const },
@@ -585,7 +618,14 @@ function RateDialog({
     onOpenChange(v);
   }
 
-  const labels = ["", t("rate.poor"), t("rate.fair"), t("rate.good"), t("rate.great"), t("rate.love")];
+  const labels = [
+    "",
+    t("rate.poor"),
+    t("rate.fair"),
+    t("rate.good"),
+    t("rate.great"),
+    t("rate.love"),
+  ];
   const shown = hover || sel;
 
   return (

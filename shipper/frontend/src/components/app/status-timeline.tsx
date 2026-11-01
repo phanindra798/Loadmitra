@@ -6,10 +6,18 @@ import type { BookingStatus } from "@/features/shipper/types";
 
 const STEPS: { status: BookingStatus; labelKey: TKey; hintKey: TKey }[] = [
   { status: "accepted", labelKey: "timeline.accepted.label", hintKey: "timeline.accepted.hint" },
-  { status: "enroute_pickup", labelKey: "timeline.enroutePickup.label", hintKey: "timeline.enroutePickup.hint" },
+  {
+    status: "enroute_pickup",
+    labelKey: "timeline.enroutePickup.label",
+    hintKey: "timeline.enroutePickup.hint",
+  },
   { status: "at_pickup", labelKey: "timeline.atPickup.label", hintKey: "timeline.atPickup.hint" },
   { status: "picked", labelKey: "timeline.picked.label", hintKey: "timeline.picked.hint" },
-  { status: "enroute_drop", labelKey: "timeline.enrouteDrop.label", hintKey: "timeline.enrouteDrop.hint" },
+  {
+    status: "enroute_drop",
+    labelKey: "timeline.enrouteDrop.label",
+    hintKey: "timeline.enrouteDrop.hint",
+  },
   { status: "delivered", labelKey: "timeline.delivered.label", hintKey: "timeline.delivered.hint" },
 ];
 
@@ -66,7 +74,10 @@ export function StatusTimeline({ status }: { status: BookingStatus }) {
                 <span className="relative flex h-2.5 w-2.5">
                   <span
                     className="absolute inset-0 rounded-full"
-                    style={{ background: "var(--primary)", animation: "lm-ping-ring 1.8s ease-out infinite" }}
+                    style={{
+                      background: "var(--primary)",
+                      animation: "lm-ping-ring 1.8s ease-out infinite",
+                    }}
                   />
                   <span className="relative h-2.5 w-2.5 rounded-full bg-primary" />
                 </span>
@@ -78,7 +89,11 @@ export function StatusTimeline({ status }: { status: BookingStatus }) {
               <p
                 className={cn(
                   "text-sm font-semibold",
-                  active ? "text-foreground" : done ? "text-foreground/80" : "text-muted-foreground",
+                  active
+                    ? "text-foreground"
+                    : done
+                      ? "text-foreground/80"
+                      : "text-muted-foreground",
                 )}
               >
                 {t(step.labelKey)}

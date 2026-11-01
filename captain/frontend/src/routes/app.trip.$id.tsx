@@ -1,8 +1,16 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  ChevronLeft, Navigation, MapPin, KeyRound, ShieldAlert, CheckCircle2,
-  Truck, Star, X, Wallet,
+  ChevronLeft,
+  Navigation,
+  MapPin,
+  KeyRound,
+  ShieldAlert,
+  CheckCircle2,
+  Truck,
+  Star,
+  X,
+  Wallet,
 } from "lucide-react";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { MapCanvas } from "@/components/app/map-canvas";
@@ -32,9 +40,20 @@ function stepFor(status: TripStatus): Step | null {
     case "at_pickup":
       return { kind: "otp", label: "Verify pickup OTP & load", otp: "pickup", next: "picked" };
     case "picked":
-      return { kind: "advance", label: "Start drive to drop", next: "enroute_drop", icon: Navigation };
+      return {
+        kind: "advance",
+        label: "Start drive to drop",
+        next: "enroute_drop",
+        icon: Navigation,
+      };
     case "enroute_drop":
-      return { kind: "otp", label: "Verify drop OTP & complete", otp: "drop", next: "delivered", complete: true };
+      return {
+        kind: "otp",
+        label: "Verify drop OTP & complete",
+        otp: "drop",
+        next: "delivered",
+        complete: true,
+      };
     default:
       return null;
   }
@@ -70,15 +89,33 @@ function TripPage() {
   const [rating, setRating] = useState(0);
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
-  useEffect(() => { setOtp(""); }, [id, trip?.status]);
+  useEffect(() => {
+    setOtp("");
+  }, [id, trip?.status]);
 
   if (!trip) {
     return (
       <div className="mx-auto min-h-[100dvh] w-full max-w-2xl">
         <div className="flex flex-col items-center gap-3 px-6 py-24 text-center">
           <Truck className="h-8 w-8 text-muted-foreground" />
-          <p role="status" className="font-semibold text-foreground">{!authenticated ? "Sign in to view this trip" : loading ? "Loading your saved trip…" : error ?? "Trip not found"}</p>
-          {!authenticated ? <Link to="/login"><Button>Sign in</Button></Link> : !loading && <Button onClick={retry} variant="outline">Retry</Button>}
+          <p role="status" className="font-semibold text-foreground">
+            {!authenticated
+              ? "Sign in to view this trip"
+              : loading
+                ? "Loading your saved trip…"
+                : (error ?? "Trip not found")}
+          </p>
+          {!authenticated ? (
+            <Link to="/login">
+              <Button>Sign in</Button>
+            </Link>
+          ) : (
+            !loading && (
+              <Button onClick={retry} variant="outline">
+                Retry
+              </Button>
+            )
+          )}
           <Link to="/app">
             <Button className="rounded-xl">Back to dashboard</Button>
           </Link>
@@ -98,10 +135,17 @@ function TripPage() {
     busyRef.current = true;
     setBusy(true);
     try {
-      const ok = step.kind === "advance" ? await updateStatus(step.next, undefined, id)
-        : step.complete ? await completeTrip(undefined, otp, id) : await updateStatus(step.next, otp, id);
+      const ok =
+        step.kind === "advance"
+          ? await updateStatus(step.next, undefined, id)
+          : step.complete
+            ? await completeTrip(undefined, otp, id)
+            : await updateStatus(step.next, otp, id);
       if (ok) setOtp("");
-    } finally { busyRef.current = false; setBusy(false); }
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
   }
 
   async function cancel() {
@@ -110,7 +154,10 @@ function TripPage() {
     setBusy(true);
     try {
       if (await cancelTrip(id)) await navigate({ to: "/app" });
-    } finally { busyRef.current = false; setBusy(false); }
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
   }
 
   return (
@@ -129,7 +176,10 @@ function TripPage() {
         <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/95 px-3 py-2 text-xs font-bold text-foreground shadow-sm backdrop-blur">
           {!delivered && trip.status !== "cancelled" && (
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-2 w-2 rounded-full bg-cyan-accent" style={{ animation: "lm-pulse-dot 1.4s ease-in-out infinite" }} />
+              <span
+                className="absolute inline-flex h-2 w-2 rounded-full bg-cyan-accent"
+                style={{ animation: "lm-pulse-dot 1.4s ease-in-out infinite" }}
+              />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-accent" />
             </span>
           )}
@@ -140,7 +190,14 @@ function TripPage() {
       {/* Trip sheet */}
       <div className="absolute inset-x-0 bottom-16 z-20 px-2 sm:px-4 lg:inset-auto lg:bottom-6 lg:right-6 lg:top-6 lg:w-[420px] lg:px-0">
         <div className="mx-auto max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl lm-no-scrollbar lg:max-h-[calc(100vh-3rem)]">
-          {error && <div role="alert" className="mb-3 rounded-xl border border-destructive/30 p-3 text-sm">Could not refresh this trip. <button type="button" onClick={retry} className="font-semibold underline">Retry</button></div>}
+          {error && (
+            <div role="alert" className="mb-3 rounded-xl border border-destructive/30 p-3 text-sm">
+              Could not refresh this trip.{" "}
+              <button type="button" onClick={retry} className="font-semibold underline">
+                Retry
+              </button>
+            </div>
+          )}
           {/* Headline */}
           <div className="flex items-center gap-3">
             <span
@@ -152,20 +209,32 @@ function TripPage() {
               {delivered ? <CheckCircle2 className="h-6 w-6" /> : <Truck className="h-6 w-6" />}
             </span>
             <div className="min-w-0">
-              <p className="truncate text-lg font-extrabold tracking-tight text-foreground">{h.title}</p>
+              <p className="truncate text-lg font-extrabold tracking-tight text-foreground">
+                {h.title}
+              </p>
               {h.sub && <p className="truncate text-sm text-muted-foreground">{h.sub}</p>}
             </div>
           </div>
 
-          <section aria-label="Trip route" className="mt-3 rounded-2xl border border-border bg-card p-3">
+          <section
+            aria-label="Trip route"
+            className="mt-3 rounded-2xl border border-border bg-card p-3"
+          >
             <p className="mb-3 break-all text-xs font-semibold text-muted-foreground">{trip.id}</p>
             <dl className="space-y-3">
-              {[{ label: "Pickup", place: trip.pickup }, { label: "Drop-off", place: trip.drop }].map(({ label, place }) => (
+              {[
+                { label: "Pickup", place: trip.pickup },
+                { label: "Drop-off", place: trip.drop },
+              ].map(({ label, place }) => (
                 <div key={label}>
                   <dt className="text-xs font-semibold text-muted-foreground">{label}</dt>
                   <dd className="break-words text-sm font-semibold text-foreground">
                     {place.label}
-                    {place.address && <span className="mt-0.5 block text-xs font-normal text-muted-foreground">{place.address}</span>}
+                    {place.address && (
+                      <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
+                        {place.address}
+                      </span>
+                    )}
                   </dd>
                 </div>
               ))}
@@ -184,8 +253,12 @@ function TripPage() {
                 <Wallet className="h-5 w-5" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-muted-foreground">Estimated net for this delivery</p>
-                <p className="text-2xl font-extrabold tracking-tight text-foreground">{inr(trip.payout.net)}</p>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Estimated net for this delivery
+                </p>
+                <p className="text-2xl font-extrabold tracking-tight text-foreground">
+                  {inr(trip.payout.net)}
+                </p>
               </div>
             </div>
           )}
@@ -204,7 +277,15 @@ function TripPage() {
                 </p>
               </div>
               <div className="mt-3 flex justify-center">
-                <InputOTP maxLength={6} value={otp} onChange={setOtp} disabled={busy} pattern={REGEXP_ONLY_DIGITS} inputMode="numeric" aria-label="Six-digit handover code">
+                <InputOTP
+                  maxLength={6}
+                  value={otp}
+                  onChange={setOtp}
+                  disabled={busy}
+                  pattern={REGEXP_ONLY_DIGITS}
+                  inputMode="numeric"
+                  aria-label="Six-digit handover code"
+                >
                   <InputOTPGroup className="gap-1.5">
                     {[0, 1, 2, 3, 4, 5].map((i) => (
                       <InputOTPSlot
@@ -216,7 +297,10 @@ function TripPage() {
                   </InputOTPGroup>
                 </InputOTP>
               </div>
-              <p className="mt-2 text-center text-[11px] text-muted-foreground">Use the latest code from the shipper's tracking screen. Codes expire after 10 minutes and allow five attempts.</p>
+              <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                Use the latest code from the shipper's tracking screen. Codes expire after 10
+                minutes and allow five attempts.
+              </p>
             </div>
           )}
 
@@ -253,13 +337,15 @@ function TripPage() {
               >
                 <ShieldAlert className="h-4 w-4" /> SOS
               </button>
-              {["accepted", "enroute_pickup", "at_pickup"].includes(trip.status) && <button
-                onClick={cancel}
-                disabled={busy}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card text-sm font-bold text-muted-foreground hover:bg-secondary hover:text-foreground"
-              >
-                <X className="h-4 w-4" /> Cancel
-              </button>}
+              {["accepted", "enroute_pickup", "at_pickup"].includes(trip.status) && (
+                <button
+                  onClick={cancel}
+                  disabled={busy}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card text-sm font-bold text-muted-foreground hover:bg-secondary hover:text-foreground"
+                >
+                  <X className="h-4 w-4" /> Cancel
+                </button>
+              )}
               {sos && (
                 <p className="col-span-2 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
                   Live location shared with LoadMitra safety team and your emergency contact.
@@ -295,7 +381,9 @@ function TripPage() {
               </div>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <Link to="/app/trips" className="col-span-1">
-                  <Button variant="outline" className="h-11 w-full rounded-xl">View trips</Button>
+                  <Button variant="outline" className="h-11 w-full rounded-xl">
+                    View trips
+                  </Button>
                 </Link>
                 <Link to="/app" className="col-span-1">
                   <Button className="h-11 w-full rounded-xl">Find next load</Button>

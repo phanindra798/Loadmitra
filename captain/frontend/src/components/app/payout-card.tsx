@@ -78,7 +78,10 @@ export function PayoutCard({
         <div className="mt-3">
           <span
             className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold"
-            style={{ background: "color-mix(in oklab, var(--success) 18%, transparent)", color: "var(--success)" }}
+            style={{
+              background: "color-mix(in oklab, var(--success) 18%, transparent)",
+              color: "var(--success)",
+            }}
           >
             <TrendingUp className="h-3.5 w-3.5" /> Bonus for filling an empty trip
           </span>

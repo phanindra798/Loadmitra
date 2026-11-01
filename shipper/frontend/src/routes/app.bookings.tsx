@@ -27,7 +27,8 @@ const ACTIVE = new Set<BookingStatus>([
 
 function statusMeta(s: BookingStatus, t: Translate): { label: string; cls: string } {
   if (s === "delivered") return { label: t("status.delivered"), cls: "bg-success/15 text-success" };
-  if (s === "cancelled") return { label: t("status.cancelled"), cls: "bg-destructive/15 text-destructive" };
+  if (s === "cancelled")
+    return { label: t("status.cancelled"), cls: "bg-destructive/15 text-destructive" };
   if (s === "requested" || s === "accepted")
     return { label: t("status.confirmed"), cls: "bg-primary/15 text-primary" };
   return { label: t("status.onTheWay"), cls: "bg-cyan-accent/15 text-cyan-accent" };
@@ -36,10 +37,19 @@ function statusMeta(s: BookingStatus, t: Translate): { label: string; cls: strin
 function BookingsPage() {
   const navigate = useNavigate();
   const t = useT();
-  const { bookings, authenticated, historyLoading, historyError, refreshBookings, hasMoreBookings, loadMoreBookings, getBooking } = useBooking();
+  const {
+    bookings,
+    authenticated,
+    historyLoading,
+    historyError,
+    refreshBookings,
+    hasMoreBookings,
+    loadMoreBookings,
+    getBooking,
+  } = useBooking();
   const [filter, setFilter] = useState<Filter>("all");
   const [detailId, setDetailId] = useState<string | null>(null);
-  const detail = detailId ? getBooking(detailId) ?? null : null;
+  const detail = detailId ? (getBooking(detailId) ?? null) : null;
 
   const filtered = bookings.filter((b) => {
     if (filter === "active") return ACTIVE.has(b.status);
@@ -57,13 +67,42 @@ function BookingsPage() {
 
   return (
     <div className="mx-auto min-h-[100dvh] w-full max-w-4xl pb-28 lg:pb-10">
-      <PageHeader title={t("bookings.title")} subtitle={t("bookings.count", { n: bookings.length })} back={false} />
+      <PageHeader
+        title={t("bookings.title")}
+        subtitle={t("bookings.count", { n: bookings.length })}
+        back={false}
+      />
 
       <div className="px-4 pt-4 sm:px-6">
-        {!authenticated && <p className="mb-4">Please <Link className="text-primary underline" to="/login">sign in</Link> to see your bookings.</p>}
-        {authenticated && <Button variant="outline" className="mb-4" onClick={() => void refreshBookings()} disabled={historyLoading}>Refresh bookings</Button>}
-        {historyLoading && <p role="status" className="mb-4 text-sm">Loading your bookings…</p>}
-        {historyError && <p role="alert" className="mb-4 text-sm text-destructive">{historyError}. Use Refresh bookings to retry.</p>}
+        {!authenticated && (
+          <p className="mb-4">
+            Please{" "}
+            <Link className="text-primary underline" to="/login">
+              sign in
+            </Link>{" "}
+            to see your bookings.
+          </p>
+        )}
+        {authenticated && (
+          <Button
+            variant="outline"
+            className="mb-4"
+            onClick={() => void refreshBookings()}
+            disabled={historyLoading}
+          >
+            Refresh bookings
+          </Button>
+        )}
+        {historyLoading && (
+          <p role="status" className="mb-4 text-sm">
+            Loading your bookings…
+          </p>
+        )}
+        {historyError && (
+          <p role="alert" className="mb-4 text-sm text-destructive">
+            {historyError}. Use Refresh bookings to retry.
+          </p>
+        )}
         {/* Filter tabs */}
         <div className="mb-4 flex gap-2 overflow-x-auto pb-1 lm-no-scrollbar">
           {tabs.map((t) => (
@@ -83,9 +122,16 @@ function BookingsPage() {
         </div>
 
         {filtered.length === 0 ? (
-          authenticated && !historyLoading && !historyError && (hasMoreBookings
-            ? <p className="py-8 text-center text-muted-foreground">No matching bookings loaded. Check older bookings below.</p>
-            : <EmptyState />)
+          authenticated &&
+          !historyLoading &&
+          !historyError &&
+          (hasMoreBookings ? (
+            <p className="py-8 text-center text-muted-foreground">
+              No matching bookings loaded. Check older bookings below.
+            </p>
+          ) : (
+            <EmptyState />
+          ))
         ) : (
           <>
             {/* Mobile: cards */}
@@ -118,11 +164,15 @@ function BookingsPage() {
                           <p className="font-semibold text-foreground">{b.pickup.label}</p>
                           <p className="text-xs text-muted-foreground">→ {b.drop.label}</p>
                         </td>
-                        <td className="px-4 py-3 text-muted-foreground">{t(MODE_I18N[b.mode].label)}</td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {t(MODE_I18N[b.mode].label)}
+                        </td>
                         <td className="px-4 py-3 text-muted-foreground">{b.truckTypeName}</td>
                         <td className="px-4 py-3 text-muted-foreground">{b.createdLabel}</td>
                         <td className="px-4 py-3">
-                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${sm.cls}`}>
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${sm.cls}`}
+                          >
                             {sm.label}
                           </span>
                         </td>
@@ -145,7 +195,16 @@ function BookingsPage() {
             </div>
           </>
         )}
-        {hasMoreBookings && <Button variant="outline" className="mt-4 w-full" disabled={historyLoading} onClick={() => void loadMoreBookings()}>Load older bookings</Button>}
+        {hasMoreBookings && (
+          <Button
+            variant="outline"
+            className="mt-4 w-full"
+            disabled={historyLoading}
+            onClick={() => void loadMoreBookings()}
+          >
+            Load older bookings
+          </Button>
+        )}
       </div>
 
       <BookingDetailsDialog
@@ -174,7 +233,9 @@ function BookingCard({ booking: b, onOpen }: { booking: Booking; onOpen: () => v
         <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
           <Icon className="h-4 w-4 text-primary" /> {t(MODE_I18N[b.mode].label)}
         </span>
-        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${sm.cls}`}>{sm.label}</span>
+        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${sm.cls}`}>
+          {sm.label}
+        </span>
       </div>
 
       <div className="mt-3 flex items-stretch gap-3">
@@ -194,7 +255,9 @@ function BookingCard({ booking: b, onOpen }: { booking: Booking; onOpen: () => v
           {b.truckTypeName} · {b.createdLabel}
         </span>
         <span className="flex items-center gap-2">
-          <span className="font-extrabold text-foreground">{inr(b.agreedPrice ?? b.price.estimate)}</span>
+          <span className="font-extrabold text-foreground">
+            {inr(b.agreedPrice ?? b.price.estimate)}
+          </span>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </span>
       </div>

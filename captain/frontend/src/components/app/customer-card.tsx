@@ -57,7 +57,9 @@ export function CustomerCard({
 
       {showActions && (
         <div className="mt-3 flex items-center justify-between gap-3">
-          <span className="text-[11px] text-muted-foreground">Chats &amp; calls are number-masked.</span>
+          <span className="text-[11px] text-muted-foreground">
+            Chats &amp; calls are number-masked.
+          </span>
           <div className="flex items-center gap-2">
             <button
               type="button"

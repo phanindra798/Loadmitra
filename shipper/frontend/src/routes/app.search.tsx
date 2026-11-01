@@ -47,9 +47,7 @@ function SearchPage() {
 
   const query = (active === "pickup" ? pickupText : dropText).trim().toLowerCase();
   const results = PLACE_DIRECTORY.filter((p) =>
-    query
-      ? `${p.label} ${p.address} ${p.city}`.toLowerCase().includes(query)
-      : true,
+    query ? `${p.label} ${p.address} ${p.city}`.toLowerCase().includes(query) : true,
   );
 
   function choose(place: Place) {
@@ -137,7 +135,12 @@ function SearchPage() {
           <div className="absolute left-[26px] top-[34px] bottom-[34px] w-px border-l-2 border-dashed border-border" />
           <FieldRow
             tone="var(--primary)"
-            icon={<span className="block h-3 w-3 rounded-full" style={{ background: "var(--primary)" }} />}
+            icon={
+              <span
+                className="block h-3 w-3 rounded-full"
+                style={{ background: "var(--primary)" }}
+              />
+            }
             placeholder={t("search.pickupPlaceholder")}
             value={pickupText}
             activeField={active === "pickup"}
@@ -206,8 +209,12 @@ function SearchPage() {
                       <Icon className="h-4 w-4" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold text-foreground">{p.label}</span>
-                      <span className="block truncate text-xs text-muted-foreground">{p.address}</span>
+                      <span className="block truncate text-sm font-semibold text-foreground">
+                        {p.label}
+                      </span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {p.address}
+                      </span>
                     </span>
                     <Navigation className="h-4 w-4 shrink-0 text-muted-foreground" />
                   </button>
@@ -233,7 +240,11 @@ function SearchPage() {
       {/* Sticky continue */}
       <div className="fixed inset-x-0 bottom-16 z-30 border-t border-border bg-background/95 p-3 backdrop-blur-xl lg:bottom-0 lg:left-[260px]">
         <div className="mx-auto max-w-2xl px-1">
-          <Button onClick={cont} disabled={!canContinue} className="h-12 w-full rounded-xl text-base">
+          <Button
+            onClick={cont}
+            disabled={!canContinue}
+            className="h-12 w-full rounded-xl text-base"
+          >
             {t("search.seeEstimate")} <ArrowRight className="h-4 w-4" />
           </Button>
         </div>

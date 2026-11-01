@@ -32,7 +32,10 @@ export function CapacityBar({
         </span>
       </div>
       <div className="mt-1.5 flex h-2.5 w-full overflow-hidden rounded-full bg-secondary">
-        <div className="h-full rounded-l-full" style={{ width: `${usedPct}%`, background: "var(--cyan-accent)" }} />
+        <div
+          className="h-full rounded-l-full"
+          style={{ width: `${usedPct}%`, background: "var(--cyan-accent)" }}
+        />
         {add > 0 && (
           <div
             className="h-full"
@@ -46,7 +49,9 @@ export function CapacityBar({
       </div>
       <div className="mt-1.5 flex items-center justify-between text-[11px] font-medium text-muted-foreground">
         <span>{freeKg.toLocaleString("en-IN")} kg free</span>
-        {add > 0 && <span className="text-primary">+ {add.toLocaleString("en-IN")} kg your load</span>}
+        {add > 0 && (
+          <span className="text-primary">+ {add.toLocaleString("en-IN")} kg your load</span>
+        )}
       </div>
     </div>
   );

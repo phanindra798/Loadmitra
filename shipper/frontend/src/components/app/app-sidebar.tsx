@@ -101,8 +101,12 @@ export function AppSidebar() {
             {initials}
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold text-foreground">{displayName}</span>
-            <span className="block truncate text-xs text-muted-foreground">{t("common.shipperAccount")}</span>
+            <span className="block truncate text-sm font-semibold text-foreground">
+              {displayName}
+            </span>
+            <span className="block truncate text-xs text-muted-foreground">
+              {t("common.shipperAccount")}
+            </span>
           </span>
         </Link>
 

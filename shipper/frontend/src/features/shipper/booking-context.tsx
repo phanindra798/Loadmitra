@@ -12,12 +12,7 @@ import {
 import { ApiError, shipperApi } from "@/lib/api";
 import { useSessionKey } from "@/lib/session";
 import { mergeBookings } from "./booking-record";
-import type {
-  Booking,
-  BookingDraft,
-  BookingMode,
-  Place,
-} from "./types";
+import type { Booking, BookingDraft, BookingMode, Place } from "./types";
 
 /**
  * Holds the in-progress booking "draft" the user assembles across the flow
@@ -112,10 +107,20 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   const { session, key } = useSessionKey();
   // Changing or clearing a session remounts all booking state and cancels its
   // pending requests. No history is reused for a different signed-in account.
-  return <BookingStore key={key} authenticated={Boolean(session)}>{children}</BookingStore>;
+  return (
+    <BookingStore key={key} authenticated={Boolean(session)}>
+      {children}
+    </BookingStore>
+  );
 }
 
-function BookingStore({ children, authenticated }: { children: ReactNode; authenticated: boolean }) {
+function BookingStore({
+  children,
+  authenticated,
+}: {
+  children: ReactNode;
+  authenticated: boolean;
+}) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [historyLoading, setHistoryLoading] = useState(authenticated);
   const [historyError, setHistoryError] = useState<string | null>(null);
@@ -124,29 +129,32 @@ function BookingStore({ children, authenticated }: { children: ReactNode; authen
   const storeBooking = useCallback((booking: Booking) => {
     dispatch({ type: "restoreBookings", bookings: [booking] });
   }, []);
-  const load = useCallback(async (before?: string) => {
-    if (!authenticated) return;
-    historyRequest.current?.abort();
-    const controller = new AbortController();
-    historyRequest.current = controller;
-    setHistoryLoading(true);
-    setHistoryError(null);
-    try {
-      const page = await shipperApi.listBookings(before, controller.signal);
-      if (controller.signal.aborted) return;
-      dispatch({ type: "restoreBookings", bookings: page.bookings });
-      setNextCursor(page.nextCursor);
-    } catch (error) {
-      if (controller.signal.aborted) return;
-      if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
-        dispatch({ type: "clearBookings" });
-        setNextCursor(null);
+  const load = useCallback(
+    async (before?: string) => {
+      if (!authenticated) return;
+      historyRequest.current?.abort();
+      const controller = new AbortController();
+      historyRequest.current = controller;
+      setHistoryLoading(true);
+      setHistoryError(null);
+      try {
+        const page = await shipperApi.listBookings(before, controller.signal);
+        if (controller.signal.aborted) return;
+        dispatch({ type: "restoreBookings", bookings: page.bookings });
+        setNextCursor(page.nextCursor);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
+          dispatch({ type: "clearBookings" });
+          setNextCursor(null);
+        }
+        setHistoryError(error instanceof Error ? error.message : "Could not load your bookings");
+      } finally {
+        if (!controller.signal.aborted) setHistoryLoading(false);
       }
-      setHistoryError(error instanceof Error ? error.message : "Could not load your bookings");
-    } finally {
-      if (!controller.signal.aborted) setHistoryLoading(false);
-    }
-  }, [authenticated]);
+    },
+    [authenticated],
+  );
   const refreshBookings = useCallback(() => load(), [load]);
   const loadMoreBookings = useCallback(async () => {
     if (nextCursor && !historyLoading) await load(nextCursor);
@@ -164,8 +172,13 @@ function BookingStore({ children, authenticated }: { children: ReactNode; authen
   const value = useMemo<BookingContextValue>(
     () => ({
       ...state,
-      authenticated, historyLoading, historyError, hasMoreBookings: nextCursor !== null,
-      refreshBookings, loadMoreBookings, storeBooking,
+      authenticated,
+      historyLoading,
+      historyError,
+      hasMoreBookings: nextCursor !== null,
+      refreshBookings,
+      loadMoreBookings,
+      storeBooking,
       setMode: (mode) => dispatch({ type: "setMode", mode }),
       setPickup: (place) => dispatch({ type: "setPickup", place }),
       setDrop: (place) => dispatch({ type: "setDrop", place }),
@@ -177,7 +190,17 @@ function BookingStore({ children, authenticated }: { children: ReactNode; authen
       createBooking: storeBooking,
       getBooking,
     }),
-    [state, getBooking, authenticated, historyLoading, historyError, nextCursor, refreshBookings, loadMoreBookings, storeBooking],
+    [
+      state,
+      getBooking,
+      authenticated,
+      historyLoading,
+      historyError,
+      nextCursor,
+      refreshBookings,
+      loadMoreBookings,
+      storeBooking,
+    ],
   );
 
   return <BookingContext.Provider value={value}>{children}</BookingContext.Provider>;
@@ -193,11 +216,21 @@ export function useBooking() {
 export function useStoredBooking(id: string) {
   const { getBooking, storeBooking, authenticated } = useBooking();
   const [revision, setRevision] = useState(0);
-  const [result, setResult] = useState({ id, loading: true, error: null as string | null, unavailable: false });
-  const retry = useCallback(() => setRevision(v => v + 1), []);
+  const [result, setResult] = useState({
+    id,
+    loading: true,
+    error: null as string | null,
+    unavailable: false,
+  });
+  const retry = useCallback(() => setRevision((v) => v + 1), []);
   useEffect(() => {
     if (!id || !authenticated) {
-      setResult({ id, loading: false, error: !authenticated ? "Please sign in to view this booking." : "No booking selected.", unavailable: true });
+      setResult({
+        id,
+        loading: false,
+        error: !authenticated ? "Please sign in to view this booking." : "No booking selected.",
+        unavailable: true,
+      });
       return;
     }
     const controller = new AbortController();
@@ -214,13 +247,21 @@ export function useStoredBooking(id: string) {
       } catch (error) {
         if (controller.signal.aborted) return;
         const unavailable = error instanceof ApiError && [401, 403, 404].includes(error.status);
-        setResult({ id, loading: false, error: error instanceof Error ? error.message : "Could not load booking", unavailable });
+        setResult({
+          id,
+          loading: false,
+          error: error instanceof Error ? error.message : "Could not load booking",
+          unavailable,
+        });
         again = !unavailable;
       }
       if (again && !controller.signal.aborted) timer = setTimeout(poll, 3000);
     }
     void poll();
-    return () => { controller.abort(); clearTimeout(timer); };
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
   }, [id, authenticated, revision, storeBooking]);
   return {
     booking: result.id === id && result.unavailable ? undefined : getBooking(id),

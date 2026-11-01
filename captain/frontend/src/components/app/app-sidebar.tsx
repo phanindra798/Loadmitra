@@ -9,7 +9,12 @@ import { NAV_ITEMS } from "./nav-items";
 import { OnlineToggle } from "./online-toggle";
 
 function initials(name: string) {
-  return name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+  return name
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 }
 
 /**
@@ -105,9 +110,12 @@ export function AppSidebar() {
             {initials(profile.name)}
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm font-semibold text-foreground">{profile.name}</span>
+            <span className="block truncate text-sm font-semibold text-foreground">
+              {profile.name}
+            </span>
             <span className="flex items-center gap-1 truncate text-xs text-muted-foreground">
-              <Star className="h-3 w-3 fill-current text-savings" /> {profile.rating} · {profile.vehicleNumber}
+              <Star className="h-3 w-3 fill-current text-savings" /> {profile.rating} ·{" "}
+              {profile.vehicleNumber}
             </span>
           </span>
         </Link>

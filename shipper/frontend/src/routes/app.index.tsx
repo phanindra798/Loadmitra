@@ -126,10 +126,19 @@ function ShipperHome() {
       <div className="absolute inset-x-0 bottom-16 z-20 px-2 sm:px-4 lg:inset-auto lg:bottom-auto lg:left-6 lg:top-20 lg:w-[400px] lg:px-0">
         <div className="mx-auto max-h-[74vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl lm-no-scrollbar lg:max-h-[calc(100vh-7rem)]">
           {/* Active trip banner */}
-          {historyLoading && <p role="status" className="mb-3 text-sm text-muted-foreground">Loading your recent bookings…</p>}
-          {historyError && <p role="alert" className="mb-3 text-sm text-destructive">
-            Could not refresh your bookings. <Link to="/app/bookings" className="underline">Open bookings to retry.</Link>
-          </p>}
+          {historyLoading && (
+            <p role="status" className="mb-3 text-sm text-muted-foreground">
+              Loading your recent bookings…
+            </p>
+          )}
+          {historyError && (
+            <p role="alert" className="mb-3 text-sm text-destructive">
+              Could not refresh your bookings.{" "}
+              <Link to="/app/bookings" className="underline">
+                Open bookings to retry.
+              </Link>
+            </p>
+          )}
           {activeTrip && (
             <Link
               to="/app/track/$id"
@@ -140,7 +149,9 @@ function ShipperHome() {
                 <Navigation2 className="h-4 w-4" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-bold text-foreground">{t("home.tripInProgress")}</span>
+                <span className="block text-sm font-bold text-foreground">
+                  {t("home.tripInProgress")}
+                </span>
                 <span className="block truncate text-xs text-muted-foreground">
                   {activeTrip.pickup.label} → {activeTrip.drop.label}
                 </span>
@@ -184,7 +195,12 @@ function ShipperHome() {
                 onClick={() => pickMode(m.id)}
               />
             ))}
-            <ServiceTile icon={Package} label={t("home.track")} tone="primary" onClick={() => navigate({ to: "/app/bookings" })} />
+            <ServiceTile
+              icon={Package}
+              label={t("home.track")}
+              tone="primary"
+              onClick={() => navigate({ to: "/app/bookings" })}
+            />
           </div>
 
           {/* Saved places */}
@@ -200,7 +216,11 @@ function ShipperHome() {
                   className="inline-flex min-w-0 items-center gap-2 rounded-xl border border-border bg-background px-3 py-2 text-left hover:border-primary/40"
                 >
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-secondary text-primary">
-                    {p.kind === "home" ? <HomeIcon className="h-3.5 w-3.5" /> : <Briefcase className="h-3.5 w-3.5" />}
+                    {p.kind === "home" ? (
+                      <HomeIcon className="h-3.5 w-3.5" />
+                    ) : (
+                      <Briefcase className="h-3.5 w-3.5" />
+                    )}
                   </span>
                   <span className="min-w-0">
                     <span className="block text-xs font-bold text-foreground">{p.label}</span>
@@ -235,7 +255,9 @@ function ShipperHome() {
                   key={o.id}
                   to="/app/offers"
                   className="flex w-56 shrink-0 flex-col justify-between rounded-2xl border border-border p-3"
-                  style={{ background: `color-mix(in oklab, ${TONE_VAR[o.tone]} 10%, var(--card))` }}
+                  style={{
+                    background: `color-mix(in oklab, ${TONE_VAR[o.tone]} 10%, var(--card))`,
+                  }}
                 >
                   <p className="text-sm font-bold text-foreground">{o.title}</p>
                   <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{o.desc}</p>

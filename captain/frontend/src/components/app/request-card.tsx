@@ -41,7 +41,10 @@ export function RequestCard({
         <div className="h-1 w-full bg-secondary">
           <div
             className="h-full transition-[width] duration-1000 ease-linear"
-            style={{ width: `${pct * 100}%`, background: pct < 0.3 ? "var(--destructive)" : "var(--primary)" }}
+            style={{
+              width: `${pct * 100}%`,
+              background: pct < 0.3 ? "var(--destructive)" : "var(--primary)",
+            }}
           />
         </div>
       )}
@@ -51,7 +54,10 @@ export function RequestCard({
         <div className="flex items-start justify-between gap-3">
           <span
             className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold"
-            style={{ background: `color-mix(in oklab, ${TONE_VAR[meta.tone]} 16%, transparent)`, color: TONE_VAR[meta.tone] }}
+            style={{
+              background: `color-mix(in oklab, ${TONE_VAR[meta.tone]} 16%, transparent)`,
+              color: TONE_VAR[meta.tone],
+            }}
           >
             <meta.icon className="h-3.5 w-3.5" /> {meta.label}
           </span>
@@ -77,7 +83,8 @@ export function RequestCard({
             <Clock className="h-3.5 w-3.5 text-primary" /> {request.etaToPickupMins} min to pickup
           </span>
           <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-foreground">
-            <Package className="h-3.5 w-3.5 text-primary" /> {request.loadWeightKg.toLocaleString("en-IN")} kg · {request.goodsType}
+            <Package className="h-3.5 w-3.5 text-primary" />{" "}
+            {request.loadWeightKg.toLocaleString("en-IN")} kg · {request.goodsType}
           </span>
         </div>
 
@@ -107,7 +114,8 @@ export function RequestCard({
               onClick={onAccept}
               className="inline-flex h-12 items-center justify-center gap-1.5 rounded-xl bg-primary text-sm font-bold text-primary-foreground shadow-sm hover:brightness-110"
             >
-              <Check className="h-4 w-4" /> Accept {showTimer && secondsLeft != null ? `· ${secondsLeft}s` : ""}
+              <Check className="h-4 w-4" /> Accept{" "}
+              {showTimer && secondsLeft != null ? `· ${secondsLeft}s` : ""}
             </button>
           </div>
         )}

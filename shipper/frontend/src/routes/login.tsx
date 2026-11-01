@@ -1,6 +1,17 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Truck, Phone, ArrowRight, ShieldCheck, Repeat, Users, MapPin, User, Mail, ChevronDown } from "lucide-react";
+import {
+  Truck,
+  Phone,
+  ArrowRight,
+  ShieldCheck,
+  Repeat,
+  Users,
+  MapPin,
+  User,
+  Mail,
+  ChevronDown,
+} from "lucide-react";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
@@ -177,7 +188,11 @@ function LoginPage() {
 
           <h1 className="text-2xl font-bold tracking-tight text-foreground">{heading}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{subheading}</p>
-          {devOtp && step !== "form" && <p role="status" className="mt-3 text-sm font-semibold">Development verification code: {devOtp}</p>}
+          {devOtp && step !== "form" && (
+            <p role="status" className="mt-3 text-sm font-semibold">
+              Development verification code: {devOtp}
+            </p>
+          )}
 
           {/* Login / Register toggle */}
           {step === "form" && (
@@ -233,7 +248,10 @@ function LoginPage() {
               )}
 
               <div>
-                <label htmlFor="phone" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <label
+                  htmlFor="phone"
+                  className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                >
                   {t("login.phoneLabel")}
                 </label>
                 <div className="mt-1.5 flex items-center rounded-xl border border-border bg-card focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
@@ -259,13 +277,20 @@ function LoginPage() {
                     autoComplete="tel"
                     placeholder="98765 43210"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, maxDigits))}
+                    onChange={(e) =>
+                      setPhone(e.target.value.replace(/\D/g, "").slice(0, maxDigits))
+                    }
                     className="min-w-0 flex-1 bg-transparent px-3 py-3 text-base font-semibold text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
                   />
                 </div>
               </div>
-              <Button type="submit" disabled={!formValid || busy} className="h-12 w-full rounded-xl text-base">
-                {isRegister ? t("login.createAccount") : t("login.sendOtp")} <ArrowRight className="h-4 w-4" />
+              <Button
+                type="submit"
+                disabled={!formValid || busy}
+                className="h-12 w-full rounded-xl text-base"
+              >
+                {isRegister ? t("login.createAccount") : t("login.sendOtp")}{" "}
+                <ArrowRight className="h-4 w-4" />
               </Button>
               {error && <p className="text-center text-sm font-medium text-destructive">{error}</p>}
             </form>
@@ -291,7 +316,11 @@ function LoginPage() {
                   </InputOTPGroup>
                 </InputOTP>
               </div>
-              <Button onClick={verify} disabled={otp.length !== 6 || busy} className="h-12 w-full rounded-xl text-base">
+              <Button
+                onClick={verify}
+                disabled={otp.length !== 6 || busy}
+                className="h-12 w-full rounded-xl text-base"
+              >
                 {t("login.verifyContinue")} <ArrowRight className="h-4 w-4" />
               </Button>
               {error && <p className="text-center text-sm font-medium text-destructive">{error}</p>}
@@ -341,7 +370,11 @@ function LoginPage() {
                 onChange={setEmail}
                 autoComplete="email"
               />
-              <Button type="submit" disabled={!profileValid || busy} className="h-12 w-full rounded-xl text-base">
+              <Button
+                type="submit"
+                disabled={!profileValid || busy}
+                className="h-12 w-full rounded-xl text-base"
+              >
                 {t("login.finishContinue")} <ArrowRight className="h-4 w-4" />
               </Button>
               {error && <p className="text-center text-sm font-medium text-destructive">{error}</p>}
@@ -379,7 +412,10 @@ function TextField({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <label
+        htmlFor={id}
+        className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+      >
         {label}
       </label>
       <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-border bg-card px-3 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">

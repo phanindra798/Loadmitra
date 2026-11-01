@@ -125,7 +125,8 @@ export const en = {
   "login.demoHint": "Demo: enter any 6 digits to continue.",
   "login.terms": "By continuing you agree to our Terms & Privacy Policy.",
   "login.tagline": "Your load, always moving.",
-  "login.brandSub": "Book full or shared trucks, save up to 30% on return trips, and track every shipment live — across India.",
+  "login.brandSub":
+    "Book full or shared trucks, save up to 30% on return trips, and track every shipment live — across India.",
   "login.feature1": "Return-load discounts up to 30%",
   "login.feature2": "Share a truck, pay for the space you use",
   "login.feature3": "Live GPS tracking with dynamic ETA",
@@ -141,7 +142,7 @@ export const en = {
   "search.savedRecent": "Saved & recent",
   "search.results": "Results",
   "search.noMatch": "No saved match",
-  "search.noMatchHint": "We'll use \"{q}\" as the {field} address.",
+  "search.noMatchHint": 'We\'ll use "{q}" as the {field} address.',
   "search.fieldPickup": "pickup",
   "search.fieldDrop": "drop",
   "search.seeEstimate": "See price estimate",
@@ -162,7 +163,8 @@ export const en = {
   "quote.availableTrucks": "Available trucks",
   "quote.tooSmall": "Too small",
   "quote.suggestPrice": "Suggest your price",
-  "quote.suggestHint": "The captain can accept your offer or send a counter-quote. The agreed price is stored on the booking — no payment is taken in-app.",
+  "quote.suggestHint":
+    "The captain can accept your offer or send a counter-quote. The agreed price is stored on the booking — no payment is taken in-app.",
   "quote.bookNow": "Book now",
 
   // Price card
@@ -177,7 +179,8 @@ export const en = {
   "price.discount": "Discount",
   "price.youSave": "You save {amount}",
   "price.co2Saved": "{kg} kg CO₂ saved",
-  "price.disclaimer": "Estimate only — the final price is negotiable with the captain. No payment is collected in the app.",
+  "price.disclaimer":
+    "Estimate only — the final price is negotiable with the captain. No payment is collected in the app.",
 
   // Capacity bar
   "capacity.used": "Capacity used",
@@ -189,7 +192,8 @@ export const en = {
   "matching.foundTitle": "Captain found",
   "matching.noBooking": "This booking is no longer available",
   "matching.searching": "Finding the best captain near you…",
-  "matching.searchingHint": "Matching by route, proximity and rating. Notifying nearby verified captains.",
+  "matching.searchingHint":
+    "Matching by route, proximity and rating. Notifying nearby verified captains.",
   "matching.cancelRequest": "Cancel request",
   "matching.accepted": "A captain accepted your request!",
   "matching.confirmTrack": "Confirm & track",
@@ -244,10 +248,12 @@ export const en = {
   "offers.title": "Offers & savings",
   "offers.subtitle": "Ship smarter, pay less",
   "offers.greenImpact": "Your green impact",
-  "offers.greenSub": "By choosing return & shared loads, you've helped keep trucks full and roads greener.",
+  "offers.greenSub":
+    "By choosing return & shared loads, you've helped keep trucks full and roads greener.",
   "offers.useOffer": "Use this offer",
   "offers.invite": "Invite a business",
-  "offers.disclaimer": "Discounts are applied to your price estimate. Final price is negotiable and settled offline.",
+  "offers.disclaimer":
+    "Discounts are applied to your price estimate. Final price is negotiable and settled offline.",
 
   // Help dialog
   "help.title": "Help & support",
@@ -261,7 +267,8 @@ export const en = {
   // About dialog
   "about.title": "About LoadMitra",
   "about.subtitle": "India's smart freight marketplace.",
-  "about.body": "LoadMitra connects shippers with verified captains (truck drivers & owners) to move goods efficiently — full loads, shared loads, and discounted return loads — with transparent per-tonne estimates and live tracking on every trip.",
+  "about.body":
+    "LoadMitra connects shippers with verified captains (truck drivers & owners) to move goods efficiently — full loads, shared loads, and discounted return loads — with transparent per-tonne estimates and live tracking on every trip.",
   "about.f1": "Book full, shared or return-load trucks across India",
   "about.f2": "Save 20–30% by booking a captain's empty return trip",
   "about.f3": "Share a truck and pay only for the space you use",
@@ -432,7 +439,8 @@ const hi: Record<TKey, string> = {
   "login.demoHint": "डेमो: जारी रखने के लिए कोई भी 6 अंक दर्ज करें।",
   "login.terms": "जारी रखकर आप हमारी शर्तों और गोपनीयता नीति से सहमत होते हैं।",
   "login.tagline": "आपका सामान, हमेशा चलता रहे।",
-  "login.brandSub": "पूरे या साझा ट्रक बुक करें, रिटर्न ट्रिप पर 30% तक बचाएँ, और हर शिपमेंट को लाइव ट्रैक करें — पूरे भारत में।",
+  "login.brandSub":
+    "पूरे या साझा ट्रक बुक करें, रिटर्न ट्रिप पर 30% तक बचाएँ, और हर शिपमेंट को लाइव ट्रैक करें — पूरे भारत में।",
   "login.feature1": "रिटर्न-लोड पर 30% तक छूट",
   "login.feature2": "ट्रक साझा करें, जितनी जगह उतना भुगतान",
   "login.feature3": "डायनेमिक ईटीए के साथ लाइव जीपीएस ट्रैकिंग",
@@ -447,7 +455,7 @@ const hi: Record<TKey, string> = {
   "search.savedRecent": "सहेजे और हाल के",
   "search.results": "परिणाम",
   "search.noMatch": "कोई सहेजा मिलान नहीं",
-  "search.noMatchHint": "हम \"{q}\" को {field} पते के रूप में उपयोग करेंगे।",
+  "search.noMatchHint": 'हम "{q}" को {field} पते के रूप में उपयोग करेंगे।',
   "search.fieldPickup": "पिकअप",
   "search.fieldDrop": "ड्रॉप",
   "search.seeEstimate": "कीमत का अनुमान देखें",
@@ -463,11 +471,13 @@ const hi: Record<TKey, string> = {
   "quote.decreaseWeight": "वज़न घटाएँ",
   "quote.increaseWeight": "वज़न बढ़ाएँ",
   "quote.goodsType": "सामान का प्रकार",
-  "quote.shareHint": "आप इस {truck} को अन्य लोड के साथ साझा करते हैं और केवल अपनी जगह का भुगतान करते हैं।",
+  "quote.shareHint":
+    "आप इस {truck} को अन्य लोड के साथ साझा करते हैं और केवल अपनी जगह का भुगतान करते हैं।",
   "quote.availableTrucks": "उपलब्ध ट्रक",
   "quote.tooSmall": "बहुत छोटा",
   "quote.suggestPrice": "अपनी कीमत सुझाएँ",
-  "quote.suggestHint": "कैप्टन आपका प्रस्ताव स्वीकार कर सकता है या काउंटर-कोट भेज सकता है। तय कीमत बुकिंग पर सहेजी जाती है — ऐप में कोई भुगतान नहीं लिया जाता।",
+  "quote.suggestHint":
+    "कैप्टन आपका प्रस्ताव स्वीकार कर सकता है या काउंटर-कोट भेज सकता है। तय कीमत बुकिंग पर सहेजी जाती है — ऐप में कोई भुगतान नहीं लिया जाता।",
   "quote.bookNow": "अभी बुक करें",
 
   "price.estimated": "अनुमानित कीमत",
@@ -481,7 +491,8 @@ const hi: Record<TKey, string> = {
   "price.discount": "छूट",
   "price.youSave": "आप बचाते हैं {amount}",
   "price.co2Saved": "{kg} किग्रा CO₂ बचाया",
-  "price.disclaimer": "केवल अनुमान — अंतिम कीमत कैप्टन से बातचीत योग्य है। ऐप में कोई भुगतान नहीं लिया जाता।",
+  "price.disclaimer":
+    "केवल अनुमान — अंतिम कीमत कैप्टन से बातचीत योग्य है। ऐप में कोई भुगतान नहीं लिया जाता।",
 
   "capacity.used": "उपयोग की गई क्षमता",
   "capacity.free": "{kg} किग्रा खाली",
@@ -491,7 +502,8 @@ const hi: Record<TKey, string> = {
   "matching.foundTitle": "कैप्टन मिल गया",
   "matching.noBooking": "यह बुकिंग अब उपलब्ध नहीं है",
   "matching.searching": "आपके पास सबसे अच्छा कैप्टन ढूँढ रहे हैं…",
-  "matching.searchingHint": "रूट, निकटता और रेटिंग के अनुसार मिलान। पास के सत्यापित कैप्टन को सूचित किया जा रहा है।",
+  "matching.searchingHint":
+    "रूट, निकटता और रेटिंग के अनुसार मिलान। पास के सत्यापित कैप्टन को सूचित किया जा रहा है।",
   "matching.cancelRequest": "अनुरोध रद्द करें",
   "matching.accepted": "एक कैप्टन ने आपका अनुरोध स्वीकार किया!",
   "matching.confirmTrack": "पुष्टि करें और ट्रैक करें",
@@ -516,10 +528,12 @@ const hi: Record<TKey, string> = {
   "track.co2Saved": "CO₂ बचाया",
   "track.sos": "एसओएस",
   "track.shareTrip": "ट्रिप साझा करें",
-  "track.sosNote": "लाइव स्थान आपके आपातकालीन संपर्कों और LoadMitra सुरक्षा टीम के साथ साझा किया गया।",
+  "track.sosNote":
+    "लाइव स्थान आपके आपातकालीन संपर्कों और LoadMitra सुरक्षा टीम के साथ साझा किया गया।",
   "track.viewBookings": "बुकिंग देखें",
   "track.bookAgain": "फिर बुक करें",
-  "track.deliveredPopupSub": "आपका शिपमेंट {place} पहुँच गया। LoadMitra के साथ शिपिंग के लिए धन्यवाद!",
+  "track.deliveredPopupSub":
+    "आपका शिपमेंट {place} पहुँच गया। LoadMitra के साथ शिपिंग के लिए धन्यवाद!",
   "track.amount": "राशि",
 
   "details.bookingMeta": "बुकिंग {id} · {created}",
@@ -543,10 +557,12 @@ const hi: Record<TKey, string> = {
   "offers.title": "ऑफ़र और बचत",
   "offers.subtitle": "स्मार्ट शिप करें, कम भुगतान करें",
   "offers.greenImpact": "आपका हरित प्रभाव",
-  "offers.greenSub": "रिटर्न और साझा लोड चुनकर, आपने ट्रकों को भरा और सड़कों को हरित रखने में मदद की है।",
+  "offers.greenSub":
+    "रिटर्न और साझा लोड चुनकर, आपने ट्रकों को भरा और सड़कों को हरित रखने में मदद की है।",
   "offers.useOffer": "इस ऑफ़र का उपयोग करें",
   "offers.invite": "किसी व्यवसाय को आमंत्रित करें",
-  "offers.disclaimer": "छूट आपके कीमत अनुमान पर लागू होती है। अंतिम कीमत बातचीत योग्य है और ऑफ़लाइन तय होती है।",
+  "offers.disclaimer":
+    "छूट आपके कीमत अनुमान पर लागू होती है। अंतिम कीमत बातचीत योग्य है और ऑफ़लाइन तय होती है।",
 
   "help.title": "सहायता और समर्थन",
   "help.subtitle": "हम 24/7 यहाँ हैं। जो भी तरीका आसान हो, हमसे संपर्क करें।",
@@ -558,7 +574,8 @@ const hi: Record<TKey, string> = {
 
   "about.title": "LoadMitra के बारे में",
   "about.subtitle": "भारत का स्मार्ट फ्रेट मार्केटप्लेस।",
-  "about.body": "LoadMitra शिपर्स को सत्यापित कैप्टन (ट्रक चालकों और मालिकों) से जोड़ता है ताकि सामान को कुशलता से ले जाया जा सके — पूरे लोड, साझा लोड, और रियायती रिटर्न लोड — पारदर्शी प्रति-टन अनुमान और हर ट्रिप पर लाइव ट्रैकिंग के साथ।",
+  "about.body":
+    "LoadMitra शिपर्स को सत्यापित कैप्टन (ट्रक चालकों और मालिकों) से जोड़ता है ताकि सामान को कुशलता से ले जाया जा सके — पूरे लोड, साझा लोड, और रियायती रिटर्न लोड — पारदर्शी प्रति-टन अनुमान और हर ट्रिप पर लाइव ट्रैकिंग के साथ।",
   "about.f1": "पूरे भारत में पूरे, साझा या रिटर्न-लोड ट्रक बुक करें",
   "about.f2": "कैप्टन की खाली रिटर्न ट्रिप बुक करके 20–30% बचाएँ",
   "about.f3": "ट्रक साझा करें और केवल अपनी जगह का भुगतान करें",
@@ -580,7 +597,8 @@ const hi: Record<TKey, string> = {
 
   "support.title": "LoadMitra समर्थन",
   "support.subtitle": "आमतौर पर कुछ ही मिनटों में जवाब",
-  "support.greeting": "नमस्ते {name} 👋 आप LoadMitra समर्थन से चैट कर रहे हैं। हम कैसे मदद कर सकते हैं?",
+  "support.greeting":
+    "नमस्ते {name} 👋 आप LoadMitra समर्थन से चैट कर रहे हैं। हम कैसे मदद कर सकते हैं?",
   "support.placeholder": "समर्थन को संदेश भेजें…",
   "support.r1": "संपर्क करने के लिए धन्यवाद — एक समर्थन एजेंट जल्द ही इसे देखेगा।",
   "support.r2": "समझ गया। क्या आप अपनी बुकिंग आईडी साझा कर सकते हैं ताकि हम इसे देख सकें?",
@@ -592,7 +610,8 @@ const hi: Record<TKey, string> = {
   "captain.connecting": "आपको {name} से जोड़ रहे हैं…",
   "captain.connectingDesc": "आपकी गोपनीयता के लिए कॉल मास्क किए गए नंबर से होती हैं।",
   "captain.maskedNote": "आपकी गोपनीयता के लिए चैट और कॉल नंबर-मास्क किए गए हैं।",
-  "captain.greeting": "नमस्ते! मैं {name} हूँ, आपका कैप्टन। मैं लगभग {min} मिनट में पिकअप पर पहुँचूँगा। 🚚",
+  "captain.greeting":
+    "नमस्ते! मैं {name} हूँ, आपका कैप्टन। मैं लगभग {min} मिनट में पिकअप पर पहुँचूँगा। 🚚",
   "captain.messagePlaceholder": "{name} को संदेश भेजें…",
   "captain.r1": "ज़रूर, कोई समस्या नहीं 👍",
   "captain.r2": "रास्ते में हूँ — जल्द मिलते हैं।",
@@ -723,7 +742,8 @@ const te: Record<TKey, string> = {
   "login.demoHint": "డెమో: కొనసాగించడానికి ఏవైనా 6 అంకెలను నమోదు చేయండి.",
   "login.terms": "కొనసాగించడం ద్వారా మీరు మా నిబంధనలు & గోప్యతా విధానానికి అంగీకరిస్తారు.",
   "login.tagline": "మీ సరుకు, ఎల్లప్పుడూ కదులుతూ.",
-  "login.brandSub": "పూర్తి లేదా షేర్డ్ ట్రక్‌లను బుక్ చేయండి, రిటర్న్ ట్రిప్‌లపై 30% వరకు ఆదా చేయండి, మరియు ప్రతి షిప్‌మెంట్‌ను లైవ్‌గా ట్రాక్ చేయండి — భారతదేశం అంతటా.",
+  "login.brandSub":
+    "పూర్తి లేదా షేర్డ్ ట్రక్‌లను బుక్ చేయండి, రిటర్న్ ట్రిప్‌లపై 30% వరకు ఆదా చేయండి, మరియు ప్రతి షిప్‌మెంట్‌ను లైవ్‌గా ట్రాక్ చేయండి — భారతదేశం అంతటా.",
   "login.feature1": "రిటర్న్-లోడ్‌లపై 30% వరకు తగ్గింపులు",
   "login.feature2": "ట్రక్‌ను షేర్ చేయండి, మీరు ఉపయోగించే స్థలానికి మాత్రమే చెల్లించండి",
   "login.feature3": "డైనమిక్ ETAతో లైవ్ GPS ట్రాకింగ్",
@@ -738,7 +758,7 @@ const te: Record<TKey, string> = {
   "search.savedRecent": "సేవ్ చేసిన & ఇటీవలి",
   "search.results": "ఫలితాలు",
   "search.noMatch": "సరిపోలే సేవ్ లేదు",
-  "search.noMatchHint": "మేము \"{q}\"ను {field} చిరునామాగా ఉపయోగిస్తాము.",
+  "search.noMatchHint": 'మేము "{q}"ను {field} చిరునామాగా ఉపయోగిస్తాము.',
   "search.fieldPickup": "పికప్",
   "search.fieldDrop": "డ్రాప్",
   "search.seeEstimate": "ధర అంచనా చూడండి",
@@ -754,11 +774,13 @@ const te: Record<TKey, string> = {
   "quote.decreaseWeight": "బరువు తగ్గించండి",
   "quote.increaseWeight": "బరువు పెంచండి",
   "quote.goodsType": "సరుకు రకం",
-  "quote.shareHint": "మీరు ఈ {truck}ను ఇతర లోడ్‌లతో పంచుకుంటారు మరియు మీ స్థలానికి మాత్రమే చెల్లిస్తారు.",
+  "quote.shareHint":
+    "మీరు ఈ {truck}ను ఇతర లోడ్‌లతో పంచుకుంటారు మరియు మీ స్థలానికి మాత్రమే చెల్లిస్తారు.",
   "quote.availableTrucks": "అందుబాటులో ఉన్న ట్రక్‌లు",
   "quote.tooSmall": "చాలా చిన్నది",
   "quote.suggestPrice": "మీ ధరను సూచించండి",
-  "quote.suggestHint": "కెప్టెన్ మీ ఆఫర్‌ను అంగీకరించవచ్చు లేదా కౌంటర్-కోట్ పంపవచ్చు. అంగీకరించిన ధర బుకింగ్‌లో సేవ్ చేయబడుతుంది — యాప్‌లో చెల్లింపు తీసుకోబడదు.",
+  "quote.suggestHint":
+    "కెప్టెన్ మీ ఆఫర్‌ను అంగీకరించవచ్చు లేదా కౌంటర్-కోట్ పంపవచ్చు. అంగీకరించిన ధర బుకింగ్‌లో సేవ్ చేయబడుతుంది — యాప్‌లో చెల్లింపు తీసుకోబడదు.",
   "quote.bookNow": "ఇప్పుడే బుక్ చేయండి",
 
   "price.estimated": "అంచనా ధర",
@@ -772,7 +794,8 @@ const te: Record<TKey, string> = {
   "price.discount": "తగ్గింపు",
   "price.youSave": "మీరు ఆదా చేస్తారు {amount}",
   "price.co2Saved": "{kg} కేజీ CO₂ ఆదా",
-  "price.disclaimer": "అంచనా మాత్రమే — చివరి ధర కెప్టెన్‌తో చర్చించదగినది. యాప్‌లో చెల్లింపు సేకరించబడదు.",
+  "price.disclaimer":
+    "అంచనా మాత్రమే — చివరి ధర కెప్టెన్‌తో చర్చించదగినది. యాప్‌లో చెల్లింపు సేకరించబడదు.",
 
   "capacity.used": "ఉపయోగించిన సామర్థ్యం",
   "capacity.free": "{kg} కేజీ ఖాళీ",
@@ -782,7 +805,8 @@ const te: Record<TKey, string> = {
   "matching.foundTitle": "కెప్టెన్ కనుగొనబడ్డారు",
   "matching.noBooking": "ఈ బుకింగ్ ఇకపై అందుబాటులో లేదు",
   "matching.searching": "మీ దగ్గర ఉత్తమ కెప్టెన్‌ను కనుగొంటోంది…",
-  "matching.searchingHint": "మార్గం, సామీప్యం మరియు రేటింగ్ ప్రకారం సరిపోల్చడం. సమీపంలోని ధృవీకరించబడిన కెప్టెన్‌లకు తెలియజేస్తోంది.",
+  "matching.searchingHint":
+    "మార్గం, సామీప్యం మరియు రేటింగ్ ప్రకారం సరిపోల్చడం. సమీపంలోని ధృవీకరించబడిన కెప్టెన్‌లకు తెలియజేస్తోంది.",
   "matching.cancelRequest": "అభ్యర్థనను రద్దు చేయండి",
   "matching.accepted": "ఒక కెప్టెన్ మీ అభ్యర్థనను అంగీకరించారు!",
   "matching.confirmTrack": "నిర్ధారించి ట్రాక్ చేయండి",
@@ -810,7 +834,8 @@ const te: Record<TKey, string> = {
   "track.sosNote": "లైవ్ స్థానం మీ అత్యవసర పరిచయాలు మరియు LoadMitra భద్రతా బృందంతో షేర్ చేయబడింది.",
   "track.viewBookings": "బుకింగ్‌లు చూడండి",
   "track.bookAgain": "మళ్లీ బుక్ చేయండి",
-  "track.deliveredPopupSub": "మీ షిప్‌మెంట్ {place}కు చేరుకుంది. LoadMitraతో షిప్ చేసినందుకు ధన్యవాదాలు!",
+  "track.deliveredPopupSub":
+    "మీ షిప్‌మెంట్ {place}కు చేరుకుంది. LoadMitraతో షిప్ చేసినందుకు ధన్యవాదాలు!",
   "track.amount": "మొత్తం",
 
   "details.bookingMeta": "బుకింగ్ {id} · {created}",
@@ -834,10 +859,12 @@ const te: Record<TKey, string> = {
   "offers.title": "ఆఫర్‌లు & ఆదా",
   "offers.subtitle": "తెలివిగా షిప్ చేయండి, తక్కువ చెల్లించండి",
   "offers.greenImpact": "మీ హరిత ప్రభావం",
-  "offers.greenSub": "రిటర్న్ & షేర్డ్ లోడ్‌లను ఎంచుకోవడం ద్వారా, మీరు ట్రక్‌లను నిండుగా మరియు రోడ్‌లను హరితంగా ఉంచడంలో సహాయపడ్డారు.",
+  "offers.greenSub":
+    "రిటర్న్ & షేర్డ్ లోడ్‌లను ఎంచుకోవడం ద్వారా, మీరు ట్రక్‌లను నిండుగా మరియు రోడ్‌లను హరితంగా ఉంచడంలో సహాయపడ్డారు.",
   "offers.useOffer": "ఈ ఆఫర్‌ను ఉపయోగించండి",
   "offers.invite": "ఒక వ్యాపారాన్ని ఆహ్వానించండి",
-  "offers.disclaimer": "తగ్గింపులు మీ ధర అంచనాకు వర్తింపజేయబడతాయి. చివరి ధర చర్చించదగినది మరియు ఆఫ్‌లైన్‌లో పరిష్కరించబడుతుంది.",
+  "offers.disclaimer":
+    "తగ్గింపులు మీ ధర అంచనాకు వర్తింపజేయబడతాయి. చివరి ధర చర్చించదగినది మరియు ఆఫ్‌లైన్‌లో పరిష్కరించబడుతుంది.",
 
   "help.title": "సహాయం & మద్దతు",
   "help.subtitle": "మేము 24/7 ఇక్కడ ఉన్నాం. ఏది సులభమో ఆ విధంగా మమ్మల్ని సంప్రదించండి.",
@@ -849,7 +876,8 @@ const te: Record<TKey, string> = {
 
   "about.title": "LoadMitra గురించి",
   "about.subtitle": "భారతదేశ స్మార్ట్ ఫ్రైట్ మార్కెట్‌ప్లేస్.",
-  "about.body": "LoadMitra సరుకును సమర్థవంతంగా తరలించడానికి షిప్పర్‌లను ధృవీకరించబడిన కెప్టెన్‌లతో (ట్రక్ డ్రైవర్‌లు & యజమానులు) కలుపుతుంది — పూర్తి లోడ్‌లు, షేర్డ్ లోడ్‌లు, మరియు తగ్గింపు రిటర్న్ లోడ్‌లు — పారదర్శక ప్రతి-టన్ను అంచనాలు మరియు ప్రతి ట్రిప్‌లో లైవ్ ట్రాకింగ్‌తో.",
+  "about.body":
+    "LoadMitra సరుకును సమర్థవంతంగా తరలించడానికి షిప్పర్‌లను ధృవీకరించబడిన కెప్టెన్‌లతో (ట్రక్ డ్రైవర్‌లు & యజమానులు) కలుపుతుంది — పూర్తి లోడ్‌లు, షేర్డ్ లోడ్‌లు, మరియు తగ్గింపు రిటర్న్ లోడ్‌లు — పారదర్శక ప్రతి-టన్ను అంచనాలు మరియు ప్రతి ట్రిప్‌లో లైవ్ ట్రాకింగ్‌తో.",
   "about.f1": "భారతదేశం అంతటా పూర్తి, షేర్డ్ లేదా రిటర్న్-లోడ్ ట్రక్‌లను బుక్ చేయండి",
   "about.f2": "కెప్టెన్ ఖాళీ రిటర్న్ ట్రిప్‌ను బుక్ చేయడం ద్వారా 20–30% ఆదా చేయండి",
   "about.f3": "ట్రక్‌ను షేర్ చేయండి మరియు మీ స్థలానికి మాత్రమే చెల్లించండి",
@@ -871,7 +899,8 @@ const te: Record<TKey, string> = {
 
   "support.title": "LoadMitra మద్దతు",
   "support.subtitle": "సాధారణంగా కొన్ని నిమిషాల్లో సమాధానం",
-  "support.greeting": "నమస్తే {name} 👋 మీరు LoadMitra మద్దతుతో చాట్ చేస్తున్నారు. మేము ఎలా సహాయం చేయగలం?",
+  "support.greeting":
+    "నమస్తే {name} 👋 మీరు LoadMitra మద్దతుతో చాట్ చేస్తున్నారు. మేము ఎలా సహాయం చేయగలం?",
   "support.placeholder": "మద్దతుకు సందేశం పంపండి…",
   "support.r1": "సంప్రదించినందుకు ధన్యవాదాలు — ఒక మద్దతు ఏజెంట్ త్వరలో దీన్ని చూస్తారు.",
   "support.r2": "అర్థమైంది. మేము పరిశీలించడానికి మీ బుకింగ్ ID షేర్ చేయగలరా?",
@@ -883,7 +912,8 @@ const te: Record<TKey, string> = {
   "captain.connecting": "మిమ్మల్ని {name}కు కలుపుతోంది…",
   "captain.connectingDesc": "మీ గోప్యత కోసం కాల్‌లు మాస్క్ చేయబడిన నంబర్ ద్వారా జరుగుతాయి.",
   "captain.maskedNote": "మీ గోప్యత కోసం చాట్‌లు & కాల్‌లు నంబర్-మాస్క్ చేయబడ్డాయి.",
-  "captain.greeting": "నమస్తే! నేను {name}, మీ కెప్టెన్. నేను సుమారు {min} నిమిషాల్లో పికప్‌కు చేరుకుంటాను. 🚚",
+  "captain.greeting":
+    "నమస్తే! నేను {name}, మీ కెప్టెన్. నేను సుమారు {min} నిమిషాల్లో పికప్‌కు చేరుకుంటాను. 🚚",
   "captain.messagePlaceholder": "{name}కు సందేశం పంపండి…",
   "captain.r1": "తప్పకుండా, సమస్య లేదు 👍",
   "captain.r2": "నేను దారిలో ఉన్నాను — త్వరలో కలుద్దాం.",
@@ -959,7 +989,8 @@ const ta: Record<TKey, string> = {
   "bookings.completed": "முடிந்தது",
   "bookings.cancelled": "ரத்து செய்யப்பட்டது",
   "bookings.empty": "இன்னும் இங்கே முன்பதிவுகள் இல்லை",
-  "bookings.emptyHint": "உங்கள் முதல் டிரக்கை முன்பதிவு செய்யுங்கள், அது நேரடி கண்காணிப்புடன் இங்கே தோன்றும்.",
+  "bookings.emptyHint":
+    "உங்கள் முதல் டிரக்கை முன்பதிவு செய்யுங்கள், அது நேரடி கண்காணிப்புடன் இங்கே தோன்றும்.",
   "bookings.bookTruck": "டிரக் முன்பதிவு செய்",
   "bookings.viewDetails": "விவரங்களைப் பார்",
   "bookings.route": "வழி",
@@ -1014,7 +1045,8 @@ const ta: Record<TKey, string> = {
   "login.demoHint": "டெமோ: தொடர ஏதேனும் 6 இலக்கங்களை உள்ளிடவும்.",
   "login.terms": "தொடர்வதன் மூலம் எங்கள் விதிமுறைகள் & தனியுரிமைக் கொள்கையை ஏற்கிறீர்கள்.",
   "login.tagline": "உங்கள் சரக்கு, எப்போதும் நகர்ந்து.",
-  "login.brandSub": "முழு அல்லது பகிர்வு டிரக்குகளை முன்பதிவு செய்யுங்கள், திரும்பும் பயணங்களில் 30% வரை சேமிக்கவும், ஒவ்வொரு ஷிப்மென்ட்டையும் நேரடியாக கண்காணிக்கவும் — இந்தியா முழுவதும்.",
+  "login.brandSub":
+    "முழு அல்லது பகிர்வு டிரக்குகளை முன்பதிவு செய்யுங்கள், திரும்பும் பயணங்களில் 30% வரை சேமிக்கவும், ஒவ்வொரு ஷிப்மென்ட்டையும் நேரடியாக கண்காணிக்கவும் — இந்தியா முழுவதும்.",
   "login.feature1": "திரும்பும்-சுமைகளில் 30% வரை தள்ளுபடி",
   "login.feature2": "டிரக்கைப் பகிருங்கள், நீங்கள் பயன்படுத்தும் இடத்திற்கு மட்டும் செலுத்துங்கள்",
   "login.feature3": "டைனமிக் ETAவுடன் நேரடி GPS கண்காணிப்பு",
@@ -1029,12 +1061,13 @@ const ta: Record<TKey, string> = {
   "search.savedRecent": "சேமித்த & சமீபத்திய",
   "search.results": "முடிவுகள்",
   "search.noMatch": "சேமித்த பொருத்தம் இல்லை",
-  "search.noMatchHint": "நாங்கள் \"{q}\"ஐ {field} முகவரியாகப் பயன்படுத்துவோம்.",
+  "search.noMatchHint": 'நாங்கள் "{q}"ஐ {field} முகவரியாகப் பயன்படுத்துவோம்.',
   "search.fieldPickup": "பிக்கப்",
   "search.fieldDrop": "டிராப்",
   "search.seeEstimate": "விலை மதிப்பீட்டைப் பார்",
   "search.geoError": "உங்கள் இடத்தை அணுக முடியவில்லை",
-  "search.geoErrorHint": "உங்கள் உலாவியில் இருப்பிட அனுமதியை வழங்கவும், அல்லது முகவரியைத் தட்டச்சு செய்யவும்.",
+  "search.geoErrorHint":
+    "உங்கள் உலாவியில் இருப்பிட அனுமதியை வழங்கவும், அல்லது முகவரியைத் தட்டச்சு செய்யவும்.",
 
   "quote.title": "டிரக்கைத் தேர்ந்தெடு",
   "quote.routeSubtitle": "{from} → {to} · {km} கி.மீ",
@@ -1045,11 +1078,13 @@ const ta: Record<TKey, string> = {
   "quote.decreaseWeight": "எடையைக் குறை",
   "quote.increaseWeight": "எடையை அதிகரி",
   "quote.goodsType": "சரக்கு வகை",
-  "quote.shareHint": "இந்த {truck}ஐ மற்ற சுமைகளுடன் பகிர்ந்து கொள்கிறீர்கள், உங்கள் இடத்திற்கு மட்டும் செலுத்துகிறீர்கள்.",
+  "quote.shareHint":
+    "இந்த {truck}ஐ மற்ற சுமைகளுடன் பகிர்ந்து கொள்கிறீர்கள், உங்கள் இடத்திற்கு மட்டும் செலுத்துகிறீர்கள்.",
   "quote.availableTrucks": "கிடைக்கும் டிரக்குகள்",
   "quote.tooSmall": "மிகச் சிறியது",
   "quote.suggestPrice": "உங்கள் விலையை பரிந்துரை செய்",
-  "quote.suggestHint": "கேப்டன் உங்கள் சலுகையை ஏற்கலாம் அல்லது எதிர்-விலை அனுப்பலாம். ஒப்புக்கொண்ட விலை முன்பதிவில் சேமிக்கப்படுகிறது — ஆப்பில் பணம் எடுக்கப்படாது.",
+  "quote.suggestHint":
+    "கேப்டன் உங்கள் சலுகையை ஏற்கலாம் அல்லது எதிர்-விலை அனுப்பலாம். ஒப்புக்கொண்ட விலை முன்பதிவில் சேமிக்கப்படுகிறது — ஆப்பில் பணம் எடுக்கப்படாது.",
   "quote.bookNow": "இப்போது முன்பதிவு செய்",
 
   "price.estimated": "மதிப்பிடப்பட்ட விலை",
@@ -1063,7 +1098,8 @@ const ta: Record<TKey, string> = {
   "price.discount": "தள்ளுபடி",
   "price.youSave": "நீங்கள் சேமிக்கிறீர்கள் {amount}",
   "price.co2Saved": "{kg} கிலோ CO₂ சேமிக்கப்பட்டது",
-  "price.disclaimer": "மதிப்பீடு மட்டுமே — இறுதி விலை கேப்டனுடன் பேரம் பேசக்கூடியது. ஆப்பில் பணம் வசூலிக்கப்படாது.",
+  "price.disclaimer":
+    "மதிப்பீடு மட்டுமே — இறுதி விலை கேப்டனுடன் பேரம் பேசக்கூடியது. ஆப்பில் பணம் வசூலிக்கப்படாது.",
 
   "capacity.used": "பயன்படுத்திய கொள்ளளவு",
   "capacity.free": "{kg} கிலோ காலி",
@@ -1073,7 +1109,8 @@ const ta: Record<TKey, string> = {
   "matching.foundTitle": "கேப்டன் கண்டறியப்பட்டார்",
   "matching.noBooking": "இந்த முன்பதிவு இனி கிடைக்கவில்லை",
   "matching.searching": "உங்களுக்கு அருகில் சிறந்த கேப்டனைத் தேடுகிறது…",
-  "matching.searchingHint": "வழி, அருகாமை மற்றும் மதிப்பீட்டின் அடிப்படையில் பொருத்துகிறது. அருகிலுள்ள சரிபார்க்கப்பட்ட கேப்டன்களுக்கு அறிவிக்கிறது.",
+  "matching.searchingHint":
+    "வழி, அருகாமை மற்றும் மதிப்பீட்டின் அடிப்படையில் பொருத்துகிறது. அருகிலுள்ள சரிபார்க்கப்பட்ட கேப்டன்களுக்கு அறிவிக்கிறது.",
   "matching.cancelRequest": "கோரிக்கையை ரத்து செய்",
   "matching.accepted": "ஒரு கேப்டன் உங்கள் கோரிக்கையை ஏற்றுக்கொண்டார்!",
   "matching.confirmTrack": "உறுதிப்படுத்தி கண்காணி",
@@ -1098,10 +1135,12 @@ const ta: Record<TKey, string> = {
   "track.co2Saved": "CO₂ சேமிப்பு",
   "track.sos": "SOS",
   "track.shareTrip": "பயணத்தைப் பகிர்",
-  "track.sosNote": "நேரடி இருப்பிடம் உங்கள் அவசரத் தொடர்புகள் மற்றும் LoadMitra பாதுகாப்புக் குழுவுடன் பகிரப்பட்டது.",
+  "track.sosNote":
+    "நேரடி இருப்பிடம் உங்கள் அவசரத் தொடர்புகள் மற்றும் LoadMitra பாதுகாப்புக் குழுவுடன் பகிரப்பட்டது.",
   "track.viewBookings": "முன்பதிவுகளைப் பார்",
   "track.bookAgain": "மீண்டும் முன்பதிவு செய்",
-  "track.deliveredPopupSub": "உங்கள் ஷிப்மென்ட் {place} சென்றடைந்தது. LoadMitra மூலம் அனுப்பியதற்கு நன்றி!",
+  "track.deliveredPopupSub":
+    "உங்கள் ஷிப்மென்ட் {place} சென்றடைந்தது. LoadMitra மூலம் அனுப்பியதற்கு நன்றி!",
   "track.amount": "தொகை",
 
   "details.bookingMeta": "முன்பதிவு {id} · {created}",
@@ -1125,10 +1164,12 @@ const ta: Record<TKey, string> = {
   "offers.title": "சலுகைகள் & சேமிப்பு",
   "offers.subtitle": "புத்திசாலித்தனமாக அனுப்பு, குறைவாக செலுத்து",
   "offers.greenImpact": "உங்கள் பசுமை தாக்கம்",
-  "offers.greenSub": "திரும்பல் & பகிர்வு சுமைகளைத் தேர்ந்தெடுப்பதன் மூலம், டிரக்குகளை நிரப்பவும் சாலைகளை பசுமையாக வைக்கவும் உதவியுள்ளீர்கள்.",
+  "offers.greenSub":
+    "திரும்பல் & பகிர்வு சுமைகளைத் தேர்ந்தெடுப்பதன் மூலம், டிரக்குகளை நிரப்பவும் சாலைகளை பசுமையாக வைக்கவும் உதவியுள்ளீர்கள்.",
   "offers.useOffer": "இந்த சலுகையைப் பயன்படுத்து",
   "offers.invite": "ஒரு வணிகத்தை அழைக்கவும்",
-  "offers.disclaimer": "தள்ளுபடிகள் உங்கள் விலை மதிப்பீட்டில் பயன்படுத்தப்படும். இறுதி விலை பேரம் பேசக்கூடியது மற்றும் ஆஃப்லைனில் தீர்க்கப்படும்.",
+  "offers.disclaimer":
+    "தள்ளுபடிகள் உங்கள் விலை மதிப்பீட்டில் பயன்படுத்தப்படும். இறுதி விலை பேரம் பேசக்கூடியது மற்றும் ஆஃப்லைனில் தீர்க்கப்படும்.",
 
   "help.title": "உதவி & ஆதரவு",
   "help.subtitle": "நாங்கள் 24/7 இங்கே இருக்கிறோம். எது எளிதோ அந்த வழியில் எங்களை அணுகவும்.",
@@ -1140,8 +1181,10 @@ const ta: Record<TKey, string> = {
 
   "about.title": "LoadMitra பற்றி",
   "about.subtitle": "இந்தியாவின் ஸ்மார்ட் சரக்கு சந்தை.",
-  "about.body": "LoadMitra சரக்கை திறமையாக நகர்த்த ஷிப்பர்களை சரிபார்க்கப்பட்ட கேப்டன்களுடன் (டிரக் ஓட்டுநர்கள் & உரிமையாளர்கள்) இணைக்கிறது — முழு சுமைகள், பகிர்வு சுமைகள், மற்றும் தள்ளுபடி திரும்பல் சுமைகள் — வெளிப்படையான டன்-ஒன்றுக்கான மதிப்பீடுகள் மற்றும் ஒவ்வொரு பயணத்திலும் நேரடி கண்காணிப்புடன்.",
-  "about.f1": "இந்தியா முழுவதும் முழு, பகிர்வு அல்லது திரும்பல்-சுமை டிரக்குகளை முன்பதிவு செய்யுங்கள்",
+  "about.body":
+    "LoadMitra சரக்கை திறமையாக நகர்த்த ஷிப்பர்களை சரிபார்க்கப்பட்ட கேப்டன்களுடன் (டிரக் ஓட்டுநர்கள் & உரிமையாளர்கள்) இணைக்கிறது — முழு சுமைகள், பகிர்வு சுமைகள், மற்றும் தள்ளுபடி திரும்பல் சுமைகள் — வெளிப்படையான டன்-ஒன்றுக்கான மதிப்பீடுகள் மற்றும் ஒவ்வொரு பயணத்திலும் நேரடி கண்காணிப்புடன்.",
+  "about.f1":
+    "இந்தியா முழுவதும் முழு, பகிர்வு அல்லது திரும்பல்-சுமை டிரக்குகளை முன்பதிவு செய்யுங்கள்",
   "about.f2": "கேப்டனின் காலி திரும்பல் பயணத்தை முன்பதிவு செய்து 20–30% சேமிக்கவும்",
   "about.f3": "டிரக்கைப் பகிர்ந்து உங்கள் இடத்திற்கு மட்டும் செலுத்துங்கள்",
   "about.f4": "OTP-சரிபார்க்கப்பட்ட பிக்கப் & டிராப்புடன் நேரடி GPS கண்காணிப்பு",
@@ -1162,7 +1205,8 @@ const ta: Record<TKey, string> = {
 
   "support.title": "LoadMitra ஆதரவு",
   "support.subtitle": "பொதுவாக சில நிமிடங்களில் பதில்",
-  "support.greeting": "வணக்கம் {name} 👋 நீங்கள் LoadMitra ஆதரவுடன் அரட்டையடிக்கிறீர்கள். நாங்கள் எப்படி உதவலாம்?",
+  "support.greeting":
+    "வணக்கம் {name} 👋 நீங்கள் LoadMitra ஆதரவுடன் அரட்டையடிக்கிறீர்கள். நாங்கள் எப்படி உதவலாம்?",
   "support.placeholder": "ஆதரவுக்கு செய்தி அனுப்பு…",
   "support.r1": "தொடர்பு கொண்டதற்கு நன்றி — ஒரு ஆதரவு முகவர் விரைவில் இதைப் பார்ப்பார்.",
   "support.r2": "புரிந்தது. நாங்கள் பார்க்க உங்கள் முன்பதிவு IDஐப் பகிர முடியுமா?",
@@ -1174,7 +1218,8 @@ const ta: Record<TKey, string> = {
   "captain.connecting": "உங்களை {name}உடன் இணைக்கிறது…",
   "captain.connectingDesc": "உங்கள் தனியுரிமைக்காக அழைப்புகள் மறைக்கப்பட்ட எண் வழியாக செல்கின்றன.",
   "captain.maskedNote": "உங்கள் தனியுரிமைக்காக அரட்டைகள் & அழைப்புகள் எண்-மறைக்கப்பட்டவை.",
-  "captain.greeting": "வணக்கம்! நான் {name}, உங்கள் கேப்டன். நான் சுமார் {min} நிமிடங்களில் பிக்கப்பை அடைவேன். 🚚",
+  "captain.greeting":
+    "வணக்கம்! நான் {name}, உங்கள் கேப்டன். நான் சுமார் {min} நிமிடங்களில் பிக்கப்பை அடைவேன். 🚚",
   "captain.messagePlaceholder": "{name}க்கு செய்தி அனுப்பு…",
   "captain.r1": "கண்டிப்பாக, பிரச்சனை இல்லை 👍",
   "captain.r2": "வழியில் இருக்கிறேன் — விரைவில் சந்திப்போம்.",
@@ -1250,7 +1295,8 @@ const kn: Record<TKey, string> = {
   "bookings.completed": "ಪೂರ್ಣಗೊಂಡಿದೆ",
   "bookings.cancelled": "ರದ್ದುಗೊಳಿಸಲಾಗಿದೆ",
   "bookings.empty": "ಇನ್ನೂ ಇಲ್ಲಿ ಬುಕಿಂಗ್‌ಗಳಿಲ್ಲ",
-  "bookings.emptyHint": "ನಿಮ್ಮ ಮೊದಲ ಟ್ರಕ್ ಬುಕ್ ಮಾಡಿ, ಅದು ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್‌ನೊಂದಿಗೆ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.",
+  "bookings.emptyHint":
+    "ನಿಮ್ಮ ಮೊದಲ ಟ್ರಕ್ ಬುಕ್ ಮಾಡಿ, ಅದು ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್‌ನೊಂದಿಗೆ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.",
   "bookings.bookTruck": "ಟ್ರಕ್ ಬುಕ್ ಮಾಡಿ",
   "bookings.viewDetails": "ವಿವರಗಳನ್ನು ನೋಡಿ",
   "bookings.route": "ಮಾರ್ಗ",
@@ -1305,7 +1351,8 @@ const kn: Record<TKey, string> = {
   "login.demoHint": "ಡೆಮೋ: ಮುಂದುವರಿಯಲು ಯಾವುದೇ 6 ಅಂಕಿಗಳನ್ನು ನಮೂದಿಸಿ.",
   "login.terms": "ಮುಂದುವರಿಯುವ ಮೂಲಕ ನೀವು ನಮ್ಮ ನಿಯಮಗಳು & ಗೌಪ್ಯತಾ ನೀತಿಗೆ ಒಪ್ಪುತ್ತೀರಿ.",
   "login.tagline": "ನಿಮ್ಮ ಸರಕು, ಯಾವಾಗಲೂ ಚಲನೆಯಲ್ಲಿ.",
-  "login.brandSub": "ಪೂರ್ಣ ಅಥವಾ ಹಂಚಿಕೆ ಟ್ರಕ್‌ಗಳನ್ನು ಬುಕ್ ಮಾಡಿ, ರಿಟರ್ನ್ ಟ್ರಿಪ್‌ಗಳಲ್ಲಿ 30% ವರೆಗೆ ಉಳಿಸಿ, ಮತ್ತು ಪ್ರತಿ ಶಿಪ್‌ಮೆಂಟ್ ಅನ್ನು ಲೈವ್ ಆಗಿ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ — ಭಾರತದಾದ್ಯಂತ.",
+  "login.brandSub":
+    "ಪೂರ್ಣ ಅಥವಾ ಹಂಚಿಕೆ ಟ್ರಕ್‌ಗಳನ್ನು ಬುಕ್ ಮಾಡಿ, ರಿಟರ್ನ್ ಟ್ರಿಪ್‌ಗಳಲ್ಲಿ 30% ವರೆಗೆ ಉಳಿಸಿ, ಮತ್ತು ಪ್ರತಿ ಶಿಪ್‌ಮೆಂಟ್ ಅನ್ನು ಲೈವ್ ಆಗಿ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ — ಭಾರತದಾದ್ಯಂತ.",
   "login.feature1": "ರಿಟರ್ನ್-ಲೋಡ್‌ಗಳಲ್ಲಿ 30% ವರೆಗೆ ರಿಯಾಯಿತಿ",
   "login.feature2": "ಟ್ರಕ್ ಹಂಚಿಕೊಳ್ಳಿ, ನೀವು ಬಳಸುವ ಜಾಗಕ್ಕೆ ಮಾತ್ರ ಪಾವತಿಸಿ",
   "login.feature3": "ಡೈನಾಮಿಕ್ ETAನೊಂದಿಗೆ ಲೈವ್ GPS ಟ್ರ್ಯಾಕಿಂಗ್",
@@ -1320,7 +1367,7 @@ const kn: Record<TKey, string> = {
   "search.savedRecent": "ಉಳಿಸಿದ & ಇತ್ತೀಚಿನ",
   "search.results": "ಫಲಿತಾಂಶಗಳು",
   "search.noMatch": "ಹೊಂದಾಣಿಕೆಯ ಉಳಿಕೆ ಇಲ್ಲ",
-  "search.noMatchHint": "ನಾವು \"{q}\"ಅನ್ನು {field} ವಿಳಾಸವಾಗಿ ಬಳಸುತ್ತೇವೆ.",
+  "search.noMatchHint": 'ನಾವು "{q}"ಅನ್ನು {field} ವಿಳಾಸವಾಗಿ ಬಳಸುತ್ತೇವೆ.',
   "search.fieldPickup": "ಪಿಕಪ್",
   "search.fieldDrop": "ಡ್ರಾಪ್",
   "search.seeEstimate": "ಬೆಲೆ ಅಂದಾಜು ನೋಡಿ",
@@ -1336,11 +1383,13 @@ const kn: Record<TKey, string> = {
   "quote.decreaseWeight": "ತೂಕ ಕಡಿಮೆ ಮಾಡಿ",
   "quote.increaseWeight": "ತೂಕ ಹೆಚ್ಚಿಸಿ",
   "quote.goodsType": "ಸರಕು ಪ್ರಕಾರ",
-  "quote.shareHint": "ನೀವು ಈ {truck}ಅನ್ನು ಇತರ ಲೋಡ್‌ಗಳೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳುತ್ತೀರಿ ಮತ್ತು ನಿಮ್ಮ ಜಾಗಕ್ಕೆ ಮಾತ್ರ ಪಾವತಿಸುತ್ತೀರಿ.",
+  "quote.shareHint":
+    "ನೀವು ಈ {truck}ಅನ್ನು ಇತರ ಲೋಡ್‌ಗಳೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳುತ್ತೀರಿ ಮತ್ತು ನಿಮ್ಮ ಜಾಗಕ್ಕೆ ಮಾತ್ರ ಪಾವತಿಸುತ್ತೀರಿ.",
   "quote.availableTrucks": "ಲಭ್ಯವಿರುವ ಟ್ರಕ್‌ಗಳು",
   "quote.tooSmall": "ತುಂಬಾ ಚಿಕ್ಕದು",
   "quote.suggestPrice": "ನಿಮ್ಮ ಬೆಲೆ ಸೂಚಿಸಿ",
-  "quote.suggestHint": "ಕ್ಯಾಪ್ಟನ್ ನಿಮ್ಮ ಆಫರ್ ಸ್ವೀಕರಿಸಬಹುದು ಅಥವಾ ಕೌಂಟರ್-ಕೋಟ್ ಕಳುಹಿಸಬಹುದು. ಒಪ್ಪಿದ ಬೆಲೆ ಬುಕಿಂಗ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗುತ್ತದೆ — ಆ್ಯಪ್‌ನಲ್ಲಿ ಪಾವತಿ ತೆಗೆದುಕೊಳ್ಳುವುದಿಲ್ಲ.",
+  "quote.suggestHint":
+    "ಕ್ಯಾಪ್ಟನ್ ನಿಮ್ಮ ಆಫರ್ ಸ್ವೀಕರಿಸಬಹುದು ಅಥವಾ ಕೌಂಟರ್-ಕೋಟ್ ಕಳುಹಿಸಬಹುದು. ಒಪ್ಪಿದ ಬೆಲೆ ಬುಕಿಂಗ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗುತ್ತದೆ — ಆ್ಯಪ್‌ನಲ್ಲಿ ಪಾವತಿ ತೆಗೆದುಕೊಳ್ಳುವುದಿಲ್ಲ.",
   "quote.bookNow": "ಈಗ ಬುಕ್ ಮಾಡಿ",
 
   "price.estimated": "ಅಂದಾಜು ಬೆಲೆ",
@@ -1354,7 +1403,8 @@ const kn: Record<TKey, string> = {
   "price.discount": "ರಿಯಾಯಿತಿ",
   "price.youSave": "ನೀವು ಉಳಿಸುತ್ತೀರಿ {amount}",
   "price.co2Saved": "{kg} ಕೆಜಿ CO₂ ಉಳಿಸಲಾಗಿದೆ",
-  "price.disclaimer": "ಅಂದಾಜು ಮಾತ್ರ — ಅಂತಿಮ ಬೆಲೆ ಕ್ಯಾಪ್ಟನ್‌ನೊಂದಿಗೆ ಮಾತುಕತೆಗೆ ಒಳಪಟ್ಟಿದೆ. ಆ್ಯಪ್‌ನಲ್ಲಿ ಪಾವತಿ ಸಂಗ್ರಹಿಸುವುದಿಲ್ಲ.",
+  "price.disclaimer":
+    "ಅಂದಾಜು ಮಾತ್ರ — ಅಂತಿಮ ಬೆಲೆ ಕ್ಯಾಪ್ಟನ್‌ನೊಂದಿಗೆ ಮಾತುಕತೆಗೆ ಒಳಪಟ್ಟಿದೆ. ಆ್ಯಪ್‌ನಲ್ಲಿ ಪಾವತಿ ಸಂಗ್ರಹಿಸುವುದಿಲ್ಲ.",
 
   "capacity.used": "ಬಳಸಿದ ಸಾಮರ್ಥ್ಯ",
   "capacity.free": "{kg} ಕೆಜಿ ಖಾಲಿ",
@@ -1364,7 +1414,8 @@ const kn: Record<TKey, string> = {
   "matching.foundTitle": "ಕ್ಯಾಪ್ಟನ್ ಸಿಕ್ಕಿದ್ದಾರೆ",
   "matching.noBooking": "ಈ ಬುಕಿಂಗ್ ಇನ್ನು ಲಭ್ಯವಿಲ್ಲ",
   "matching.searching": "ನಿಮ್ಮ ಹತ್ತಿರ ಅತ್ಯುತ್ತಮ ಕ್ಯಾಪ್ಟನ್ ಹುಡುಕುತ್ತಿದೆ…",
-  "matching.searchingHint": "ಮಾರ್ಗ, ಸಾಮೀಪ್ಯ ಮತ್ತು ರೇಟಿಂಗ್ ಆಧಾರದ ಮೇಲೆ ಹೊಂದಿಸಲಾಗುತ್ತಿದೆ. ಹತ್ತಿರದ ಪರಿಶೀಲಿಸಿದ ಕ್ಯಾಪ್ಟನ್‌ಗಳಿಗೆ ತಿಳಿಸಲಾಗುತ್ತಿದೆ.",
+  "matching.searchingHint":
+    "ಮಾರ್ಗ, ಸಾಮೀಪ್ಯ ಮತ್ತು ರೇಟಿಂಗ್ ಆಧಾರದ ಮೇಲೆ ಹೊಂದಿಸಲಾಗುತ್ತಿದೆ. ಹತ್ತಿರದ ಪರಿಶೀಲಿಸಿದ ಕ್ಯಾಪ್ಟನ್‌ಗಳಿಗೆ ತಿಳಿಸಲಾಗುತ್ತಿದೆ.",
   "matching.cancelRequest": "ವಿನಂತಿಯನ್ನು ರದ್ದುಮಾಡಿ",
   "matching.accepted": "ಒಬ್ಬ ಕ್ಯಾಪ್ಟನ್ ನಿಮ್ಮ ವಿನಂತಿಯನ್ನು ಸ್ವೀಕರಿಸಿದ್ದಾರೆ!",
   "matching.confirmTrack": "ದೃಢೀಕರಿಸಿ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ",
@@ -1389,10 +1440,12 @@ const kn: Record<TKey, string> = {
   "track.co2Saved": "CO₂ ಉಳಿಸಲಾಗಿದೆ",
   "track.sos": "SOS",
   "track.shareTrip": "ಟ್ರಿಪ್ ಹಂಚಿಕೊಳ್ಳಿ",
-  "track.sosNote": "ಲೈವ್ ಸ್ಥಳವನ್ನು ನಿಮ್ಮ ತುರ್ತು ಸಂಪರ್ಕಗಳು ಮತ್ತು LoadMitra ಸುರಕ್ಷತಾ ತಂಡದೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಲಾಗಿದೆ.",
+  "track.sosNote":
+    "ಲೈವ್ ಸ್ಥಳವನ್ನು ನಿಮ್ಮ ತುರ್ತು ಸಂಪರ್ಕಗಳು ಮತ್ತು LoadMitra ಸುರಕ್ಷತಾ ತಂಡದೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಲಾಗಿದೆ.",
   "track.viewBookings": "ಬುಕಿಂಗ್‌ಗಳನ್ನು ನೋಡಿ",
   "track.bookAgain": "ಮತ್ತೆ ಬುಕ್ ಮಾಡಿ",
-  "track.deliveredPopupSub": "ನಿಮ್ಮ ಶಿಪ್‌ಮೆಂಟ್ {place} ತಲುಪಿದೆ. LoadMitraದೊಂದಿಗೆ ಶಿಪ್ ಮಾಡಿದ್ದಕ್ಕೆ ಧನ್ಯವಾದಗಳು!",
+  "track.deliveredPopupSub":
+    "ನಿಮ್ಮ ಶಿಪ್‌ಮೆಂಟ್ {place} ತಲುಪಿದೆ. LoadMitraದೊಂದಿಗೆ ಶಿಪ್ ಮಾಡಿದ್ದಕ್ಕೆ ಧನ್ಯವಾದಗಳು!",
   "track.amount": "ಮೊತ್ತ",
 
   "details.bookingMeta": "ಬುಕಿಂಗ್ {id} · {created}",
@@ -1416,10 +1469,12 @@ const kn: Record<TKey, string> = {
   "offers.title": "ಆಫರ್‌ಗಳು & ಉಳಿತಾಯ",
   "offers.subtitle": "ಬುದ್ಧಿವಂತಿಕೆಯಿಂದ ಶಿಪ್ ಮಾಡಿ, ಕಡಿಮೆ ಪಾವತಿಸಿ",
   "offers.greenImpact": "ನಿಮ್ಮ ಹಸಿರು ಪ್ರಭಾವ",
-  "offers.greenSub": "ರಿಟರ್ನ್ & ಹಂಚಿಕೆ ಲೋಡ್‌ಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡುವ ಮೂಲಕ, ಟ್ರಕ್‌ಗಳನ್ನು ತುಂಬಿಸಲು ಮತ್ತು ರಸ್ತೆಗಳನ್ನು ಹಸಿರಾಗಿಡಲು ನೀವು ಸಹಾಯ ಮಾಡಿದ್ದೀರಿ.",
+  "offers.greenSub":
+    "ರಿಟರ್ನ್ & ಹಂಚಿಕೆ ಲೋಡ್‌ಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡುವ ಮೂಲಕ, ಟ್ರಕ್‌ಗಳನ್ನು ತುಂಬಿಸಲು ಮತ್ತು ರಸ್ತೆಗಳನ್ನು ಹಸಿರಾಗಿಡಲು ನೀವು ಸಹಾಯ ಮಾಡಿದ್ದೀರಿ.",
   "offers.useOffer": "ಈ ಆಫರ್ ಬಳಸಿ",
   "offers.invite": "ಒಂದು ವ್ಯಾಪಾರವನ್ನು ಆಹ್ವಾನಿಸಿ",
-  "offers.disclaimer": "ರಿಯಾಯಿತಿಗಳು ನಿಮ್ಮ ಬೆಲೆ ಅಂದಾಜಿಗೆ ಅನ್ವಯಿಸುತ್ತವೆ. ಅಂತಿಮ ಬೆಲೆ ಮಾತುಕತೆಗೆ ಒಳಪಟ್ಟಿದೆ ಮತ್ತು ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಪರಿಹರಿಸಲಾಗುತ್ತದೆ.",
+  "offers.disclaimer":
+    "ರಿಯಾಯಿತಿಗಳು ನಿಮ್ಮ ಬೆಲೆ ಅಂದಾಜಿಗೆ ಅನ್ವಯಿಸುತ್ತವೆ. ಅಂತಿಮ ಬೆಲೆ ಮಾತುಕತೆಗೆ ಒಳಪಟ್ಟಿದೆ ಮತ್ತು ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಪರಿಹರಿಸಲಾಗುತ್ತದೆ.",
 
   "help.title": "ಸಹಾಯ & ಬೆಂಬಲ",
   "help.subtitle": "ನಾವು 24/7 ಇಲ್ಲಿದ್ದೇವೆ. ಯಾವುದು ಸುಲಭವೋ ಆ ರೀತಿ ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ.",
@@ -1431,7 +1486,8 @@ const kn: Record<TKey, string> = {
 
   "about.title": "LoadMitra ಬಗ್ಗೆ",
   "about.subtitle": "ಭಾರತದ ಸ್ಮಾರ್ಟ್ ಫ್ರೈಟ್ ಮಾರ್ಕೆಟ್‌ಪ್ಲೇಸ್.",
-  "about.body": "LoadMitra ಸರಕನ್ನು ದಕ್ಷವಾಗಿ ಸಾಗಿಸಲು ಶಿಪ್ಪರ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಿದ ಕ್ಯಾಪ್ಟನ್‌ಗಳೊಂದಿಗೆ (ಟ್ರಕ್ ಚಾಲಕರು & ಮಾಲೀಕರು) ಸಂಪರ್ಕಿಸುತ್ತದೆ — ಪೂರ್ಣ ಲೋಡ್‌ಗಳು, ಹಂಚಿಕೆ ಲೋಡ್‌ಗಳು, ಮತ್ತು ರಿಯಾಯಿತಿ ರಿಟರ್ನ್ ಲೋಡ್‌ಗಳು — ಪಾರದರ್ಶಕ ಪ್ರತಿ-ಟನ್ ಅಂದಾಜುಗಳು ಮತ್ತು ಪ್ರತಿ ಟ್ರಿಪ್‌ನಲ್ಲಿ ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್‌ನೊಂದಿಗೆ.",
+  "about.body":
+    "LoadMitra ಸರಕನ್ನು ದಕ್ಷವಾಗಿ ಸಾಗಿಸಲು ಶಿಪ್ಪರ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಿದ ಕ್ಯಾಪ್ಟನ್‌ಗಳೊಂದಿಗೆ (ಟ್ರಕ್ ಚಾಲಕರು & ಮಾಲೀಕರು) ಸಂಪರ್ಕಿಸುತ್ತದೆ — ಪೂರ್ಣ ಲೋಡ್‌ಗಳು, ಹಂಚಿಕೆ ಲೋಡ್‌ಗಳು, ಮತ್ತು ರಿಯಾಯಿತಿ ರಿಟರ್ನ್ ಲೋಡ್‌ಗಳು — ಪಾರದರ್ಶಕ ಪ್ರತಿ-ಟನ್ ಅಂದಾಜುಗಳು ಮತ್ತು ಪ್ರತಿ ಟ್ರಿಪ್‌ನಲ್ಲಿ ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್‌ನೊಂದಿಗೆ.",
   "about.f1": "ಭಾರತದಾದ್ಯಂತ ಪೂರ್ಣ, ಹಂಚಿಕೆ ಅಥವಾ ರಿಟರ್ನ್-ಲೋಡ್ ಟ್ರಕ್‌ಗಳನ್ನು ಬುಕ್ ಮಾಡಿ",
   "about.f2": "ಕ್ಯಾಪ್ಟನ್‌ನ ಖಾಲಿ ರಿಟರ್ನ್ ಟ್ರಿಪ್ ಬುಕ್ ಮಾಡುವ ಮೂಲಕ 20–30% ಉಳಿಸಿ",
   "about.f3": "ಟ್ರಕ್ ಹಂಚಿಕೊಳ್ಳಿ ಮತ್ತು ನಿಮ್ಮ ಜಾಗಕ್ಕೆ ಮಾತ್ರ ಪಾವತಿಸಿ",
@@ -1453,7 +1509,8 @@ const kn: Record<TKey, string> = {
 
   "support.title": "LoadMitra ಬೆಂಬಲ",
   "support.subtitle": "ಸಾಮಾನ್ಯವಾಗಿ ಕೆಲವು ನಿಮಿಷಗಳಲ್ಲಿ ಉತ್ತರ",
-  "support.greeting": "ನಮಸ್ಕಾರ {name} 👋 ನೀವು LoadMitra ಬೆಂಬಲದೊಂದಿಗೆ ಚಾಟ್ ಮಾಡುತ್ತಿದ್ದೀರಿ. ನಾವು ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?",
+  "support.greeting":
+    "ನಮಸ್ಕಾರ {name} 👋 ನೀವು LoadMitra ಬೆಂಬಲದೊಂದಿಗೆ ಚಾಟ್ ಮಾಡುತ್ತಿದ್ದೀರಿ. ನಾವು ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?",
   "support.placeholder": "ಬೆಂಬಲಕ್ಕೆ ಸಂದೇಶ ಕಳುಹಿಸಿ…",
   "support.r1": "ಸಂಪರ್ಕಿಸಿದ್ದಕ್ಕೆ ಧನ್ಯವಾದಗಳು — ಒಬ್ಬ ಬೆಂಬಲ ಏಜೆಂಟ್ ಶೀಘ್ರದಲ್ಲೇ ಇದನ್ನು ನೋಡುತ್ತಾರೆ.",
   "support.r2": "ಅರ್ಥವಾಯಿತು. ನಾವು ಪರಿಶೀಲಿಸಲು ನಿಮ್ಮ ಬುಕಿಂಗ್ ID ಹಂಚಿಕೊಳ್ಳಬಹುದೇ?",
@@ -1465,7 +1522,8 @@ const kn: Record<TKey, string> = {
   "captain.connecting": "ನಿಮ್ಮನ್ನು {name}ಗೆ ಸಂಪರ್ಕಿಸುತ್ತಿದೆ…",
   "captain.connectingDesc": "ನಿಮ್ಮ ಗೌಪ್ಯತೆಗಾಗಿ ಕರೆಗಳು ಮಾಸ್ಕ್ ಮಾಡಿದ ನಂಬರ್ ಮೂಲಕ ಹೋಗುತ್ತವೆ.",
   "captain.maskedNote": "ನಿಮ್ಮ ಗೌಪ್ಯತೆಗಾಗಿ ಚಾಟ್‌ಗಳು & ಕರೆಗಳು ನಂಬರ್-ಮಾಸ್ಕ್ ಮಾಡಲಾಗಿದೆ.",
-  "captain.greeting": "ನಮಸ್ಕಾರ! ನಾನು {name}, ನಿಮ್ಮ ಕ್ಯಾಪ್ಟನ್. ನಾನು ಸುಮಾರು {min} ನಿಮಿಷಗಳಲ್ಲಿ ಪಿಕಪ್‌ಗೆ ತಲುಪುತ್ತೇನೆ. 🚚",
+  "captain.greeting":
+    "ನಮಸ್ಕಾರ! ನಾನು {name}, ನಿಮ್ಮ ಕ್ಯಾಪ್ಟನ್. ನಾನು ಸುಮಾರು {min} ನಿಮಿಷಗಳಲ್ಲಿ ಪಿಕಪ್‌ಗೆ ತಲುಪುತ್ತೇನೆ. 🚚",
   "captain.messagePlaceholder": "{name}ಗೆ ಸಂದೇಶ ಕಳುಹಿಸಿ…",
   "captain.r1": "ಖಂಡಿತ, ಸಮಸ್ಯೆ ಇಲ್ಲ 👍",
   "captain.r2": "ದಾರಿಯಲ್ಲಿದ್ದೇನೆ — ಶೀಘ್ರದಲ್ಲೇ ಸಿಗೋಣ.",
@@ -1596,7 +1654,8 @@ const ml: Record<TKey, string> = {
   "login.demoHint": "ഡെമോ: തുടരാൻ ഏതെങ്കിലും 6 അക്കങ്ങൾ നൽകുക.",
   "login.terms": "തുടരുന്നതിലൂടെ നിങ്ങൾ ഞങ്ങളുടെ നിബന്ധനകളും സ്വകാര്യതാ നയവും അംഗീകരിക്കുന്നു.",
   "login.tagline": "നിങ്ങളുടെ ചരക്ക്, എപ്പോഴും ചലിക്കുന്നു.",
-  "login.brandSub": "പൂർണ്ണമോ പങ്കിട്ടതോ ആയ ട്രക്കുകൾ ബുക്ക് ചെയ്യുക, റിട്ടേൺ ട്രിപ്പുകളിൽ 30% വരെ ലാഭിക്കുക, ഓരോ ഷിപ്മെന്റും തത്സമയം ട്രാക്ക് ചെയ്യുക — ഇന്ത്യയിലുടനീളം.",
+  "login.brandSub":
+    "പൂർണ്ണമോ പങ്കിട്ടതോ ആയ ട്രക്കുകൾ ബുക്ക് ചെയ്യുക, റിട്ടേൺ ട്രിപ്പുകളിൽ 30% വരെ ലാഭിക്കുക, ഓരോ ഷിപ്മെന്റും തത്സമയം ട്രാക്ക് ചെയ്യുക — ഇന്ത്യയിലുടനീളം.",
   "login.feature1": "റിട്ടേൺ-ലോഡുകളിൽ 30% വരെ കിഴിവ്",
   "login.feature2": "ട്രക്ക് പങ്കിടുക, നിങ്ങൾ ഉപയോഗിക്കുന്ന സ്ഥലത്തിന് മാത്രം പണം നൽകുക",
   "login.feature3": "ഡൈനാമിക് ETA-യോടെ തത്സമയ GPS ട്രാക്കിംഗ്",
@@ -1611,12 +1670,13 @@ const ml: Record<TKey, string> = {
   "search.savedRecent": "സേവ് ചെയ്തതും സമീപകാലവും",
   "search.results": "ഫലങ്ങൾ",
   "search.noMatch": "സേവ് ചെയ്ത പൊരുത്തമില്ല",
-  "search.noMatchHint": "ഞങ്ങൾ \"{q}\" എന്നത് {field} വിലാസമായി ഉപയോഗിക്കും.",
+  "search.noMatchHint": 'ഞങ്ങൾ "{q}" എന്നത് {field} വിലാസമായി ഉപയോഗിക്കും.',
   "search.fieldPickup": "പിക്കപ്പ്",
   "search.fieldDrop": "ഡ്രോപ്പ്",
   "search.seeEstimate": "വില എസ്റ്റിമേറ്റ് കാണുക",
   "search.geoError": "നിങ്ങളുടെ സ്ഥലം ആക്സസ് ചെയ്യാനായില്ല",
-  "search.geoErrorHint": "നിങ്ങളുടെ ബ്രൗസറിൽ ലൊക്കേഷൻ അനുമതി നൽകുക, അല്ലെങ്കിൽ വിലാസം ടൈപ്പ് ചെയ്യുക.",
+  "search.geoErrorHint":
+    "നിങ്ങളുടെ ബ്രൗസറിൽ ലൊക്കേഷൻ അനുമതി നൽകുക, അല്ലെങ്കിൽ വിലാസം ടൈപ്പ് ചെയ്യുക.",
 
   "quote.title": "ട്രക്ക് തിരഞ്ഞെടുക്കുക",
   "quote.routeSubtitle": "{from} → {to} · {km} കി.മീ",
@@ -1627,11 +1687,13 @@ const ml: Record<TKey, string> = {
   "quote.decreaseWeight": "ഭാരം കുറയ്ക്കുക",
   "quote.increaseWeight": "ഭാരം കൂട്ടുക",
   "quote.goodsType": "ചരക്ക് തരം",
-  "quote.shareHint": "നിങ്ങൾ ഈ {truck} മറ്റ് ലോഡുകളുമായി പങ്കിടുന്നു, നിങ്ങളുടെ സ്ഥലത്തിന് മാത്രം പണം നൽകുന്നു.",
+  "quote.shareHint":
+    "നിങ്ങൾ ഈ {truck} മറ്റ് ലോഡുകളുമായി പങ്കിടുന്നു, നിങ്ങളുടെ സ്ഥലത്തിന് മാത്രം പണം നൽകുന്നു.",
   "quote.availableTrucks": "ലഭ്യമായ ട്രക്കുകൾ",
   "quote.tooSmall": "വളരെ ചെറുത്",
   "quote.suggestPrice": "നിങ്ങളുടെ വില നിർദ്ദേശിക്കുക",
-  "quote.suggestHint": "ക്യാപ്റ്റന് നിങ്ങളുടെ ഓഫർ സ്വീകരിക്കാം അല്ലെങ്കിൽ കൗണ്ടർ-ക്വോട്ട് അയയ്ക്കാം. സമ്മതിച്ച വില ബുക്കിംഗിൽ സേവ് ചെയ്യപ്പെടുന്നു — ആപ്പിൽ പണം ഈടാക്കില്ല.",
+  "quote.suggestHint":
+    "ക്യാപ്റ്റന് നിങ്ങളുടെ ഓഫർ സ്വീകരിക്കാം അല്ലെങ്കിൽ കൗണ്ടർ-ക്വോട്ട് അയയ്ക്കാം. സമ്മതിച്ച വില ബുക്കിംഗിൽ സേവ് ചെയ്യപ്പെടുന്നു — ആപ്പിൽ പണം ഈടാക്കില്ല.",
   "quote.bookNow": "ഇപ്പോൾ ബുക്ക് ചെയ്യുക",
 
   "price.estimated": "എസ്റ്റിമേറ്റ് വില",
@@ -1645,7 +1707,8 @@ const ml: Record<TKey, string> = {
   "price.discount": "കിഴിവ്",
   "price.youSave": "നിങ്ങൾ ലാഭിക്കുന്നു {amount}",
   "price.co2Saved": "{kg} കിലോ CO₂ ലാഭിച്ചു",
-  "price.disclaimer": "എസ്റ്റിമേറ്റ് മാത്രം — അന്തിമ വില ക്യാപ്റ്റനുമായി വിലപേശാവുന്നതാണ്. ആപ്പിൽ പണം ശേഖരിക്കില്ല.",
+  "price.disclaimer":
+    "എസ്റ്റിമേറ്റ് മാത്രം — അന്തിമ വില ക്യാപ്റ്റനുമായി വിലപേശാവുന്നതാണ്. ആപ്പിൽ പണം ശേഖരിക്കില്ല.",
 
   "capacity.used": "ഉപയോഗിച്ച ശേഷി",
   "capacity.free": "{kg} കിലോ ഒഴിവ്",
@@ -1655,7 +1718,8 @@ const ml: Record<TKey, string> = {
   "matching.foundTitle": "ക്യാപ്റ്റനെ കണ്ടെത്തി",
   "matching.noBooking": "ഈ ബുക്കിംഗ് ഇനി ലഭ്യമല്ല",
   "matching.searching": "നിങ്ങൾക്കടുത്ത് മികച്ച ക്യാപ്റ്റനെ കണ്ടെത്തുന്നു…",
-  "matching.searchingHint": "റൂട്ട്, സാമീപ്യം, റേറ്റിംഗ് എന്നിവ അനുസരിച്ച് പൊരുത്തപ്പെടുത്തുന്നു. അടുത്തുള്ള പരിശോധിച്ച ക്യാപ്റ്റൻമാരെ അറിയിക്കുന്നു.",
+  "matching.searchingHint":
+    "റൂട്ട്, സാമീപ്യം, റേറ്റിംഗ് എന്നിവ അനുസരിച്ച് പൊരുത്തപ്പെടുത്തുന്നു. അടുത്തുള്ള പരിശോധിച്ച ക്യാപ്റ്റൻമാരെ അറിയിക്കുന്നു.",
   "matching.cancelRequest": "അഭ്യർത്ഥന റദ്ദാക്കുക",
   "matching.accepted": "ഒരു ക്യാപ്റ്റൻ നിങ്ങളുടെ അഭ്യർത്ഥന സ്വീകരിച്ചു!",
   "matching.confirmTrack": "സ്ഥിരീകരിച്ച് ട്രാക്ക് ചെയ്യുക",
@@ -1680,10 +1744,12 @@ const ml: Record<TKey, string> = {
   "track.co2Saved": "CO₂ ലാഭിച്ചു",
   "track.sos": "SOS",
   "track.shareTrip": "ട്രിപ്പ് പങ്കിടുക",
-  "track.sosNote": "തത്സമയ സ്ഥലം നിങ്ങളുടെ അടിയന്തര കോൺടാക്റ്റുകളുമായും LoadMitra സുരക്ഷാ ടീമുമായും പങ്കിട്ടു.",
+  "track.sosNote":
+    "തത്സമയ സ്ഥലം നിങ്ങളുടെ അടിയന്തര കോൺടാക്റ്റുകളുമായും LoadMitra സുരക്ഷാ ടീമുമായും പങ്കിട്ടു.",
   "track.viewBookings": "ബുക്കിംഗുകൾ കാണുക",
   "track.bookAgain": "വീണ്ടും ബുക്ക് ചെയ്യുക",
-  "track.deliveredPopupSub": "നിങ്ങളുടെ ഷിപ്മെന്റ് {place}-ൽ എത്തി. LoadMitra വഴി ഷിപ്പ് ചെയ്തതിന് നന്ദി!",
+  "track.deliveredPopupSub":
+    "നിങ്ങളുടെ ഷിപ്മെന്റ് {place}-ൽ എത്തി. LoadMitra വഴി ഷിപ്പ് ചെയ്തതിന് നന്ദി!",
   "track.amount": "തുക",
 
   "details.bookingMeta": "ബുക്കിംഗ് {id} · {created}",
@@ -1707,10 +1773,12 @@ const ml: Record<TKey, string> = {
   "offers.title": "ഓഫറുകളും ലാഭവും",
   "offers.subtitle": "സ്മാർട്ടായി ഷിപ്പ് ചെയ്യൂ, കുറച്ച് നൽകൂ",
   "offers.greenImpact": "നിങ്ങളുടെ ഹരിത സ്വാധീനം",
-  "offers.greenSub": "റിട്ടേൺ & പങ്കിട്ട ലോഡുകൾ തിരഞ്ഞെടുത്തതിലൂടെ, ട്രക്കുകൾ നിറയ്ക്കാനും റോഡുകൾ ഹരിതമാക്കാനും നിങ്ങൾ സഹായിച്ചു.",
+  "offers.greenSub":
+    "റിട്ടേൺ & പങ്കിട്ട ലോഡുകൾ തിരഞ്ഞെടുത്തതിലൂടെ, ട്രക്കുകൾ നിറയ്ക്കാനും റോഡുകൾ ഹരിതമാക്കാനും നിങ്ങൾ സഹായിച്ചു.",
   "offers.useOffer": "ഈ ഓഫർ ഉപയോഗിക്കുക",
   "offers.invite": "ഒരു ബിസിനസ്സിനെ ക്ഷണിക്കുക",
-  "offers.disclaimer": "കിഴിവുകൾ നിങ്ങളുടെ വില എസ്റ്റിമേറ്റിൽ ബാധകമാക്കുന്നു. അന്തിമ വില വിലപേശാവുന്നതും ഓഫ്‌ലൈനിൽ തീർപ്പാക്കുന്നതുമാണ്.",
+  "offers.disclaimer":
+    "കിഴിവുകൾ നിങ്ങളുടെ വില എസ്റ്റിമേറ്റിൽ ബാധകമാക്കുന്നു. അന്തിമ വില വിലപേശാവുന്നതും ഓഫ്‌ലൈനിൽ തീർപ്പാക്കുന്നതുമാണ്.",
 
   "help.title": "സഹായം & പിന്തുണ",
   "help.subtitle": "ഞങ്ങൾ 24/7 ഇവിടെയുണ്ട്. ഏതാണ് എളുപ്പമെങ്കിൽ ആ വഴി ഞങ്ങളെ ബന്ധപ്പെടുക.",
@@ -1722,7 +1790,8 @@ const ml: Record<TKey, string> = {
 
   "about.title": "LoadMitra-നെ കുറിച്ച്",
   "about.subtitle": "ഇന്ത്യയുടെ സ്മാർട്ട് ഫ്രൈറ്റ് മാർക്കറ്റ്‌പ്ലേസ്.",
-  "about.body": "LoadMitra ചരക്ക് കാര്യക്ഷമമായി നീക്കാൻ ഷിപ്പർമാരെ പരിശോധിച്ച ക്യാപ്റ്റൻമാരുമായി (ട്രക്ക് ഡ്രൈവർമാർ & ഉടമകൾ) ബന്ധിപ്പിക്കുന്നു — പൂർണ്ണ ലോഡുകൾ, പങ്കിട്ട ലോഡുകൾ, കിഴിവുള്ള റിട്ടേൺ ലോഡുകൾ — സുതാര്യമായ ഓരോ-ടൺ എസ്റ്റിമേറ്റുകളും ഓരോ ട്രിപ്പിലും തത്സമയ ട്രാക്കിംഗും.",
+  "about.body":
+    "LoadMitra ചരക്ക് കാര്യക്ഷമമായി നീക്കാൻ ഷിപ്പർമാരെ പരിശോധിച്ച ക്യാപ്റ്റൻമാരുമായി (ട്രക്ക് ഡ്രൈവർമാർ & ഉടമകൾ) ബന്ധിപ്പിക്കുന്നു — പൂർണ്ണ ലോഡുകൾ, പങ്കിട്ട ലോഡുകൾ, കിഴിവുള്ള റിട്ടേൺ ലോഡുകൾ — സുതാര്യമായ ഓരോ-ടൺ എസ്റ്റിമേറ്റുകളും ഓരോ ട്രിപ്പിലും തത്സമയ ട്രാക്കിംഗും.",
   "about.f1": "ഇന്ത്യയിലുടനീളം പൂർണ്ണ, പങ്കിട്ട അല്ലെങ്കിൽ റിട്ടേൺ-ലോഡ് ട്രക്കുകൾ ബുക്ക് ചെയ്യുക",
   "about.f2": "ക്യാപ്റ്റന്റെ ഒഴിഞ്ഞ റിട്ടേൺ ട്രിപ്പ് ബുക്ക് ചെയ്ത് 20–30% ലാഭിക്കുക",
   "about.f3": "ട്രക്ക് പങ്കിട്ട് നിങ്ങളുടെ സ്ഥലത്തിന് മാത്രം പണം നൽകുക",
@@ -1744,7 +1813,8 @@ const ml: Record<TKey, string> = {
 
   "support.title": "LoadMitra പിന്തുണ",
   "support.subtitle": "സാധാരണയായി കുറച്ച് മിനിറ്റിനുള്ളിൽ മറുപടി",
-  "support.greeting": "നമസ്കാരം {name} 👋 നിങ്ങൾ LoadMitra പിന്തുണയുമായി ചാറ്റ് ചെയ്യുകയാണ്. ഞങ്ങൾ എങ്ങനെ സഹായിക്കാം?",
+  "support.greeting":
+    "നമസ്കാരം {name} 👋 നിങ്ങൾ LoadMitra പിന്തുണയുമായി ചാറ്റ് ചെയ്യുകയാണ്. ഞങ്ങൾ എങ്ങനെ സഹായിക്കാം?",
   "support.placeholder": "പിന്തുണയ്ക്ക് സന്ദേശം അയയ്ക്കുക…",
   "support.r1": "ബന്ധപ്പെട്ടതിന് നന്ദി — ഒരു പിന്തുണാ ഏജന്റ് ഉടൻ ഇത് പരിശോധിക്കും.",
   "support.r2": "മനസ്സിലായി. ഞങ്ങൾക്ക് പരിശോധിക്കാൻ നിങ്ങളുടെ ബുക്കിംഗ് ID പങ്കിടാമോ?",
@@ -1755,8 +1825,10 @@ const ml: Record<TKey, string> = {
   "captain.tripsSuffix": "{n} ട്രിപ്പുകൾ",
   "captain.connecting": "നിങ്ങളെ {name}-മായി ബന്ധിപ്പിക്കുന്നു…",
   "captain.connectingDesc": "നിങ്ങളുടെ സ്വകാര്യതയ്ക്കായി കോളുകൾ മാസ്ക് ചെയ്ത നമ്പർ വഴിയാണ്.",
-  "captain.maskedNote": "നിങ്ങളുടെ സ്വകാര്യതയ്ക്കായി ചാറ്റുകളും കോളുകളും നമ്പർ-മാസ്ക് ചെയ്തിരിക്കുന്നു.",
-  "captain.greeting": "നമസ്കാരം! ഞാൻ {name}, നിങ്ങളുടെ ക്യാപ്റ്റൻ. ഏകദേശം {min} മിനിറ്റിൽ പിക്കപ്പിൽ എത്തും. 🚚",
+  "captain.maskedNote":
+    "നിങ്ങളുടെ സ്വകാര്യതയ്ക്കായി ചാറ്റുകളും കോളുകളും നമ്പർ-മാസ്ക് ചെയ്തിരിക്കുന്നു.",
+  "captain.greeting":
+    "നമസ്കാരം! ഞാൻ {name}, നിങ്ങളുടെ ക്യാപ്റ്റൻ. ഏകദേശം {min} മിനിറ്റിൽ പിക്കപ്പിൽ എത്തും. 🚚",
   "captain.messagePlaceholder": "{name}-ന് സന്ദേശം അയയ്ക്കുക…",
   "captain.r1": "തീർച്ചയായും, പ്രശ്നമില്ല 👍",
   "captain.r2": "വഴിയിലാണ് — ഉടൻ കാണാം.",

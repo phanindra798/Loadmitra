@@ -77,20 +77,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#0f1729" },
-      { name: "description", content: "LoadMitra — India's smart freight marketplace. Book trucks, share loads, save with return trips." },
+      {
+        name: "description",
+        content:
+          "LoadMitra — India's smart freight marketplace. Book trucks, share loads, save with return trips.",
+      },
       { property: "og:title", content: "LoadMitra" },
-      { property: "og:description", content: "LoadMitra — India's smart freight marketplace. Book trucks, share loads, save with return trips." },
+      {
+        property: "og:description",
+        content:
+          "LoadMitra — India's smart freight marketplace. Book trucks, share loads, save with return trips.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { title: "LoadMitra" },
       { name: "twitter:title", content: "LoadMitra" },
-      { name: "twitter:description", content: "LoadMitra — India's smart freight marketplace. Book trucks, share loads, save with return trips." },
+      {
+        name: "twitter:description",
+        content:
+          "LoadMitra — India's smart freight marketplace. Book trucks, share loads, save with return trips.",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,

@@ -37,7 +37,10 @@ export function ServiceTile({
       )}
       <span
         className="grid h-11 w-11 shrink-0 place-items-center rounded-xl ring-1 ring-border transition-colors group-hover:ring-transparent"
-        style={{ background: `color-mix(in oklab, ${TONE_VAR[tone]} 14%, transparent)`, color: TONE_VAR[tone] }}
+        style={{
+          background: `color-mix(in oklab, ${TONE_VAR[tone]} 14%, transparent)`,
+          color: TONE_VAR[tone],
+        }}
       >
         <Icon className="h-5 w-5" />
       </span>

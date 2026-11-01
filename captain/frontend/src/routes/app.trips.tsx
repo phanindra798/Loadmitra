@@ -17,20 +17,29 @@ function TripsPage() {
   const { trips, activeTrip, authenticated, tripsLoading, tripsError, refreshTrips } = useCaptain();
   const [filter, setFilter] = useState<Filter>("all");
 
-  const history = trips.filter((t) =>
-    filter === "all" ? true : t.status === filter,
-  );
+  const history = trips.filter((t) => (filter === "all" ? true : t.status === filter));
   const totalEarned = trips
     .filter((t) => t.status === "delivered")
     .reduce((sum, t) => sum + t.payout.net, 0);
 
   return (
     <div className="mx-auto min-h-[100dvh] w-full max-w-2xl pb-28 lg:pb-10">
-      <PageHeader title="My trips" subtitle={`${trips.length} recent trips · ${inr(totalEarned)} estimated payout`} back={false} />
+      <PageHeader
+        title="My trips"
+        subtitle={`${trips.length} recent trips · ${inr(totalEarned)} estimated payout`}
+        back={false}
+      />
 
       <div className="px-4 pt-4 sm:px-6">
         <TripSyncStatus />
-        <button type="button" onClick={refreshTrips} disabled={!authenticated || tripsLoading} className="mb-3 text-sm font-semibold underline disabled:opacity-50">Refresh trips</button>
+        <button
+          type="button"
+          onClick={refreshTrips}
+          disabled={!authenticated || tripsLoading}
+          className="mb-3 text-sm font-semibold underline disabled:opacity-50"
+        >
+          Refresh trips
+        </button>
         {/* Active trip */}
         {activeTrip && (
           <Link
@@ -93,7 +102,11 @@ function TripsPage() {
             </Link>
           </div>
         ) : null}
-        {trips.length >= 100 && <p className="mt-3 text-xs text-muted-foreground">Showing recent history. Older trips can still be opened using their saved link.</p>}
+        {trips.length >= 100 && (
+          <p className="mt-3 text-xs text-muted-foreground">
+            Showing recent history. Older trips can still be opened using their saved link.
+          </p>
+        )}
       </div>
     </div>
   );

@@ -17,11 +17,61 @@ import type {
  */
 
 export const TRUCK_TYPES: TruckType[] = [
-  { id: "ace", name: "Tata Ace", desc: "Up to 750 kg • 7 ft open", capacityKg: 750, capacityCFT: 180, vehicleFactor: 1.0, ratePerKm: 18, baseFare: 250, emoji: "🛻" },
-  { id: "pickup8", name: "Pickup 8 ft", desc: "Up to 1,200 kg • 8 ft", capacityKg: 1200, capacityCFT: 260, vehicleFactor: 1.25, ratePerKm: 24, baseFare: 320, emoji: "🚐" },
-  { id: "tata407", name: "Tata 407", desc: "Up to 2,500 kg • 9 ft", capacityKg: 2500, capacityCFT: 420, vehicleFactor: 1.7, ratePerKm: 30, baseFare: 480, emoji: "🚚" },
-  { id: "truck14", name: "14 ft Truck", desc: "Up to 3,500 kg • 14 ft", capacityKg: 3500, capacityCFT: 720, vehicleFactor: 2.1, ratePerKm: 36, baseFare: 650, emoji: "🚛" },
-  { id: "truck17", name: "17 ft Truck", desc: "Up to 5,000 kg • 17 ft", capacityKg: 5000, capacityCFT: 980, vehicleFactor: 2.6, ratePerKm: 44, baseFare: 850, emoji: "🚛" },
+  {
+    id: "ace",
+    name: "Tata Ace",
+    desc: "Up to 750 kg • 7 ft open",
+    capacityKg: 750,
+    capacityCFT: 180,
+    vehicleFactor: 1.0,
+    ratePerKm: 18,
+    baseFare: 250,
+    emoji: "🛻",
+  },
+  {
+    id: "pickup8",
+    name: "Pickup 8 ft",
+    desc: "Up to 1,200 kg • 8 ft",
+    capacityKg: 1200,
+    capacityCFT: 260,
+    vehicleFactor: 1.25,
+    ratePerKm: 24,
+    baseFare: 320,
+    emoji: "🚐",
+  },
+  {
+    id: "tata407",
+    name: "Tata 407",
+    desc: "Up to 2,500 kg • 9 ft",
+    capacityKg: 2500,
+    capacityCFT: 420,
+    vehicleFactor: 1.7,
+    ratePerKm: 30,
+    baseFare: 480,
+    emoji: "🚚",
+  },
+  {
+    id: "truck14",
+    name: "14 ft Truck",
+    desc: "Up to 3,500 kg • 14 ft",
+    capacityKg: 3500,
+    capacityCFT: 720,
+    vehicleFactor: 2.1,
+    ratePerKm: 36,
+    baseFare: 650,
+    emoji: "🚛",
+  },
+  {
+    id: "truck17",
+    name: "17 ft Truck",
+    desc: "Up to 5,000 kg • 17 ft",
+    capacityKg: 5000,
+    capacityCFT: 980,
+    vehicleFactor: 2.6,
+    ratePerKm: 44,
+    baseFare: 850,
+    emoji: "🚛",
+  },
 ];
 
 export function truckById(id?: string): TruckType | undefined {
@@ -49,11 +99,71 @@ export const CAPTAIN: CaptainProfile = {
  */
 export const CAPTAIN_POOL: CaptainProfile[] = [
   CAPTAIN,
-  { id: "cap-2087", name: "Suresh Babu", phoneMasked: "+91 ••••• ••5 12", vehicleNumber: "TS07 AB 9032", truckTypeId: "ace", rating: 4.7, trips: 880, joinedLabel: "Captain since Jul 2023", hue: 28, kycVerified: true, city: "Hyderabad" },
-  { id: "cap-3391", name: "Imran Khan", phoneMasked: "+91 ••••• ••7 65", vehicleNumber: "AP16 CJ 4410", truckTypeId: "truck14", rating: 4.9, trips: 2120, joinedLabel: "Captain since Jan 2022", hue: 145, kycVerified: true, city: "Vijayawada" },
-  { id: "cap-4456", name: "Mahesh Reddy", phoneMasked: "+91 ••••• ••3 28", vehicleNumber: "TS09 KX 7781", truckTypeId: "pickup8", rating: 4.6, trips: 610, joinedLabel: "Captain since Nov 2023", hue: 280, kycVerified: true, city: "Warangal" },
-  { id: "cap-5512", name: "Venkatesh Rao", phoneMasked: "+91 ••••• ••9 04", vehicleNumber: "KA01 MN 5567", truckTypeId: "truck17", rating: 4.8, trips: 1740, joinedLabel: "Captain since Mar 2021", hue: 200, kycVerified: true, city: "Bengaluru" },
-  { id: "cap-6634", name: "Prakash Naidu", phoneMasked: "+91 ••••• ••1 89", vehicleNumber: "AP31 DG 2245", truckTypeId: "tata407", rating: 4.5, trips: 430, joinedLabel: "Captain since Feb 2024", hue: 340, kycVerified: false, city: "Guntur" },
+  {
+    id: "cap-2087",
+    name: "Suresh Babu",
+    phoneMasked: "+91 ••••• ••5 12",
+    vehicleNumber: "TS07 AB 9032",
+    truckTypeId: "ace",
+    rating: 4.7,
+    trips: 880,
+    joinedLabel: "Captain since Jul 2023",
+    hue: 28,
+    kycVerified: true,
+    city: "Hyderabad",
+  },
+  {
+    id: "cap-3391",
+    name: "Imran Khan",
+    phoneMasked: "+91 ••••• ••7 65",
+    vehicleNumber: "AP16 CJ 4410",
+    truckTypeId: "truck14",
+    rating: 4.9,
+    trips: 2120,
+    joinedLabel: "Captain since Jan 2022",
+    hue: 145,
+    kycVerified: true,
+    city: "Vijayawada",
+  },
+  {
+    id: "cap-4456",
+    name: "Mahesh Reddy",
+    phoneMasked: "+91 ••••• ••3 28",
+    vehicleNumber: "TS09 KX 7781",
+    truckTypeId: "pickup8",
+    rating: 4.6,
+    trips: 610,
+    joinedLabel: "Captain since Nov 2023",
+    hue: 280,
+    kycVerified: true,
+    city: "Warangal",
+  },
+  {
+    id: "cap-5512",
+    name: "Venkatesh Rao",
+    phoneMasked: "+91 ••••• ••9 04",
+    vehicleNumber: "KA01 MN 5567",
+    truckTypeId: "truck17",
+    rating: 4.8,
+    trips: 1740,
+    joinedLabel: "Captain since Mar 2021",
+    hue: 200,
+    kycVerified: true,
+    city: "Bengaluru",
+  },
+  {
+    id: "cap-6634",
+    name: "Prakash Naidu",
+    phoneMasked: "+91 ••••• ••1 89",
+    vehicleNumber: "AP31 DG 2245",
+    truckTypeId: "tata407",
+    rating: 4.5,
+    trips: 430,
+    joinedLabel: "Captain since Feb 2024",
+    hue: 340,
+    kycVerified: false,
+    city: "Guntur",
+  },
 ];
 
 /** Stable, distinct captain identity for a given key (the signed-in phone). */
@@ -66,12 +176,24 @@ export function captainIdentityFor(key?: string): CaptainProfile {
 
 const PLACES: Record<string, Place> = {
   hitec: { label: "HITEC City warehouse", address: "Madhapur, Hyderabad", city: "Hyderabad" },
-  kompally: { label: "Kompally Warehouse", address: "Plot 44, Kompally Industrial Area", city: "Hyderabad" },
+  kompally: {
+    label: "Kompally Warehouse",
+    address: "Plot 44, Kompally Industrial Area",
+    city: "Hyderabad",
+  },
   gachibowli: { label: "Gachibowli", address: "DLF Cyber City, Gachibowli", city: "Hyderabad" },
-  secunderabad: { label: "Secunderabad Rly Station", address: "Station Road, Secunderabad", city: "Hyderabad" },
+  secunderabad: {
+    label: "Secunderabad Rly Station",
+    address: "Station Road, Secunderabad",
+    city: "Hyderabad",
+  },
   vijayawada: { label: "Vijayawada", address: "Benz Circle, Vijayawada", city: "Vijayawada" },
   warangal: { label: "Warangal", address: "Hanamkonda, Warangal", city: "Warangal" },
-  bengaluru: { label: "Whitefield, Bengaluru", address: "ITPL Main Rd, Whitefield", city: "Bengaluru" },
+  bengaluru: {
+    label: "Whitefield, Bengaluru",
+    address: "ITPL Main Rd, Whitefield",
+    city: "Bengaluru",
+  },
   guntur: { label: "Guntur Market Yard", address: "Mirchi Yard, Guntur", city: "Guntur" },
 };
 
@@ -92,7 +214,12 @@ interface RequestSeed {
 
 function buildRequest(s: RequestSeed): LoadRequest {
   const truck = truckById(s.truckTypeId)!;
-  const fare = estimateFare({ truck, distanceKm: s.distanceKm, mode: s.mode, loadWeightKg: s.loadWeightKg });
+  const fare = estimateFare({
+    truck,
+    distanceKm: s.distanceKm,
+    mode: s.mode,
+    loadWeightKg: s.loadWeightKg,
+  });
   return {
     id: s.id,
     mode: s.mode,
@@ -175,9 +302,7 @@ export const LOAD_REQUESTS: LoadRequest[] = [
   }),
 ];
 
-function buildTrip(
-  s: RequestSeed & { status: Trip["status"]; ratingGiven?: number },
-): Trip {
+function buildTrip(s: RequestSeed & { status: Trip["status"]; ratingGiven?: number }): Trip {
   const r = buildRequest(s);
   return {
     id: s.id,

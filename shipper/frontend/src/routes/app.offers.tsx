@@ -50,7 +50,9 @@ function OffersPage() {
             <Leaf className="h-5 w-5" />
             <p className="text-sm font-semibold">{t("offers.greenImpact")}</p>
           </div>
-          <p className="mt-2 text-3xl font-extrabold tracking-tight">{t("price.co2Saved", { kg: "1,250" })}</p>
+          <p className="mt-2 text-3xl font-extrabold tracking-tight">
+            {t("price.co2Saved", { kg: "1,250" })}
+          </p>
           <p className="mt-1 text-sm text-white/80">{t("offers.greenSub")}</p>
         </div>
 
@@ -59,11 +61,17 @@ function OffersPage() {
           {OFFERS.map((o) => {
             const Icon = ICONS[o.icon];
             return (
-              <div key={o.id} className="flex flex-col rounded-2xl border border-border bg-card p-4 shadow-sm">
+              <div
+                key={o.id}
+                className="flex flex-col rounded-2xl border border-border bg-card p-4 shadow-sm"
+              >
                 <div className="flex items-start justify-between gap-3">
                   <span
                     className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
-                    style={{ background: `color-mix(in oklab, ${TONE_VAR[o.tone]} 16%, transparent)`, color: TONE_VAR[o.tone] }}
+                    style={{
+                      background: `color-mix(in oklab, ${TONE_VAR[o.tone]} 16%, transparent)`,
+                      color: TONE_VAR[o.tone],
+                    }}
                   >
                     <Icon className="h-5 w-5" />
                   </span>
@@ -71,11 +79,17 @@ function OffersPage() {
                     onClick={() => copy(o.code)}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-border px-2.5 py-1 text-xs font-bold text-foreground hover:bg-secondary"
                   >
-                    {copied === o.code ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+                    {copied === o.code ? (
+                      <Check className="h-3.5 w-3.5 text-success" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5" />
+                    )}
                     {o.code}
                   </button>
                 </div>
-                <h3 className="mt-3 text-base font-bold tracking-tight text-foreground">{o.title}</h3>
+                <h3 className="mt-3 text-base font-bold tracking-tight text-foreground">
+                  {o.title}
+                </h3>
                 <p className="mt-1 flex-1 text-sm text-muted-foreground">{o.desc}</p>
                 <button
                   onClick={() => use(o)}
@@ -88,7 +102,9 @@ function OffersPage() {
           })}
         </div>
 
-        <p className="px-1 text-center text-[11px] text-muted-foreground">{t("offers.disclaimer")}</p>
+        <p className="px-1 text-center text-[11px] text-muted-foreground">
+          {t("offers.disclaimer")}
+        </p>
       </div>
     </div>
   );

@@ -78,15 +78,22 @@ export function PriceRangeCard({
           {price.savings > 0 && (
             <span
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold"
-              style={{ background: "color-mix(in oklab, var(--savings) 20%, transparent)", color: "var(--savings)" }}
+              style={{
+                background: "color-mix(in oklab, var(--savings) 20%, transparent)",
+                color: "var(--savings)",
+              }}
             >
-              <TrendingDown className="h-3.5 w-3.5" /> {t("price.youSave", { amount: inr(price.savings) })}
+              <TrendingDown className="h-3.5 w-3.5" />{" "}
+              {t("price.youSave", { amount: inr(price.savings) })}
             </span>
           )}
           {price.co2SavedKg > 0 && (
             <span
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold"
-              style={{ background: "color-mix(in oklab, var(--success) 18%, transparent)", color: "var(--success)" }}
+              style={{
+                background: "color-mix(in oklab, var(--success) 18%, transparent)",
+                color: "var(--success)",
+              }}
             >
               <Leaf className="h-3.5 w-3.5" /> {t("price.co2Saved", { kg: price.co2SavedKg })}
             </span>

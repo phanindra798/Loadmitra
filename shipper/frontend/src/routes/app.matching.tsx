@@ -40,9 +40,13 @@ function MatchingPage() {
         <div className="flex flex-col items-center gap-3 px-6 py-20 text-center">
           <Truck className="h-8 w-8 text-muted-foreground" />
           <p role={pollError ? "alert" : "status"} className="font-semibold text-foreground">
-            {loading ? "Loading your booking…" : pollError ?? t("matching.noBooking")}
+            {loading ? "Loading your booking…" : (pollError ?? t("matching.noBooking"))}
           </p>
-          {pollError && <Button variant="outline" onClick={retry}>Try again</Button>}
+          {pollError && (
+            <Button variant="outline" onClick={retry}>
+              Try again
+            </Button>
+          )}
           <Link to="/login">Sign in</Link>
           <Link to="/app">
             <Button className="rounded-xl">{t("common.goHome")}</Button>
@@ -54,12 +58,17 @@ function MatchingPage() {
 
   async function cancel() {
     if (cancelRef.current) return;
-    cancelRef.current = true; setCancelling(true);
+    cancelRef.current = true;
+    setCancelling(true);
     try {
       storeBooking(await shipperApi.cancelBooking(booking!.id));
       navigate({ to: "/app" });
-    } catch (error) { toast.error(error instanceof Error ? error.message : "Cancellation failed"); }
-    finally { cancelRef.current = false; setCancelling(false); }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Cancellation failed");
+    } finally {
+      cancelRef.current = false;
+      setCancelling(false);
+    }
   }
 
   function confirm() {
@@ -68,26 +77,44 @@ function MatchingPage() {
 
   return (
     <div className="mx-auto min-h-[100dvh] w-full max-w-2xl pb-28 lg:pb-10">
-      <PageHeader title={phase === "searching" ? t("matching.findingTitle") : t("matching.foundTitle")} />
+      <PageHeader
+        title={phase === "searching" ? t("matching.findingTitle") : t("matching.foundTitle")}
+      />
 
       <div className="px-4 pt-6 sm:px-6">
-        {pollError && <p role="alert" className="mb-3 text-sm text-destructive">{pollError}. Retrying…</p>}
+        {pollError && (
+          <p role="alert" className="mb-3 text-sm text-destructive">
+            {pollError}. Retrying…
+          </p>
+        )}
         {/* Route summary */}
         <div className="mb-6 rounded-2xl border border-border bg-card p-4 shadow-sm">
           <div className="flex items-center gap-2 text-sm">
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--primary)" }} />
-            <span className="min-w-0 flex-1 truncate font-semibold text-foreground">{booking.pickup.label}</span>
+            <span className="min-w-0 flex-1 truncate font-semibold text-foreground">
+              {booking.pickup.label}
+            </span>
           </div>
           <div className="ml-[5px] h-4 border-l-2 border-dashed border-border" />
           <div className="flex items-center gap-2 text-sm">
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--savings)" }} />
-            <span className="min-w-0 flex-1 truncate font-semibold text-foreground">{booking.drop.label}</span>
+            <span className="min-w-0 flex-1 truncate font-semibold text-foreground">
+              {booking.drop.label}
+            </span>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-dashed border-border pt-3 text-xs">
-            <span className="rounded-full bg-secondary px-2.5 py-1 font-semibold text-foreground">{t(MODE_I18N[booking.mode].label)}</span>
-            <span className="rounded-full bg-secondary px-2.5 py-1 font-semibold text-foreground">{booking.truckTypeName}</span>
-            <span className="rounded-full bg-secondary px-2.5 py-1 font-semibold text-foreground">{booking.price.distanceKm} km</span>
-            <span className="ml-auto font-extrabold text-foreground">{inr(booking.agreedPrice ?? booking.price.estimate)}</span>
+            <span className="rounded-full bg-secondary px-2.5 py-1 font-semibold text-foreground">
+              {t(MODE_I18N[booking.mode].label)}
+            </span>
+            <span className="rounded-full bg-secondary px-2.5 py-1 font-semibold text-foreground">
+              {booking.truckTypeName}
+            </span>
+            <span className="rounded-full bg-secondary px-2.5 py-1 font-semibold text-foreground">
+              {booking.price.distanceKm} km
+            </span>
+            <span className="ml-auto font-extrabold text-foreground">
+              {inr(booking.agreedPrice ?? booking.price.estimate)}
+            </span>
           </div>
         </div>
 
@@ -105,7 +132,8 @@ function MatchingPage() {
               <div
                 className="lm-radar absolute inset-0 rounded-full"
                 style={{
-                  background: "conic-gradient(from 0deg, transparent 0deg, color-mix(in oklab, var(--primary) 35%, transparent) 60deg, transparent 70deg)",
+                  background:
+                    "conic-gradient(from 0deg, transparent 0deg, color-mix(in oklab, var(--primary) 35%, transparent) 60deg, transparent 70deg)",
                   animation: "lm-radar-sweep 2.2s linear infinite",
                 }}
               />
@@ -114,7 +142,9 @@ function MatchingPage() {
               </span>
             </div>
             <h2 className="mt-6 text-lg font-bold text-foreground">{t("matching.searching")}</h2>
-            <p className="mt-1 max-w-xs text-sm text-muted-foreground">{t("matching.searchingHint")}</p>
+            <p className="mt-1 max-w-xs text-sm text-muted-foreground">
+              {t("matching.searchingHint")}
+            </p>
             <button
               onClick={cancel}
               disabled={cancelling}

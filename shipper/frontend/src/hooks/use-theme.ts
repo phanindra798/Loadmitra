@@ -24,8 +24,7 @@ export function useTheme() {
     try {
       const saved = readStored(STORAGE_KEY) as Theme | null;
       initial =
-        saved ??
-        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        saved ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     } catch {
       /* storage unavailable — fall back to light */
     }

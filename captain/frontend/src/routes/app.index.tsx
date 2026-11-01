@@ -1,8 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  Bell, MapPin, ChevronDown, Radar, Wallet, Route as RouteIcon,
-  Navigation2, ChevronRight, Star, Power,
+  Bell,
+  MapPin,
+  ChevronDown,
+  Radar,
+  Wallet,
+  Route as RouteIcon,
+  Navigation2,
+  ChevronRight,
+  Star,
+  Power,
 } from "lucide-react";
 import { MapCanvas } from "@/components/app/map-canvas";
 import { OnlineToggle } from "@/components/app/online-toggle";
@@ -19,14 +27,34 @@ export const Route = createFileRoute("/app/")({
 const REQUEST_TTL = 30; // seconds an offer stays before auto-skipping
 
 function initials(name: string) {
-  return name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+  return name
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 }
 
 function CaptainDashboard() {
   const navigate = useNavigate();
   const {
-    online, requests, activeTrip, earnings, profile, requestPool,
-    addRequest, acceptRequest, declineRequest, tripsLoading, tripsError, authenticated, earningsLoading, earningsError, profileLoading, profileError, refreshProfile,
+    online,
+    requests,
+    activeTrip,
+    earnings,
+    profile,
+    requestPool,
+    addRequest,
+    acceptRequest,
+    declineRequest,
+    tripsLoading,
+    tripsError,
+    authenticated,
+    earningsLoading,
+    earningsError,
+    profileLoading,
+    profileError,
+    refreshProfile,
   } = useCaptain();
 
   // Live location for the captain (real GPS via the browser).
@@ -58,7 +86,16 @@ function CaptainDashboard() {
       addRequest(next);
     }, delay);
     return () => clearTimeout(t);
-  }, [authenticated, tripsLoading, tripsError, online, activeTrip, requests, requestPool, addRequest]);
+  }, [
+    authenticated,
+    tripsLoading,
+    tripsError,
+    online,
+    activeTrip,
+    requests,
+    requestPool,
+    addRequest,
+  ]);
 
   // Countdown on the top (featured) offer; auto-skip when it expires.
   const firstId = requests[0]?.id;
@@ -78,7 +115,7 @@ function CaptainDashboard() {
   }, [firstId, declineRequest]);
 
   async function accept(id: string) {
-    if (!await acceptRequest(id)) return;
+    if (!(await acceptRequest(id))) return;
     navigate({ to: "/app/trip/$id", params: { id } });
   }
 
@@ -136,9 +173,25 @@ function CaptainDashboard() {
       <div className="absolute inset-x-0 bottom-16 z-20 px-2 sm:px-4 lg:inset-auto lg:bottom-auto lg:left-6 lg:top-20 lg:w-[420px] lg:px-0">
         <div className="mx-auto max-h-[76vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl lm-no-scrollbar lg:max-h-[calc(100vh-7rem)]">
           <TripSyncStatus />
-          {authenticated && !profileLoading && (profileError ?
-            <div role="alert" className="mb-3 rounded-xl border border-border p-3 text-sm">Could not load your vehicle. <button onClick={refreshProfile} className="underline">Retry profile</button></div> : !profile.truckTypeId &&
-            <Link to="/app/account" className="mb-3 block rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm font-semibold">Register your vehicle to receive and accept matching loads →</Link>)}
+          {authenticated &&
+            !profileLoading &&
+            (profileError ? (
+              <div role="alert" className="mb-3 rounded-xl border border-border p-3 text-sm">
+                Could not load your vehicle.{" "}
+                <button onClick={refreshProfile} className="underline">
+                  Retry profile
+                </button>
+              </div>
+            ) : (
+              !profile.truckTypeId && (
+                <Link
+                  to="/app/account"
+                  className="mb-3 block rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm font-semibold"
+                >
+                  Register your vehicle to receive and accept matching loads →
+                </Link>
+              )
+            ))}
           {/* Active trip banner */}
           {activeTrip && (
             <Link
@@ -166,8 +219,8 @@ function CaptainDashboard() {
                 Hi {profile.name.split(" ")[0]} 👋
               </h2>
               <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Star className="h-3.5 w-3.5 fill-current text-savings" /> {profile.rating > 0 ? profile.rating : "Not rated"} ·{" "}
-                {profile.vehicleNumber}
+                <Star className="h-3.5 w-3.5 fill-current text-savings" />{" "}
+                {profile.rating > 0 ? profile.rating : "Not rated"} · {profile.vehicleNumber}
               </p>
             </div>
             <Link
@@ -185,9 +238,30 @@ function CaptainDashboard() {
 
           {/* Mini stats */}
           <div className="mt-3 grid grid-cols-3 gap-2">
-            <Stat label="Deliveries today" value={!authenticated || earningsLoading || earningsError ? "—" : String(earnings.tripsToday)} />
-            <Stat label="Online hrs" value={earnings.onlineHoursToday == null ? "Not tracked" : String(earnings.onlineHoursToday)} />
-            <Stat label="Accept rate" value={earnings.acceptanceRate == null ? "Not tracked" : `${Math.round(earnings.acceptanceRate * 100)}%`} />
+            <Stat
+              label="Deliveries today"
+              value={
+                !authenticated || earningsLoading || earningsError
+                  ? "—"
+                  : String(earnings.tripsToday)
+              }
+            />
+            <Stat
+              label="Online hrs"
+              value={
+                earnings.onlineHoursToday == null
+                  ? "Not tracked"
+                  : String(earnings.onlineHoursToday)
+              }
+            />
+            <Stat
+              label="Accept rate"
+              value={
+                earnings.acceptanceRate == null
+                  ? "Not tracked"
+                  : `${Math.round(earnings.acceptanceRate * 100)}%`
+              }
+            />
           </div>
 
           {/* Offline state */}

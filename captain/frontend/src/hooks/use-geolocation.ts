@@ -16,7 +16,13 @@ const LAST_KEY = "lm-geo";
 /** Best-effort reverse geocode with no API key; falls back to raw coordinates. */
 async function reverseGeocode(lat: number, lon: number): Promise<GeoPlace> {
   const coords = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-  const fallback: GeoPlace = { label: "Current location", address: coords, city: "Current location", lat, lon };
+  const fallback: GeoPlace = {
+    label: "Current location",
+    address: coords,
+    city: "Current location",
+    lat,
+    lon,
+  };
   try {
     const res = await fetch(
       `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
@@ -29,7 +35,8 @@ async function reverseGeocode(lat: number, lon: number): Promise<GeoPlace> {
     } = await res.json();
     const city = d.city || d.locality || d.principalSubdivision || "Current location";
     const label = d.locality || d.city || city;
-    const address = [d.locality, d.city, d.principalSubdivision].filter(Boolean).join(", ") || coords;
+    const address =
+      [d.locality, d.city, d.principalSubdivision].filter(Boolean).join(", ") || coords;
     return { label, address, city, lat, lon };
   } catch {
     return fallback;
@@ -43,7 +50,9 @@ async function reverseGeocode(lat: number, lon: number): Promise<GeoPlace> {
  */
 export function useGeolocation() {
   const [status, setStatus] = useState<GeoStatus>("idle");
-  const [place, setPlace] = useState<GeoPlace | null>(() => readJSON<GeoPlace | null>(LAST_KEY, null));
+  const [place, setPlace] = useState<GeoPlace | null>(() =>
+    readJSON<GeoPlace | null>(LAST_KEY, null),
+  );
 
   const locate = useCallback((): Promise<GeoPlace | null> => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {

@@ -12,7 +12,11 @@ export interface ChatMessage {
 }
 
 function timeLabel(): string {
-  return new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true });
+  return new Date().toLocaleTimeString("en-IN", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 }
 
 const DEFAULT_REPLIES = [
@@ -70,12 +74,18 @@ export function ChatSheet({
   function send() {
     const t = text.trim();
     if (!t) return;
-    setMessages((m) => [...m, { id: `me-${m.length}-${t.length}`, from: "me", text: t, time: timeLabel() }]);
+    setMessages((m) => [
+      ...m,
+      { id: `me-${m.length}-${t.length}`, from: "me", text: t, time: timeLabel() },
+    ]);
     setText("");
     const reply = autoReplies[replyIdx.current % autoReplies.length];
     replyIdx.current += 1;
     window.setTimeout(() => {
-      setMessages((m) => [...m, { id: `them-${m.length}`, from: "them", text: reply, time: timeLabel() }]);
+      setMessages((m) => [
+        ...m,
+        { id: `them-${m.length}`, from: "them", text: reply, time: timeLabel() },
+      ]);
     }, 900);
   }
 
@@ -90,7 +100,9 @@ export function ChatSheet({
         <div className="flex items-center gap-3 border-b border-border px-4 py-3 pr-12">
           <span
             className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-bold text-white"
-            style={{ background: accentHue != null ? `hsl(${accentHue} 60% 45%)` : "var(--primary)" }}
+            style={{
+              background: accentHue != null ? `hsl(${accentHue} 60% 45%)` : "var(--primary)",
+            }}
           >
             {avatar ?? title.slice(0, 1)}
           </span>
@@ -101,14 +113,20 @@ export function ChatSheet({
         </div>
 
         {/* Messages */}
-        <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto bg-secondary/30 px-4 py-4 lm-no-scrollbar">
+        <div
+          ref={scrollRef}
+          className="flex-1 space-y-2 overflow-y-auto bg-secondary/30 px-4 py-4 lm-no-scrollbar"
+        >
           {messages.length === 0 && (
             <p className="mx-auto mt-6 max-w-[16rem] text-center text-xs text-muted-foreground">
               {t("chat.empty")}
             </p>
           )}
           {messages.map((m) => (
-            <div key={m.id} className={cn("flex", m.from === "me" ? "justify-end" : "justify-start")}>
+            <div
+              key={m.id}
+              className={cn("flex", m.from === "me" ? "justify-end" : "justify-start")}
+            >
               <div
                 className={cn(
                   "max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm",
@@ -118,7 +136,12 @@ export function ChatSheet({
                 )}
               >
                 <p className="whitespace-pre-wrap break-words">{m.text}</p>
-                <p className={cn("mt-0.5 text-[10px]", m.from === "me" ? "text-primary-foreground/70" : "text-muted-foreground")}>
+                <p
+                  className={cn(
+                    "mt-0.5 text-[10px]",
+                    m.from === "me" ? "text-primary-foreground/70" : "text-muted-foreground",
+                  )}
+                >
                   {m.time}
                 </p>
               </div>

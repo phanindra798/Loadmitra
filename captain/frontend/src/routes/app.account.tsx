@@ -1,8 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
-  Pencil, Sun, Moon, Languages, Truck, FileCheck, Headphones, Info, Star,
-  LogOut, ChevronRight, ShieldCheck, Phone,
+  Pencil,
+  Sun,
+  Moon,
+  Languages,
+  Truck,
+  FileCheck,
+  Headphones,
+  Info,
+  Star,
+  LogOut,
+  ChevronRight,
+  ShieldCheck,
+  Phone,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
@@ -29,7 +40,12 @@ export const Route = createFileRoute("/app/account")({
 });
 
 function initials(name: string) {
-  return name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+  return name
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 }
 
 function AccountPage() {
@@ -81,12 +97,16 @@ function AccountPage() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-1.5 truncate text-base font-bold text-foreground">
-              {displayName} {profile.kycVerified && <ShieldCheck className="h-4 w-4 shrink-0 text-success" />}
+              {displayName}{" "}
+              {profile.kycVerified && <ShieldCheck className="h-4 w-4 shrink-0 text-success" />}
             </p>
-            {account?.email && <p className="truncate text-xs text-muted-foreground">{account.email}</p>}
+            {account?.email && (
+              <p className="truncate text-xs text-muted-foreground">{account.email}</p>
+            )}
             <p className="flex items-center gap-2 truncate text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1 font-semibold text-foreground">
-                <Star className="h-3.5 w-3.5 fill-current text-savings" /> {profile.rating > 0 ? profile.rating : "Not rated"}
+                <Star className="h-3.5 w-3.5 fill-current text-savings" />{" "}
+                {profile.rating > 0 ? profile.rating : "Not rated"}
               </span>
               · {profile.trips.toLocaleString("en-IN")} deliveries
             </p>
@@ -113,15 +133,30 @@ function AccountPage() {
 
         {/* Vehicle */}
         <Section title="Your vehicle" icon={Truck}>
-          {!authenticated ? <p>Sign in to register your vehicle.</p> : profileLoading ? <p role="status">Loading vehicle…</p> : profileError ?
-            <div role="alert"><p>Could not load your vehicle. {profileError}</p><Button onClick={refreshProfile}>Retry profile</Button></div> :
-            <VehicleRegistration key={`${profile.id}:${profile.vehicleNumber}:${profile.truckTypeId}:${profile.city}`} profile={profile} />}
+          {!authenticated ? (
+            <p>Sign in to register your vehicle.</p>
+          ) : profileLoading ? (
+            <p role="status">Loading vehicle…</p>
+          ) : profileError ? (
+            <div role="alert">
+              <p>Could not load your vehicle. {profileError}</p>
+              <Button onClick={refreshProfile}>Retry profile</Button>
+            </div>
+          ) : (
+            <VehicleRegistration
+              key={`${profile.id}:${profile.vehicleNumber}:${profile.truckTypeId}:${profile.city}`}
+              profile={profile}
+            />
+          )}
         </Section>
 
         {/* Documents / KYC */}
         <Section title="Documents & KYC" icon={FileCheck}>
-          <p className="mb-2 text-xs text-muted-foreground">Document collection and verification are not available yet. Saving a vehicle does not verify these documents.</p>
-          {["Driving licence", "Vehicle RC", "Insurance", "Aadhaar / PAN"].map(label => (
+          <p className="mb-2 text-xs text-muted-foreground">
+            Document collection and verification are not available yet. Saving a vehicle does not
+            verify these documents.
+          </p>
+          {["Driving licence", "Vehicle RC", "Insurance", "Aadhaar / PAN"].map((label) => (
             <div key={label} className="flex items-center justify-between gap-3 py-2.5">
               <span className="text-sm font-semibold">{label}</span>
               <span className="rounded-full bg-secondary px-2 py-1 text-xs">Not submitted</span>
@@ -140,10 +175,17 @@ function AccountPage() {
                   onClick={() => setLang(l.code)}
                   className={[
                     "flex flex-col items-start rounded-xl border px-3 py-2.5 text-left transition-colors",
-                    active ? "border-primary bg-primary/10" : "border-border bg-background hover:border-primary/40",
+                    active
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-background hover:border-primary/40",
                   ].join(" ")}
                 >
-                  <span className={["text-sm font-bold", active ? "text-primary" : "text-foreground"].join(" ")}>
+                  <span
+                    className={[
+                      "text-sm font-bold",
+                      active ? "text-primary" : "text-foreground",
+                    ].join(" ")}
+                  >
                     {l.native}
                   </span>
                   <span className="text-[11px] text-muted-foreground">{l.label}</span>
@@ -174,9 +216,24 @@ function AccountPage() {
 
         {/* Notifications */}
         <Section title="Notifications">
-          <ToggleRow label="New load alerts" hint="Get notified of loads near you" checked={push} onChange={setPush} />
-          <ToggleRow label="SMS updates" hint="Trip & payout updates by SMS" checked={sms} onChange={setSms} />
-          <ToggleRow label="Incentives & offers" hint="Bonus and surge alerts" checked={promo} onChange={setPromo} />
+          <ToggleRow
+            label="New load alerts"
+            hint="Get notified of loads near you"
+            checked={push}
+            onChange={setPush}
+          />
+          <ToggleRow
+            label="SMS updates"
+            hint="Trip & payout updates by SMS"
+            checked={sms}
+            onChange={setSms}
+          />
+          <ToggleRow
+            label="Incentives & offers"
+            hint="Bonus and surge alerts"
+            checked={promo}
+            onChange={setPromo}
+          />
         </Section>
 
         {/* More */}
@@ -207,13 +264,15 @@ function AccountPage() {
         </p>
       </div>
 
-      {editOpen && <EditProfileDialog
-        open={editOpen}
-        onOpenChange={setEditOpen}
-        name={displayName}
-        email={account?.email ?? ""}
-        onSave={saveEdit}
-      />}
+      {editOpen && (
+        <EditProfileDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          name={displayName}
+          email={account?.email ?? ""}
+          onSave={saveEdit}
+        />
+      )}
     </div>
   );
 }
@@ -262,7 +321,10 @@ function EditProfileDialog({
           }}
         >
           <div>
-            <label htmlFor="edit-name" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <label
+              htmlFor="edit-name"
+              className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            >
               Full name
             </label>
             <input
@@ -274,7 +336,10 @@ function EditProfileDialog({
             />
           </div>
           <div>
-            <label htmlFor="edit-email" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <label
+              htmlFor="edit-email"
+              className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            >
               Email
             </label>
             <input
@@ -310,7 +375,9 @@ function Section({
       <h2 className="mb-2 flex items-center gap-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {Icon && <Icon className="h-4 w-4" />} {title}
       </h2>
-      <div className="rounded-2xl border border-border bg-card p-3 shadow-sm sm:p-4">{children}</div>
+      <div className="rounded-2xl border border-border bg-card p-3 shadow-sm sm:p-4">
+        {children}
+      </div>
     </section>
   );
 }
@@ -337,7 +404,13 @@ function ToggleRow({
   );
 }
 
-function LinkRow({ icon: Icon, label }: { icon: React.ComponentType<{ className?: string }>; label: string }) {
+function LinkRow({
+  icon: Icon,
+  label,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+}) {
   return (
     <button className="flex w-full items-center gap-3 py-2.5 text-left hover:opacity-80">
       <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-primary">
