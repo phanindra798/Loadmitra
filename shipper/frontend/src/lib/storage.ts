@@ -16,6 +16,11 @@
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
+/** Over HTTPS, mark cookies Secure so the session token never travels over plain HTTP. */
+function cookieFlags(): string {
+  return "; path=/; samesite=lax" + (location.protocol === "https:" ? "; secure" : "");
+}
+
 function escapeForRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -46,7 +51,8 @@ export function writeStored(key: string, value: string, maxAgeSeconds = ONE_YEAR
   try {
     document.cookie =
       `${encodeURIComponent(key)}=${encodeURIComponent(value)}` +
-      `; path=/; max-age=${maxAgeSeconds}; samesite=lax`;
+      `; max-age=${maxAgeSeconds}` +
+      cookieFlags();
   } catch {
     /* ignore */
   }
@@ -61,7 +67,7 @@ export function writeStored(key: string, value: string, maxAgeSeconds = ONE_YEAR
 export function removeStored(key: string): void {
   if (typeof document === "undefined") return;
   try {
-    document.cookie = `${encodeURIComponent(key)}=; path=/; max-age=0; samesite=lax`;
+    document.cookie = `${encodeURIComponent(key)}=; max-age=0` + cookieFlags();
   } catch {
     /* ignore */
   }

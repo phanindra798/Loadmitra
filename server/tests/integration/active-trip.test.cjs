@@ -422,3 +422,10 @@ test('identity migration keeps legacy accounts and allows the same digits in ano
   await assert.rejects(User.create({ role: 'shipper', name: 'Duplicate', phone: '9888888888', dialCode: '+91' }), { code: 11000 });
   await User.deleteMany({ phone: '9888888888' });
 });
+
+test('health reports ok once MongoDB is connected', async () => {
+  const response = await fetch(base + '/health');
+  assert.equal(response.status, 200);
+  const { status, db } = await response.json();
+  assert.deepEqual({ status, db }, { status: 'ok', db: 'up' });
+});
