@@ -1,0 +1,2 @@
+# Deploy files run on Linux: keep LF line endings on every checkout.
+deploy/aws-ec2/** text eol=lf

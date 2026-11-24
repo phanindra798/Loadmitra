@@ -1,0 +1,25 @@
+{
+  "agent": { "metrics_collection_interval": 300, "run_as_user": "root" },
+  "metrics": {
+    "namespace": "LoadMitra",
+    "append_dimensions": { "InstanceId": "${aws:InstanceId}" },
+    "metrics_collected": {
+      "mem": { "measurement": ["mem_used_percent"] },
+      "disk": { "measurement": ["used_percent"], "resources": ["/"] },
+      "swap": { "measurement": ["swap_used_percent"] }
+    }
+  },
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          { "file_path": "/home/ec2-user/.pm2/logs/loadmitra-api-out.log", "log_group_name": "/loadmitra/api", "log_stream_name": "{instance_id}-out", "retention_in_days": 14 },
+          { "file_path": "/home/ec2-user/.pm2/logs/loadmitra-api-error.log", "log_group_name": "/loadmitra/api", "log_stream_name": "{instance_id}-error", "retention_in_days": 14 },
+          { "file_path": "/home/ec2-user/.pm2/logs/loadmitra-shipper-*.log", "log_group_name": "/loadmitra/shipper", "log_stream_name": "{instance_id}", "retention_in_days": 14 },
+          { "file_path": "/home/ec2-user/.pm2/logs/loadmitra-captain-*.log", "log_group_name": "/loadmitra/captain", "log_stream_name": "{instance_id}", "retention_in_days": 14 },
+          { "file_path": "/var/log/nginx/error.log", "log_group_name": "/loadmitra/nginx", "log_stream_name": "{instance_id}-error", "retention_in_days": 14 }
+        ]
+      }
+    }
+  }
+}

@@ -46,13 +46,13 @@ function setAuthCookie(res: Response, token: string): void {
   });
 }
 
-/** Codes are exposed only in local development until an SMS adapter is configured. */
+/** Codes are exposed only in on-screen delivery mode until an SMS adapter is configured. */
 export function hashOtp(phone: string, role: string, code: string): string {
   return createHmac("sha256", env.JWT_SECRET).update(`${phone}:${role}:${code}`).digest("hex");
 }
 
 function deliveryAvailable(res: Response): boolean {
-  if (!env.isProd) return true;
+  if (env.otpDelivery === "screen") return true;
   res.status(503).json({ error: "SMS delivery is not configured" });
   return false;
 }

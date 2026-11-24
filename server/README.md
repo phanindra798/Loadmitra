@@ -254,3 +254,16 @@ Validation: 6 new backend tests (auth, headers, per-user routing, cancel/accept 
 - **Clean shutdown.** On `SIGINT`/`SIGTERM` (for example a process-manager restart) the API ends live streams, finishes in-flight requests, disconnects MongoDB and exits, or gives up after 8 s. The portals reconnect to the new process.
 
 Validation: 101 backend regression tests (new: health while MongoDB is down; one captain's limit leaves another on the same IP untouched), 36 isolated MongoDB integration tests (new: health once connected), 16 shipper and 25 captain frontend tests, and both browser journeys pass. Typecheck and lint are clean (no errors). The shutdown path was not exercised by a test: Windows cannot deliver `SIGINT`/`SIGTERM` to a child process.
+
+## AWS deployment — 24 November 2026
+
+Free-tier deployment kit in `deploy/aws-ec2/` (see its README): one EC2 instance runs the API and both portals under PM2 behind nginx, with Let's Encrypt HTTPS on free `sslip.io` hostnames, MongoDB Atlas M0, and the CloudWatch agent for logs and memory/disk metrics. Two new API settings:
+
+- `TRUST_PROXY`: the number of proxy hops (`1` behind that nginx). Without it every request appears to come from nginx, so all users share one rate-limit bucket.
+- `OTP_DELIVERY`: `screen` or `sms`. Production defaults to `sms`, which answers 503 until an SMS adapter exists. `OTP_DELIVERY=screen` enables on-screen codes for a demo deployment and logs a warning at boot. Anyone can then sign in as any number.
+
+Kit details: nginx gives `/api/events` its own `location` with buffering off and a 1-hour read timeout, so live updates pass straight through. PM2 waits 10 s on restart (`kill_timeout`) for the API's clean shutdown, `pm2-logrotate` caps logs (10 MB × 7), and `deploy.sh` waits for `/health` to report the database. `set-db-password.sh` writes the Atlas password into the server's `.env` from a hidden prompt. `.gitattributes` keeps the kit's files LF on Windows checkouts; CRLF scripts fail under bash on the server.
+
+Deployed and checked from the internet: HTTPS on all three hosts with HTTP redirects, sign-up and login, the live event stream through nginx, logout revocation, CORS for both portals, and CloudWatch log delivery. The Free-plan AWS account is pinned to Sydney (ap-southeast-2), so EC2 (t4g.micro, Arm) and the Atlas cluster both run there.
+
+Validation: 104 backend regression tests (including proxy hops and OTP delivery modes) pass.

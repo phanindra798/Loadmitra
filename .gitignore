@@ -39,3 +39,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# AWS release bundles (deploy/aws-ec2/build.sh)
+deploy/aws-ec2/release/
