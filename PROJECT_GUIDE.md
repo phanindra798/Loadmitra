@@ -943,6 +943,20 @@ Other quality tools: `npm run typecheck` (server), `npm run lint` and `npm run f
 
 ## 15. Deployment and configuration
 
+### AWS (current deployment, `deploy/aws-ec2/`)
+
+One EC2 **t4g.micro** (Arm, Amazon Linux 2023, Sydney ap-southeast-2) runs all three apps under **PM2**, behind **nginx**, with free **Let's Encrypt** HTTPS on `api.` / `ship.` / `captain.<ip>.sslip.io`. MongoDB stays on **Atlas M0** in the same region, allow-listed to the instance's **Elastic IP**. An **IAM instance role** grants the **CloudWatch agent** (logs + memory/disk/swap metrics) and a private **S3** bucket (prepared for future KYC uploads) without any access keys.
+
+- `setup-ec2.sh`: one-time setup (2 GB swap, Node 22, nginx, CloudWatch agent, PM2 + log rotation, certbot, auto-renew cron).
+- `build.sh`: builds locally (1 GB RAM is too small to build on the server) with the Nitro `node-server` preset and the public URLs baked in.
+- `deploy.sh`: uploads, keeps the server's `.env`, `npm ci`, `pm2 startOrReload`, nginx + certbot on first run, waits for `/health`.
+- New API settings: `TRUST_PROXY=1` (real client IP behind nginx) and `OTP_DELIVERY=screen|sms`. **The demo deployment uses `screen`, so anyone can sign in as any number.** Use dummy data only.
+- `/health` now returns 503 `{db:"down"}` while MongoDB is unreachable, and the API shuts down gracefully on SIGTERM/SIGINT.
+
+The full explanation, a review of the deployment and interview Q&A are in [`docs/LoadMitra_Master_Guide.pdf`](docs/LoadMitra_Master_Guide.pdf).
+
+### Other options
+
 - **Frontends → Vercel.** `vite.config.ts` forces Nitro's `vercel` preset (`.vercel/output`). Override with `NITRO_PRESET` (e.g. `node-server`, `cloudflare-module`). Ports are pinned with `strictPort` so the shipper can never accidentally take the captain's port 8081.
 - **API → any Node host** (Render, Railway, Fly…): `npm run build` then `npm start` (`node dist/index.js`). Set `NODE_ENV=production`, a strong `JWT_SECRET`, `MONGODB_URI` and `CORS_ORIGIN` = your two portal URLs.
 - **Cookies across domains:** in production the cookie is `SameSite=None; Secure` because the frontends and API are on different domains.

@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LoadMitra Master Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+  :root {
+    --ink: #14213d; --muted: #5b6475; --brand: #1d4ed8; --brand-soft: #e8efff;
+    --green: #0f7b4f; --green-soft: #e6f6ee; --amber: #9a5b00; --amber-soft: #fff4dd;
+    --red: #b42318; --red-soft: #fdecea; --line: #d9dee8; --code-bg: #f4f6fa;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "Inter", "DejaVu Sans", sans-serif; color: var(--ink); font-size: 10.2pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 21pt; margin: 0 0 4mm; color: var(--brand); page-break-before: always; letter-spacing: -0.3px; }
+  h1 .num { color: var(--muted); font-weight: 500; margin-right: 6px; }
+  h2 { font-size: 13.5pt; margin: 6mm 0 2mm; border-bottom: 1.5px solid var(--line); padding-bottom: 1mm; page-break-after: avoid; }
+  h3 { font-size: 11pt; margin: 4mm 0 1.5mm; page-break-after: avoid; }
+  p { margin: 0 0 2.4mm; }
+  ul, ol { margin: 0 0 2.6mm; padding-left: 6mm; }
+  li { margin-bottom: 1mm; }
+  code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.6pt; background: var(--code-bg); padding: 0.3mm 1mm; border-radius: 2px; }
+  pre { font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; line-height: 1.35; background: var(--code-bg); border: 1px solid var(--line); border-radius: 4px; padding: 3mm; white-space: pre; overflow: hidden; page-break-inside: avoid; margin: 0 0 3mm; }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 3.5mm; font-size: 9pt; page-break-inside: auto; }
+  tr { page-break-inside: avoid; }
+  th { background: var(--brand-soft); text-align: left; padding: 1.6mm 2mm; border: 1px solid var(--line); }
+  td { padding: 1.4mm 2mm; border: 1px solid var(--line); vertical-align: top; }
+  .box { border-radius: 5px; padding: 3mm 4mm; margin: 0 0 3.5mm; page-break-inside: avoid; border-left: 4px solid; }
+  .say { background: var(--green-soft); border-color: var(--green); }
+  .say::before { content: "HOW TO SAY IT IN THE INTERVIEW"; display: block; font-size: 7.5pt; font-weight: 700; letter-spacing: 0.6px; color: var(--green); margin-bottom: 1mm; }
+  .tip { background: var(--brand-soft); border-color: var(--brand); }
+  .tip::before { content: "TIP"; display: block; font-size: 7.5pt; font-weight: 700; letter-spacing: 0.6px; color: var(--brand); margin-bottom: 1mm; }
+  .warn { background: var(--amber-soft); border-color: var(--amber); }
+  .warn::before { content: "BE HONEST ABOUT THIS"; display: block; font-size: 7.5pt; font-weight: 700; letter-spacing: 0.6px; color: var(--amber); margin-bottom: 1mm; }
+  .issue { background: var(--red-soft); border-color: var(--red); }
+  .yours { background: #f3ecff; border-color: #6d28d9; }
+  .yours::before { content: "MAKE IT YOURS"; display: block; font-size: 7.5pt; font-weight: 700; letter-spacing: 0.6px; color: #6d28d9; margin-bottom: 1mm; }
+  .qa { margin: 0 0 3mm; page-break-inside: avoid; }
+  .qa .q { font-weight: 700; margin-bottom: 0.8mm; }
+  .qa .q::before { content: "Q. "; color: var(--brand); }
+  .qa .a { padding-left: 5mm; border-left: 2px solid var(--line); }
+  .tech { border: 1px solid var(--line); border-radius: 5px; padding: 3mm 4mm; margin: 0 0 3.5mm; page-break-inside: avoid; }
+  .tech h3 { margin-top: 0; color: var(--brand); }
+  .tech .row { margin-bottom: 1.2mm; }
+  .tech .lbl { font-weight: 700; display: inline-block; min-width: 25mm; color: var(--muted); font-size: 8.8pt; text-transform: uppercase; letter-spacing: 0.4px; }
+  .muted { color: var(--muted); }
+  .cover { height: 255mm; display: flex; flex-direction: column; justify-content: space-between; padding: 10mm 4mm; }
+  .cover h1 { page-break-before: avoid; font-size: 40pt; color: var(--ink); margin: 0; }
+  .cover .brand { color: var(--brand); }
+  .cover .sub { font-size: 15pt; color: var(--muted); margin-top: 4mm; }
+  .cover .stack { display: flex; flex-wrap: wrap; gap: 2mm; margin-top: 10mm; }
+  .chip { background: var(--brand-soft); color: var(--brand); border-radius: 20px; padding: 1mm 3.5mm; font-size: 9pt; font-weight: 600; }
+  .toc { columns: 2; column-gap: 10mm; font-size: 10pt; }
+  .toc div { margin-bottom: 1.6mm; break-inside: avoid; }
+  .toc b { color: var(--brand); display: inline-block; width: 8mm; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .stat { border: 1px solid var(--line); border-radius: 5px; padding: 3mm; text-align: center; }
+  .stat b { display: block; font-size: 17pt; color: var(--brand); }
+  .pb { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<!-- ============================ COVER ============================ -->
+<div class="cover">
+  <div>
+    <div class="chip" style="display:inline-block">Project master guide &amp; interview prep</div>
+    <h1 style="margin-top:12mm">Load<span class="brand">Mitra</span></h1>
+    <div class="sub">India-first freight marketplace connecting <b>Shippers</b> with truck <b>Captains</b>: full loads, shared loads and discounted return loads, with live tracking and transparent per-tonne pricing.</div>
+    <div class="stack">
+      <span class="chip">React 19</span><span class="chip">TypeScript</span><span class="chip">TanStack Start / Router / Query</span>
+      <span class="chip">Vite</span><span class="chip">Tailwind CSS 4</span><span class="chip">Radix UI / shadcn</span>
+      <span class="chip">Node.js</span><span class="chip">Express</span><span class="chip">MongoDB Atlas</span><span class="chip">Mongoose</span>
+      <span class="chip">Zod</span><span class="chip">JWT + OTP</span><span class="chip">Server-Sent Events</span>
+      <span class="chip">AWS EC2</span><span class="chip">nginx</span><span class="chip">PM2</span><span class="chip">Let's Encrypt</span>
+      <span class="chip">CloudWatch</span><span class="chip">S3</span><span class="chip">IAM</span>
+    </div>
+  </div>
+  <div class="grid2" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat"><b>3</b>apps (2 portals + 1 API)</div>
+    <div class="stat"><b>23</b>API endpoints</div>
+    <div class="stat"><b>104</b>backend tests passing</div>
+    <div class="stat"><b>6</b>languages</div>
+  </div>
+  <div class="muted" style="font-size:9pt">
+    What this guide gives you: the idea, the architecture, every technology (what it is, why it was chosen, how it is used, how to explain it), the AWS deployment line by line, a review of that deployment, and about 80 interview questions with model answers.<br>
+    Based on the repository <code>phanindra798/Loadmitra</code> at commit <code>3263cd3</code> (24 Nov 2026).
+  </div>
+</div>
+
+<!-- ============================ TOC ============================ -->
+<h1 style="page-break-before:always">Contents</h1>
+<div class="toc">
+  <div><b>1</b>The pitch: 30 seconds and 2 minutes</div>
+  <div><b>2</b>The idea: the problem and why it matters</div>
+  <div><b>3</b>Users, roles and features</div>
+  <div><b>4</b>Architecture</div>
+  <div><b>5</b>Repository structure</div>
+  <div><b>6</b>Tech stack: frontend</div>
+  <div><b>7</b>Tech stack: backend</div>
+  <div><b>8</b>Tech stack: database (MongoDB)</div>
+  <div><b>9</b>Tech stack: AWS and DevOps</div>
+  <div><b>10</b>Data model</div>
+  <div><b>11</b>API reference</div>
+  <div><b>12</b>A booking from start to finish</div>
+  <div><b>13</b>Pricing and payouts, with numbers</div>
+  <div><b>14</b>Security design</div>
+  <div><b>15</b>Hard problems solved</div>
+  <div><b>16</b>Live updates (SSE)</div>
+  <div><b>17</b>Testing strategy</div>
+  <div><b>18</b>AWS deployment step by step</div>
+  <div><b>19</b>Deployment review: what's good and what to improve</div>
+  <div><b>20</b>Limitations and roadmap</div>
+  <div><b>21</b>How to scale it</div>
+  <div><b>22</b>Interview questions and model answers</div>
+  <div><b>23</b>One-page cheat sheet</div>
+  <div><b>24</b>Glossary</div>
+</div>
+
+<!-- ============================ 1 PITCH ============================ -->
+<h1><span class="num">1</span>The pitch</h1>
+
+<h2>30-second version</h2>
+<div class="box say">
+"LoadMitra is a freight marketplace for India, like Uber but for trucks. Shippers book a truck and see a transparent per-tonne price, and truck drivers, called Captains, accept loads that match their vehicle. It supports full loads, <b>shared</b> loads for small shippers, and discounted <b>return</b> loads so trucks don't drive back empty. I built it as two React portals backed by one Node/Express/MongoDB API, with phone-OTP login, an atomic booking-acceptance flow, OTP-verified pickup and delivery, live updates over Server-Sent Events, and I deployed it on AWS EC2 behind nginx with HTTPS and CloudWatch monitoring."
+</div>
+
+<h2>2-minute version (structure it like this)</h2>
+<ol>
+  <li><b>Problem (20 s):</b> Indian road freight is fragmented. Small businesses can't fill a whole truck, prices are negotiated by phone, and many trucks return empty after a delivery.</li>
+  <li><b>Solution (20 s):</b> Two apps. The Shipper portal does search → quote → book → track. The Captain portal does go online → accept → pickup → deliver → earnings. Three booking modes: full, shared, return.</li>
+  <li><b>Architecture (30 s):</b> Two TanStack Start (React + SSR) frontends and one shared Express + TypeScript API on MongoDB. The <code>bookings</code> collection is the bridge between the two portals.</li>
+  <li><b>Hard parts (30 s):</b> Two captains accepting the same load at once is solved with conditional atomic updates. A captain holding two active trips is blocked by a partial unique index. A captain faking a delivery is blocked by a shipper-issued handover OTP. Clients can't tamper with prices because the server recomputes distance and fare. Live updates use SSE with a polling fallback.</li>
+  <li><b>Delivery (20 s):</b> Deployed on one AWS EC2 instance: nginx reverse proxy, PM2 process manager, Let's Encrypt HTTPS, MongoDB Atlas, CloudWatch logs and metrics, and an IAM role for S3. There are 104 automated backend tests plus browser end-to-end tests.</li>
+</ol>
+<div class="box tip">Interviewers love a story with <b>a problem → a decision → a trade-off → a result</b>. For every technology below there's a "why" and an "alternative considered". Use them.</div>
+
+<!-- ============================ 2 IDEA ============================ -->
+<h1><span class="num">2</span>The idea: problem and motivation</h1>
+
+<h2>The problem in Indian road freight</h2>
+<table>
+  <tr><th>Pain point</th><th>Who suffers</th><th>LoadMitra's answer</th><th>Code name</th></tr>
+  <tr><td>A small trader has 500 kg of goods but must pay for a whole truck</td><td>Small shippers</td><td><b>Shared load</b>: pay only your share of capacity, plus a 20% share discount</td><td><code>shared</code></td></tr>
+  <tr><td>Trucks drive back empty after a delivery (wasted fuel, money and CO₂)</td><td>Captains, environment</td><td><b>Return load</b>: 25% cheaper for the shipper, plus a 6% incentive for the captain</td><td><code>return</code></td></tr>
+  <tr><td>Prices are opaque and negotiated on the phone</td><td>Everyone</td><td>Transparent itemized estimate with a ±8% range and a ₹/tonne figure</td><td>all modes</td></tr>
+  <tr><td>Normal case: you need the whole truck</td><td>Shippers</td><td><b>Full load</b></td><td><code>full</code></td></tr>
+  <tr><td>Cargo disputes ("was it really delivered?")</td><td>Shippers</td><td>The shipper issues a one-time handover code at pickup and at drop</td><td>handover OTP</td></tr>
+</table>
+
+<h2>Why the name</h2>
+<p><b>"Mitra"</b> means <i>friend</i> in Hindi/Sanskrit. A "friend for your load" is a friendly, India-first brand. Supporting 6 Indian languages (English, Hindi, Telugu, Tamil, Kannada, Malayalam) follows from the same thinking: many drivers are more comfortable in their regional language.</p>
+
+<h2>Why a marketplace with two separate apps</h2>
+<ul>
+  <li>Shippers and drivers have different goals, devices and screens. Mixing them in one app makes both worse.</li>
+  <li>The proven model is ride-hailing (Uber/Rapido): a customer app plus a driver app. LoadMitra applies it to goods.</li>
+  <li>One shared backend keeps a <b>single source of truth</b> for each booking that both sides watch.</li>
+</ul>
+
+<div class="box yours">
+Interviewers often ask "<i>How did you get this idea?</i>". Answer with a <b>real</b> personal story, because they can tell when it's made up. A useful template:<br>
+"I noticed <i>[what you saw: a family business, a relative who transports goods, the trucks you see near markets or highways, a news article about empty return trips]</i>. When I looked into it, I learned that <i>[a fact: small shippers overpay, trucks return empty, prices aren't transparent]</i>. Ride-hailing solved a similar matching problem for people, so I wanted to build that for goods, with features specific to India like shared and return loads and regional languages."<br>
+Fill in the brackets with what is true for you before the interview.
+</div>
+
+<!-- ============================ 3 FEATURES ============================ -->
+<h1><span class="num">3</span>Users, roles and features</h1>
+<table>
+  <tr><th style="width:18%">Role</th><th>Who</th><th>App and port</th><th>Can do</th></tr>
+  <tr><td><b>shipper</b></td><td>Customer with goods</td><td><code>shipper/frontend</code>, :8080</td><td>Get estimate, book, track live, cancel before pickup, generate handover code, see history, edit profile</td></tr>
+  <tr><td><b>captain</b></td><td>Truck driver or owner</td><td><code>captain/frontend</code>, :8081</td><td>Register vehicle, go online, see matching loads, accept, move through trip stages, enter handover codes, see earnings</td></tr>
+</table>
+<p>The same phone number can have a shipper account <i>and</i> a captain account. Identity is <b>country code + phone + role</b>.</p>
+
+<h2>Shipper screens</h2>
+<table>
+  <tr><th>Screen</th><th>File</th><th>What it does</th></tr>
+  <tr><td>Landing</td><td><code>routes/index.tsx</code></td><td>Marketing page, language/theme, link to the captain portal</td></tr>
+  <tr><td>Login</td><td><code>routes/login.tsx</code></td><td>Country code + phone → OTP → (new user: name/email) → token</td></tr>
+  <tr><td>Home</td><td><code>app.index.tsx</code></td><td>Map-first home, choose mode, saved places, detect location</td></tr>
+  <tr><td>Search</td><td><code>app.search.tsx</code></td><td>Pickup and drop, suggestions, current location, swap</td></tr>
+  <tr><td>Quote</td><td><code>app.quote.tsx</code></td><td>Recommends the smallest truck that fits; weight, goods type, price range; Book</td></tr>
+  <tr><td>Matching</td><td><code>app.matching.tsx</code></td><td>Radar animation until a captain accepts; then the captain card</td></tr>
+  <tr><td>Track</td><td><code>app.track.$id.tsx</code></td><td>Status timeline, map, captain, handover code, share</td></tr>
+  <tr><td>Bookings</td><td><code>app.bookings.tsx</code></td><td>History with cursor pagination and a details dialog</td></tr>
+  <tr><td>Offers, Account</td><td><code>app.offers.tsx</code>, <code>app.account.tsx</code></td><td>Promotions; profile, language, theme, logout</td></tr>
+</table>
+
+<h2>Captain screens</h2>
+<table>
+  <tr><th>Screen</th><th>File</th><th>What it does</th></tr>
+  <tr><td>Dashboard</td><td><code>app.index.tsx</code></td><td>Online/offline toggle, GPS, offer cards with a 30-second countdown (accept/skip), today's earnings</td></tr>
+  <tr><td>Trip</td><td><code>app.trip.$id.tsx</code></td><td>Step buttons: Head to pickup → Arrived → Pickup OTP → Start drive → Drop OTP; SOS; payout</td></tr>
+  <tr><td>Trips, Earnings</td><td><code>app.trips.tsx</code>, <code>app.earnings.tsx</code></td><td>History; today/week/month, weekly chart, ledger</td></tr>
+  <tr><td>Account</td><td><code>app.account.tsx</code></td><td>Profile, <b>vehicle registration</b>, KYC status, language, logout</td></tr>
+</table>
+
+<!-- ============================ 4 ARCHITECTURE ============================ -->
+<h1><span class="num">4</span>Architecture</h1>
+<h2>Logical architecture</h2>
+<pre>
+  ┌──────────────────────────┐            ┌──────────────────────────┐
+  │   SHIPPER PORTAL         │            │   CAPTAIN PORTAL         │
+  │   React + TanStack Start │            │   React + TanStack Start │
+  │   (SSR)  :8080           │            │   (SSR)  :8081           │
+  └────────────┬─────────────┘            └─────────────┬────────────┘
+               │   HTTPS JSON (fetch, Bearer JWT)         │
+               │   + live stream  GET /api/events (SSE)   │
+               └──────────────────┬───────────────────────┘
+                                  ▼
+               ┌──────────────────────────────────────┐
+               │  SHARED API   Node + Express + TS    │
+               │  :4000                               │
+               │  routes → middleware → controllers   │
+               │        → services → models           │
+               └──────────────────┬───────────────────┘
+                                  ▼  Mongoose
+               ┌──────────────────────────────────────┐
+               │  MongoDB Atlas                       │
+               │  users · otps · bookings ·           │
+               │  revokedtokens                       │
+               └──────────────────────────────────────┘
+</pre>
+
+<h2>Production (AWS) architecture</h2>
+<pre>
+ Internet
+    │ HTTPS 443 (HTTP 80 → redirect)
+    ▼
+ ┌─────────────────────── EC2 t4g.micro (Arm, Amazon Linux 2023, Sydney) ─────────┐
+ │  Elastic IP  ── Security Group: 22 (my IP), 80, 443                            │
+ │                                                                                │
+ │  nginx  (TLS from Let's Encrypt, auto-renew cron)                              │
+ │    api.&lt;ip&gt;.sslip.io      ──► 127.0.0.1:4000  loadmitra-api      (PM2)         │
+ │    ship.&lt;ip&gt;.sslip.io     ──► 127.0.0.1:8080  loadmitra-shipper  (PM2)         │
+ │    captain.&lt;ip&gt;.sslip.io  ──► 127.0.0.1:8081  loadmitra-captain  (PM2)         │
+ │                                                                                │
+ │  CloudWatch agent ──► Logs (/loadmitra/*) + Metrics (mem, disk, swap)          │
+ │  IAM instance role ──► S3 bucket (private, encrypted; for future KYC docs)     │
+ │  2 GB swap file, pm2-logrotate                                                 │
+ └──────────────────────────────────────┬─────────────────────────────────────────┘
+                                        │ TLS, IP allow-listed
+                                        ▼
+                      MongoDB Atlas M0 (AWS, Sydney, same region)
+</pre>
+
+<h2>Key architecture decisions</h2>
+<table>
+  <tr><th>Decision</th><th>Why</th><th>Trade-off</th></tr>
+  <tr><td>Two frontends, one backend</td><td>Different users and screens; deploy independently; one source of truth</td><td>Some UI code is duplicated between the portals</td></tr>
+  <tr><td>Layered backend (routes → middleware → controllers → services → models)</td><td>Separation of concerns, easy to test and change</td><td>More files than a single-file server</td></tr>
+  <tr><td>A monolithic API, not microservices</td><td>Small team, one domain, simple deploys, atomic DB operations</td><td>Scaling means scaling everything together</td></tr>
+  <tr><td>The server is authoritative (recomputes price, distance, identity)</td><td>Never trust the client</td><td>The formula is duplicated on the client for instant UI</td></tr>
+  <tr><td>SSE + polling fallback</td><td>Instant updates with a guaranteed fallback</td><td>Some extra requests</td></tr>
+  <tr><td>Single EC2 instance</td><td>Fits the free tier/credits, simple</td><td>Single point of failure; in-memory state</td></tr>
+</table>
+
+<!-- ============================ 5 REPO ============================ -->
+<h1><span class="num">5</span>Repository structure</h1>
+<pre>
+Loadmitra/
+├── package.json              root scripts: dev, dev:api, dev:captain, build, install:all
+├── server/                   SHARED API
+│   ├── src/index.ts          start HTTP, connect DB with retry, graceful shutdown
+│   ├── src/app.ts            helmet, cors, json, cookies, trust proxy, routes, errors
+│   ├── src/config/env.ts     Zod-validated env vars (fail fast)
+│   ├── src/config/db.ts      Mongo connect + retry + index installation
+│   ├── src/routes/index.ts   URL map + auth/role/rate-limit middleware per route
+│   ├── src/middleware/       auth.ts, rate-limit.ts, async-handler.ts, error.ts
+│   ├── src/controllers/      auth, bookings, requests, trips, captain, earnings,
+│   │                         pricing, trucks, events
+│   ├── src/services/         pricing, earnings, earnings-summary, handover-otp,
+│   │                         active-trip, identity-index, booking-view, live-events
+│   ├── src/models/           user, otp, booking, revoked-token  (Mongoose schemas)
+│   ├── src/data/trucks.ts    truck catalogue, rate card, city distance table
+│   └── tests/                unit (104), integration (real Mongo), browser (CDP)
+├── shipper/frontend/src/
+│   ├── routes/               file-based pages
+│   ├── components/ui/        shadcn/Radix building blocks
+│   ├── components/app/       MapCanvas, CaptainCard, HandoverCode, PriceRangeCard…
+│   ├── features/shipper/     types, pricing, booking-context, i18n, translations
+│   ├── hooks/                use-theme, use-geolocation, use-persisted-state
+│   └── lib/                  api.ts, session.ts, storage.ts, live.ts, use-live-events.ts
+├── captain/frontend/src/     same layout; features/captain/ (captain-context,
+│                             earnings, trip-record, i18n)
+└── deploy/aws-ec2/           README, setup-ec2.sh, build.sh, deploy.sh, nginx.conf,
+                              ecosystem.config.cjs (PM2), cloudwatch-agent.json,
+                              set-db-password.sh
+</pre>
+<div class="box say">"The backend follows a layered architecture. <b>Routes</b> map URLs, <b>middleware</b> handles cross-cutting concerns like authentication, roles and rate limits, <b>controllers</b> validate input with Zod and orchestrate, <b>services</b> hold reusable business logic like pricing, and <b>models</b> define the MongoDB schemas. That keeps each file focused and testable."</div>
+
+<!-- ============================ 6 FRONTEND STACK ============================ -->
+<h1><span class="num">6</span>Tech stack: frontend</h1>
+<p>Each card answers four interview questions: <b>What is it? Why this one? How is it used in LoadMitra? What else could you have used?</b></p>
+
+<div class="tech"><h3>React 19</h3>
+<div class="row"><span class="lbl">What</span>A JavaScript library for building UIs out of reusable <b>components</b> (functions that return UI). State changes re-render only what changed.</div>
+<div class="row"><span class="lbl">Why</span>Industry standard, huge ecosystem (Radix, TanStack), component reuse across two portals, and strong hiring relevance.</div>
+<div class="row"><span class="lbl">How used</span>Every screen and widget is a component. It uses hooks (<code>useState</code>, <code>useEffect</code>, <code>useReducer</code>, <code>useContext</code>, <code>useSyncExternalStore</code>) and Context providers for app state (<code>BookingProvider</code>, <code>CaptainProvider</code>).</div>
+<div class="row"><span class="lbl">Alternatives</span>Vue, Angular, Svelte. React was chosen for its ecosystem and familiarity.</div>
+</div>
+
+<div class="tech"><h3>TypeScript</h3>
+<div class="row"><span class="lbl">What</span>JavaScript with static types. The compiler catches mistakes like passing a string where a number is expected before the code runs.</div>
+<div class="row"><span class="lbl">Why</span>The domain has many shapes (Booking, Trip, Payout, PriceBreakdown). Types keep the server, shipper and captain consistent and make refactoring safe.</div>
+<div class="row"><span class="lbl">How used</span>The whole repo, all three apps. Shared domain types live in <code>server/src/types/index.ts</code> and are mirrored in <code>features/*/types.ts</code>.</div>
+<div class="row"><span class="lbl">Alternatives</span>Plain JavaScript with JSDoc. That's riskier as the project grows.</div>
+</div>
+
+<div class="tech"><h3>TanStack Start (SSR framework)</h3>
+<div class="row"><span class="lbl">What</span>A full-stack React framework. Pages are <b>server-side rendered</b> (the HTML is built on the server) and then <b>hydrated</b> (made interactive) in the browser.</div>
+<div class="row"><span class="lbl">Why</span>A faster first paint on slow mobile networks, good SEO for the landing page, and type-safe routing out of the box. Cookies let SSR read the language and theme with no flash.</div>
+<div class="row"><span class="lbl">How used</span><code>src/router.tsx</code>, <code>src/start.ts</code> (error middleware), <code>src/server.ts</code> (SSR wrapper that shows a friendly error page). Built with <b>Nitro</b>: the <code>node-server</code> preset for AWS (<code>.output/server/index.mjs</code> run by PM2), or <code>vercel</code>.</div>
+<div class="row"><span class="lbl">Alternatives</span>Next.js (most popular), Remix, a plain Vite SPA. TanStack was chosen for end-to-end type safety and close integration with TanStack Router/Query. The project was also scaffolded with Lovable, which uses this stack.</div>
+</div>
+
+<div class="tech"><h3>TanStack Router (file-based routing)</h3>
+<div class="row"><span class="lbl">What</span>A type-safe router. The file name decides the URL: <code>app.track.$id.tsx</code> → <code>/app/track/:id</code>.</div>
+<div class="row"><span class="lbl">Why</span>Route params and search params are typed (e.g. <code>validateSearch</code> on the matching page), and nested layouts with <code>&lt;Outlet/&gt;</code> keep providers mounted.</div>
+<div class="row"><span class="lbl">How used</span><code>__root.tsx</code> is the HTML shell; <code>app.tsx</code> is the layout with sidebar, bottom nav and providers. <code>routeTree.gen.ts</code> is auto-generated.</div>
+<div class="row"><span class="lbl">Alternatives</span>React Router.</div>
+</div>
+
+<div class="tech"><h3>TanStack Query (React Query)</h3>
+<div class="row"><span class="lbl">What</span>A library that manages <b>server state</b>: fetching, caching, loading/error states, background refetch, polling and cache invalidation.</div>
+<div class="row"><span class="lbl">Why</span>The captain app shows several server resources that must stay fresh (trips, offers, earnings, profile). Doing that by hand with <code>useEffect</code> is error-prone.</div>
+<div class="row"><span class="lbl">How used</span><code>captain-context.tsx</code> defines queries with polling intervals (trips 3 s/30 s, offers 6 s/30 s, earnings 15 s/60 s; the faster value is used when the live stream is down). Live events call <code>invalidateQueries</code>. The shipper quote screen uses it for the server estimate with the local estimate as <code>initialData</code>.</div>
+<div class="row"><span class="lbl">Alternatives</span>SWR, Redux Toolkit Query, plain fetch.</div>
+</div>
+
+<div class="tech"><h3>Vite</h3>
+<div class="row"><span class="lbl">What</span>A build tool and dev server: instant start, hot module replacement, optimized production bundles.</div>
+<div class="row"><span class="lbl">Why</span>Much faster than Webpack. TanStack Start runs on it.</div>
+<div class="row"><span class="lbl">How used</span><code>vite.config.ts</code> pins ports (8080/8081) with <code>strictPort</code> and selects the Nitro preset. <code>VITE_*</code> env vars (API URL, portal URLs) are <b>baked in at build time</b>.</div>
+</div>
+
+<div class="tech"><h3>Tailwind CSS 4</h3>
+<div class="row"><span class="lbl">What</span>Utility-first CSS: style with small classes like <code>px-4 rounded-xl text-sm</code> directly in the markup.</div>
+<div class="row"><span class="lbl">Why</span>Fast and consistent styling with a small CSS output. Design tokens (CSS variables) make light/dark themes easy.</div>
+<div class="row"><span class="lbl">How used</span><code>styles.css</code> defines colour tokens; <code>use-theme.ts</code> toggles the <code>dark</code> class on <code>&lt;html&gt;</code>. Responsive classes (<code>lg:</code>) give a sidebar on desktop and a bottom tab bar on mobile.</div>
+<div class="row"><span class="lbl">Alternatives</span>CSS Modules, styled-components, MUI.</div>
+</div>
+
+<div class="tech"><h3>Radix UI + shadcn/ui</h3>
+<div class="row"><span class="lbl">What</span>Radix provides unstyled, <b>accessible</b> primitives (dialog, dropdown, tabs…). shadcn/ui is a set of pre-styled copies of them that live in your own repo (<code>components/ui/</code>).</div>
+<div class="row"><span class="lbl">Why</span>Keyboard and screen-reader support for free, and full control because the code is ours, not a black-box dependency.</div>
+<div class="row"><span class="lbl">How used</span>Dialogs, sheets, the OTP input (<code>input-otp</code>), toasts (<code>sonner</code>), icons (<code>lucide-react</code>).</div>
+</div>
+
+<div class="tech"><h3>Other frontend pieces</h3>
+<div class="row"><span class="lbl">i18n</span>A custom lightweight <code>t()</code> function (<code>features/*/i18n.tsx</code>) with 6 languages and an English fallback. No heavy library is needed.</div>
+<div class="row"><span class="lbl">Map</span><code>MapCanvas</code> is a CSS/SVG <b>visual placeholder</b>, so no Google Maps key or cost. Real tiles can be added behind the same overlay.</div>
+<div class="row"><span class="lbl">Geolocation</span>Browser GPS plus a free key-less reverse geocoder (BigDataCloud), falling back to coordinates.</div>
+<div class="row"><span class="lbl">Storage</span><code>lib/storage.ts</code>: cookie first (so SSR can read it), mirrored to localStorage. Cookies are marked <code>Secure</code> over HTTPS.</div>
+<div class="row"><span class="lbl">Quality</span>ESLint + Prettier; frontend unit tests with Node's built-in test runner.</div>
+</div>
+
+<!-- ============================ 7 BACKEND STACK ============================ -->
+<h1><span class="num">7</span>Tech stack: backend</h1>
+
+<div class="tech"><h3>Node.js (v22 in production)</h3>
+<div class="row"><span class="lbl">What</span>A JavaScript runtime for servers. It's event-driven and non-blocking, so one process handles many concurrent connections.</div>
+<div class="row"><span class="lbl">Why</span>One language across the stack, and very good at I/O-heavy work (database calls, many open SSE connections). Runs on Arm (t4g) with no changes.</div>
+<div class="row"><span class="lbl">Alternatives</span>Java/Spring Boot, Python/FastAPI, Go.</div>
+</div>
+
+<div class="tech"><h3>Express 4 (4.22.3)</h3>
+<div class="row"><span class="lbl">What</span>A minimal web framework: routing plus a <b>middleware</b> chain (functions that run in order for each request).</div>
+<div class="row"><span class="lbl">Why</span>Simple, battle-tested, enormous ecosystem (helmet, cors, cookie-parser, morgan).</div>
+<div class="row"><span class="lbl">How used</span><code>app.ts</code> builds the app (it's separate from <code>index.ts</code> so tests can import it). <code>asyncHandler</code> is needed because Express 4 doesn't catch rejected promises. The central <code>errorHandler</code> returns clean 400/500 responses.</div>
+<div class="row"><span class="lbl">Alternatives</span>Fastify (faster), NestJS (more structure), Koa.</div>
+</div>
+
+<div class="tech"><h3>Zod</h3>
+<div class="row"><span class="lbl">What</span>Runtime schema validation. TypeScript types disappear at runtime; Zod actually checks incoming JSON.</div>
+<div class="row"><span class="lbl">Why</span>All client input is untrusted. You get clear 400 errors and typed data after parsing.</div>
+<div class="row"><span class="lbl">How used</span>Every controller (e.g. <code>createBookingSchema</code>, Indian phone regex <code>^[6-9]\d{9}$</code>, vehicle number normalization). Also <b>environment variables</b> in <code>config/env.ts</code>: the server refuses to boot with bad config (fail fast).</div>
+</div>
+
+<div class="tech"><h3>JWT (jsonwebtoken) + phone OTP</h3>
+<div class="row"><span class="lbl">What</span>A JWT is a signed token containing <code>{userId, role, jti, exp}</code>. The OTP is a 6-digit one-time code that proves you own the phone.</div>
+<div class="row"><span class="lbl">Why</span>OTP: Indian users expect phone login, not passwords. JWT: stateless verification, so no session lookup per request (except a revocation check).</div>
+<div class="row"><span class="lbl">How used</span>HS256 with the algorithm pinned, 30-day expiry, a unique <code>jti</code> per login for logout revocation. Sent as <code>Authorization: Bearer</code> and as an <code>httpOnly</code> cookie (<code>SameSite=None; Secure</code> in production).</div>
+<div class="row"><span class="lbl">Alternatives</span>Server-side sessions (Redis), Firebase Auth, Auth0/Cognito.</div>
+</div>
+
+<div class="tech"><h3>Security and utility middleware</h3>
+<table>
+<tr><th>Package</th><th>What it does here</th></tr>
+<tr><td><code>helmet</code></td><td>Secure HTTP headers (HSTS, no-sniff, frame protection…)</td></tr>
+<tr><td><code>cors</code></td><td>Only the two portal origins (<code>CORS_ORIGIN</code>) may call the API with credentials</td></tr>
+<tr><td><code>cookie-parser</code></td><td>Reads the <code>lm_token</code> cookie</td></tr>
+<tr><td><code>morgan</code></td><td>Request logging in development only</td></tr>
+<tr><td><code>dotenv</code></td><td>Loads <code>.env</code> into <code>process.env</code></td></tr>
+<tr><td>custom <code>rate-limit.ts</code></td><td>Fixed-window in-memory limiter keyed by IP+phone (OTP) or by <b>account</b> (signed-in routes)</td></tr>
+<tr><td><code>tsx</code> / <code>tsc</code></td><td>Dev run with auto-reload / compile to <code>dist/</code> for production</td></tr>
+<tr><td><code>node:crypto</code></td><td><code>randomInt</code> for codes, <code>createHmac</code> for hashing, <code>timingSafeEqual</code> for comparison, <code>randomUUID</code> for <code>jti</code></td></tr>
+</table>
+</div>
+
+<div class="tech"><h3>Server-Sent Events (SSE)</h3>
+<div class="row"><span class="lbl">What</span>A one-way, long-lived HTTP response through which the server pushes text messages to the browser.</div>
+<div class="row"><span class="lbl">Why not WebSockets?</span>Updates only flow server → client, SSE is plain HTTP (works through nginx and proxies, auto-reconnect semantics), and it needs no extra library. Client → server actions remain normal REST calls.</div>
+<div class="row"><span class="lbl">How used</span><code>GET /api/events</code>, see §16.</div>
+</div>
+
+<!-- ============================ 8 DATABASE ============================ -->
+<h1><span class="num">8</span>Tech stack: database (MongoDB)</h1>
+<div class="tech"><h3>MongoDB + Mongoose, hosted on MongoDB Atlas</h3>
+<div class="row"><span class="lbl">What</span>MongoDB is a document database that stores JSON-like documents in collections. Mongoose adds schemas, validation and models in Node. Atlas is MongoDB's managed cloud service.</div>
+<div class="row"><span class="lbl">Why</span>A booking is naturally a <b>nested document</b> (pickup, drop, captain snapshot, price snapshot, handover OTP). Reading one document gives the whole booking with no joins. Single-document updates are <b>atomic</b>, which is the basis of the race-condition fixes. Atlas M0 is free and managed (no DB server to run on the 1 GB EC2).</div>
+<div class="row"><span class="lbl">How used</span>4 collections; indexes for uniqueness, TTL expiry and the partial "one active trip" rule; <code>findOneAndUpdate</code> with conditions; one aggregation pipeline (<code>$facet</code>, <code>$group</code>, <code>$dateToString</code> with timezone) for earnings.</div>
+<div class="row"><span class="lbl">Alternatives</span>PostgreSQL (relational, transactions, strong for reporting). A fair answer: "Postgres would also work. I chose MongoDB because bookings are document-shaped and single-document atomic updates covered my concurrency needs. If I needed complex cross-entity reporting or multi-table transactions, I'd consider Postgres."</div>
+</div>
+
+<h2>Index cheat sheet (why each exists)</h2>
+<table>
+<tr><th>Collection</th><th>Index</th><th>Purpose</th></tr>
+<tr><td>users</td><td>unique <code>(dialCode, phone, role)</code></td><td>One account per phone per role per country</td></tr>
+<tr><td>otps</td><td>same unique + TTL on <code>expiresAt</code></td><td>One live challenge; MongoDB auto-deletes expired codes</td></tr>
+<tr><td>bookings</td><td>unique <code>bookingId</code></td><td>Idempotent creation; ID hijack → 409</td></tr>
+<tr><td>bookings</td><td><b>partial unique</b> <code>acceptedByCaptainId</code> (active only)</td><td>A captain can hold at most one active trip, enforced by the DB</td></tr>
+<tr><td>bookings</td><td><code>(shipperId, _id desc)</code>, captain history indexes</td><td>Fast owner-scoped history and earnings</td></tr>
+<tr><td>revokedtokens</td><td>unique <code>jti</code> + TTL</td><td>Logout revocation that cleans itself up</td></tr>
+</table>
+
+<!-- ============================ 9 AWS / DEVOPS STACK ============================ -->
+<h1><span class="num">9</span>Tech stack: AWS and DevOps</h1>
+<p>The deployment kit lives in <code>deploy/aws-ec2/</code>. Every piece is explained here: what it is, why it's used, and how to talk about it.</p>
+
+<div class="tech"><h3>Amazon EC2 (t4g.micro, Amazon Linux 2023, Arm/Graviton)</h3>
+<div class="row"><span class="lbl">What</span>A virtual machine in the AWS cloud. t4g.micro = 2 vCPU (burstable), 1 GB RAM, on AWS Graviton (Arm) processors.</div>
+<div class="row"><span class="lbl">Why</span>The cheapest way to run 3 Node processes plus nginx 24/7. Graviton is cheaper than x86 t3.micro for the same size. Node is plain JavaScript, so Arm needs no code changes. Amazon Linux 2023 is AWS-optimized and ships the CloudWatch agent package.</div>
+<div class="row"><span class="lbl">Details</span>Region <b>ap-southeast-2 (Sydney)</b>, because the free-plan account is pinned to one region. 12 GB gp3 disk. A 2 GB <b>swap file</b> (<code>setup-ec2.sh</code>) because 1 GB RAM is tight for three Node processes.</div>
+<div class="row"><span class="lbl">Alternatives</span>Elastic Beanstalk, ECS Fargate, App Runner, Lambda, Lightsail. All are more managed but cost more or don't fit SSE/long connections well.</div>
+</div>
+
+<div class="tech"><h3>Elastic IP</h3>
+<div class="row"><span class="lbl">What</span>A static public IPv4 address that you attach to the instance.</div>
+<div class="row"><span class="lbl">Why</span>The IP survives stop/start, so DNS names (sslip.io), the Atlas IP allow-list and TLS certificates stay valid. Note: an <i>unattached</i> Elastic IP is billed, so release it if you delete the instance.</div>
+</div>
+
+<div class="tech"><h3>Security Group (virtual firewall)</h3>
+<div class="row"><span class="lbl">Rules</span>SSH 22 from <b>my IP only</b>; HTTP 80 and HTTPS 443 from anywhere. Ports 4000/8080/8081 are <b>not</b> open: the Node apps bind to <code>127.0.0.1</code> and only nginx is public.</div>
+<div class="row"><span class="lbl">Why</span>Least exposure. Only the reverse proxy is reachable from the internet.</div>
+</div>
+
+<div class="tech"><h3>nginx (reverse proxy + TLS termination)</h3>
+<div class="row"><span class="lbl">What</span>A high-performance web server used here as a <b>reverse proxy</b>: it receives public traffic and forwards it to local apps by hostname.</div>
+<div class="row"><span class="lbl">Why</span>One public entry point for 3 apps (virtual hosts by <code>server_name</code>), HTTPS termination, HTTP→HTTPS redirect, and protection of Node from direct exposure.</div>
+<div class="row"><span class="lbl">Key config</span>A special <code>location /api/events</code> with <code>proxy_buffering off</code> and <code>proxy_read_timeout 1h</code> so SSE messages pass instantly and the stream isn't cut between 25-second pings. <code>X-Forwarded-For $remote_addr</code> <b>overwrites</b> the header (clients can't spoof their IP). <code>client_max_body_size 1m</code> matches the API limit. WebSocket upgrade headers on the portals (Vite/HMR compatibility).</div>
+</div>
+
+<div class="tech"><h3>Let's Encrypt + certbot + sslip.io</h3>
+<div class="row"><span class="lbl">What</span>Let's Encrypt issues free TLS certificates; certbot requests them and edits the nginx config. sslip.io is a free DNS service where <code>api.13-233-10-20.sslip.io</code> resolves to <code>13.233.10.20</code>.</div>
+<div class="row"><span class="lbl">Why</span>HTTPS with no domain purchase. HTTPS is required for <code>Secure</code> cookies, geolocation in browsers, and trust.</div>
+<div class="row"><span class="lbl">Renewal</span>Certificates last 90 days. A cron job runs <code>certbot renew</code> twice a day and reloads nginx.</div>
+</div>
+
+<div class="tech"><h3>PM2 (process manager)</h3>
+<div class="row"><span class="lbl">What</span>A production process manager for Node: it starts, restarts on crash, and starts again on reboot.</div>
+<div class="row"><span class="lbl">How used</span><code>ecosystem.config.cjs</code> declares 3 apps: <code>loadmitra-api</code> (dist/index.js), <code>loadmitra-shipper</code> and <code>loadmitra-captain</code> (Nitro <code>.output/server/index.mjs</code>). <code>max_memory_restart</code> (300M/250M) keeps the 1 GB box stable. <code>kill_timeout: 10000</code> gives the API's graceful shutdown (8 s) time to drain. <code>pm2 startup systemd</code> restarts after reboot. <code>pm2-logrotate</code>: 10 MB × 7 files, compressed.</div>
+<div class="row"><span class="lbl">Alternatives</span>systemd units, Docker + docker-compose.</div>
+</div>
+
+<div class="tech"><h3>IAM role (instance profile)</h3>
+<div class="row"><span class="lbl">What</span>An identity attached to the EC2 instance that grants it AWS permissions through <b>temporary credentials</b>. No access keys are stored anywhere.</div>
+<div class="row"><span class="lbl">Policies</span>AWS-managed <code>CloudWatchAgentServerPolicy</code> plus an inline policy allowing only <code>s3:PutObject/GetObject/DeleteObject</code> on <code>loadmitra-documents-…/*</code>. That's <b>least privilege</b>.</div>
+</div>
+
+<div class="tech"><h3>Amazon S3</h3>
+<div class="row"><span class="lbl">What</span>Object storage for files.</div>
+<div class="row"><span class="lbl">Setup</span>A private bucket (Block Public Access ON), SSE-S3 encryption, in the same region. It's <b>prepared for future captain KYC document uploads</b>; the app doesn't upload anything yet. Say this honestly.</div>
+</div>
+
+<div class="tech"><h3>Amazon CloudWatch (agent, logs, metrics, alarms)</h3>
+<div class="row"><span class="lbl">Logs</span>The agent ships PM2 logs and the nginx error log to log groups <code>/loadmitra/api</code>, <code>/shipper</code>, <code>/captain</code>, <code>/nginx</code>, kept for 14 days.</div>
+<div class="row"><span class="lbl">Metrics</span>Custom namespace <code>LoadMitra</code>: <code>mem_used_percent</code>, disk <code>used_percent</code>, <code>swap_used_percent</code> every 5 minutes. EC2 doesn't report memory by default; that's why the agent is needed.</div>
+<div class="row"><span class="lbl">Alarms</span><code>StatusCheckFailed ≥ 1</code> and <code>mem_used_percent &gt; 90</code> → SNS email.</div>
+<div class="row"><span class="lbl">Health</span><code>/health</code> returns 200 <code>{db:"up"}</code> or <b>503</b> <code>{status:"degraded", db:"down"}</code> so monitoring sees a DB outage.</div>
+</div>
+
+<div class="tech"><h3>Cost controls (AWS Budgets)</h3>
+<p>A <b>zero-spend budget</b> alert is created first. The kit avoids billed extras: no second instance, no load balancer, no NAT gateway, no idle Elastic IP. The README estimates about <b>USD 12–13/month</b>, covered by new-account credits.</p>
+</div>
+
+<!-- ============================ 10 DATA MODEL ============================ -->
+<h1><span class="num">10</span>Data model</h1>
+<h2>User</h2>
+<pre>{ role: "shipper"|"captain", name, email, phone: "9876543210", dialCode: "+91",
+  vehicle?: { vehicleNumber: "TS09AB1234", truckTypeId: "ace", city },   // captains
+  createdAt, updatedAt }</pre>
+<h2>Otp (login challenge)</h2>
+<pre>{ dialCode, phone, role, codeHash /* HMAC, never the code */, attempts (≤5), expiresAt /* TTL */ }</pre>
+<h2>Booking: the bridge between the two portals</h2>
+<pre>{ bookingId: "LM-&lt;UUID&gt;", shipperId, requestFingerprint, customerName,
+  mode: "full"|"shared"|"return", pickup:{label,address,city}, drop:{...},
+  distanceKm /* server-computed */, truckTypeId, truckTypeName, loadWeightKg, goodsType,
+  agreedPrice /* server-computed */, priceSnapshot /* frozen breakdown */,
+  status:     "open" → "accepted" | "cancelled"            // marketplace state
+  tripStatus: accepted → enroute_pickup → at_pickup → picked
+              → enroute_drop → delivered | cancelled      // driving state
+  acceptedByCaptainId, captain /* snapshot */, handoverOtp:{stage,codeHash,expiresAt,issuedAt,attempts},
+  completedAt, payoutSnapshot /* frozen at delivery */, createdAt, updatedAt }</pre>
+<h2>RevokedToken</h2>
+<pre>{ jti, expiresAt /* TTL: removed when the JWT would have expired anyway */ }</pre>
+
+<div class="box say">"I separated <b>status</b> (is the load still on the market?) from <b>tripStatus</b> (where is the truck?). And I store <b>snapshots</b> of the price, the captain and the payout, so history and earnings don't change if the rate card or the captain's vehicle changes later. That's the same idea as storing the price on an order line instead of looking it up from the product table."</div>
+
+<h2>Trip state machine</h2>
+<pre>
+ accepted ─► enroute_pickup ─► at_pickup ─[pickup OTP]─► picked ─► enroute_drop ─[drop OTP]─► delivered
+    │              │               │
+    └──────────────┴───────────────┴──────────► cancelled   (only before goods are on the truck)
+</pre>
+<p>Defined in <code>trips.controller.ts</code> as a <code>transitions</code> map. No skipping, no going backwards, no cancelling after pickup.</p>
+
+<!-- ============================ 11 API ============================ -->
+<h1><span class="num">11</span>API reference</h1>
+<table>
+<tr><th>Method and path</th><th>Access</th><th>Rate limit</th><th>Purpose</th></tr>
+<tr><td><code>GET /health</code></td><td>public</td><td>–</td><td>Liveness + DB state (200/503)</td></tr>
+<tr><td><code>POST /api/auth/send-otp</code></td><td>public</td><td>5/h per IP+phone</td><td>Create login code</td></tr>
+<tr><td><code>POST /api/auth/verify-otp</code></td><td>public</td><td>10/10 min per IP+phone</td><td>Verify → JWT (register if new)</td></tr>
+<tr><td><code>GET/PATCH /api/auth/me</code></td><td>signed in</td><td>–</td><td>Profile read/update</td></tr>
+<tr><td><code>POST /api/auth/logout</code></td><td>any</td><td>–</td><td>Revoke token (<code>jti</code>)</td></tr>
+<tr><td><code>GET /api/events</code></td><td>signed in</td><td>30/min per account</td><td>SSE live stream</td></tr>
+<tr><td><code>GET /api/trucks</code></td><td>public</td><td>–</td><td>Truck catalogue</td></tr>
+<tr><td><code>POST /api/pricing/estimate</code></td><td>public</td><td>–</td><td>Price estimate</td></tr>
+<tr><td><code>POST /api/bookings</code></td><td>shipper</td><td>20/min per account</td><td>Create booking (idempotent)</td></tr>
+<tr><td><code>GET /api/bookings[/:id]</code></td><td>shipper</td><td>120/min</td><td>History (cursor) / one booking</td></tr>
+<tr><td><code>POST /api/bookings/:id/cancel</code></td><td>shipper</td><td>20/min</td><td>Cancel before pickup</td></tr>
+<tr><td><code>POST /api/bookings/:id/handover-otp</code></td><td>shipper</td><td>5/10 min per booking</td><td>Pickup/drop code</td></tr>
+<tr><td><code>GET /api/captain/me</code></td><td>captain</td><td>300/min reads</td><td>Captain profile</td></tr>
+<tr><td><code>PATCH /api/captain/vehicle</code></td><td>captain</td><td>30/min writes</td><td>Register vehicle</td></tr>
+<tr><td><code>GET /api/captain/requests</code></td><td>captain</td><td>reads</td><td>Job board (matching truck + capacity)</td></tr>
+<tr><td><code>POST /api/captain/requests/:id/accept</code></td><td>captain</td><td>writes</td><td>Atomic accept</td></tr>
+<tr><td><code>GET /api/captain/trips[/:id]</code></td><td>captain</td><td>reads</td><td>History + active trip</td></tr>
+<tr><td><code>POST /api/captain/trips/:id/status</code></td><td>captain</td><td>writes</td><td>State-machine transition (+OTP)</td></tr>
+<tr><td><code>GET /api/captain/earnings</code></td><td>captain</td><td>reads</td><td>Earnings summary (IST)</td></tr>
+<tr><td><code>POST /api/captain/earnings/quote</code></td><td>captain</td><td>writes</td><td>Payout for a hypothetical load</td></tr>
+</table>
+<h2>Status codes used and what they mean here</h2>
+<p><b>400</b> invalid input (Zod) · <b>401</b> not signed in / bad or revoked token / wrong OTP · <b>403</b> wrong role · <b>404</b> not found <i>or not yours</i> (we don't reveal existence) · <b>409</b> state conflict (load taken, active trip exists, invalid transition, registration required) · <b>429</b> rate limited, with <code>Retry-After</code> · <b>503</b> SMS not configured, DB down, index missing.</p>
+
+<!-- ============================ 12 JOURNEY ============================ -->
+<h1><span class="num">12</span>A booking from start to finish</h1>
+<pre>
+SHIPPER                         API / DB                               CAPTAIN
+1 send-otp, verify-otp ───────► HMAC code, 5 tries, consume ──► JWT
+                                                              (captain logs in, registers vehicle)
+2 Quote: local price instantly; POST /pricing/estimate refines it
+3 POST /bookings ─────────────► recompute distance + price, fingerprint,
+                                upsert status=open
+                                SSE: shipper{booking}, all captains{offers} ──► job board refresh
+4 Matching screen (radar)                                     5 offer card (30 s) → Accept
+                                ◄─────────── POST /requests/:id/accept
+                                atomic open→accepted, captain snapshot,
+                                partial unique index (1 active trip)
+  SSE{booking} ◄────────────────  publishBookingChange
+  GET /bookings/:id → CaptainCard
+6 Track screen                                                7 enroute_pickup → at_pickup
+8 "Generate pickup code" ──────► HMAC stored, 10 min, 30 s cooldown
+  tells code to driver in person ─────────────────────────────► 9 enters code → picked
+                                verify: reserve attempt → constant-time
+                                compare → conditional transition
+10                                                             enroute_drop
+11 drop code ────────────────── in person ─────────────────────► 12 enters code → delivered
+                                completedAt + payoutSnapshot saved
+  "Delivered" ◄── SSE ────────────────────────────── SSE ──► earnings refresh
+</pre>
+
+<!-- ============================ 13 PRICING ============================ -->
+<h1><span class="num">13</span>Pricing and payouts, with numbers</h1>
+<h2>Truck rate card (<code>server/src/data/trucks.ts</code>)</h2>
+<table>
+<tr><th>id</th><th>Truck</th><th>Capacity</th><th>₹/km</th><th>Base ₹</th></tr>
+<tr><td>ace</td><td>Tata Ace</td><td>750 kg</td><td>18</td><td>250</td></tr>
+<tr><td>pickup8</td><td>Pickup 8 ft</td><td>1,200 kg</td><td>24</td><td>320</td></tr>
+<tr><td>tata407</td><td>Tata 407</td><td>2,500 kg</td><td>30</td><td>480</td></tr>
+<tr><td>truck14</td><td>14 ft Truck</td><td>3,500 kg</td><td>36</td><td>650</td></tr>
+<tr><td>truck17</td><td>17 ft Truck</td><td>5,000 kg</td><td>44</td><td>850</td></tr>
+</table>
+<h2>Shipper formula</h2>
+<pre>subtotal = (baseFare + distanceKm × ratePerKm) × surge(1.0)
+full   : estimate = subtotal
+return : estimate = subtotal × 0.75
+shared : share = clamp(weight / capacity, 0.10, 1.00);  estimate = share × subtotal × 0.80
+range  = estimate × 0.92 … × 1.08 (rounded to ₹10)    perTon = estimate / tonnes</pre>
+<h2>Captain payout</h2>
+<pre>commission = 15% of fare      incentive = 6% (return) | 4% (shared) | 0 (full)
+net        = fare − commission + incentive</pre>
+<h2>Worked examples: Hyderabad → Warangal (145 km)</h2>
+<table>
+<tr><th>Case</th><th>Shipper pays (estimate)</th><th>Captain net</th></tr>
+<tr><td>Tata Ace, full, 500 kg</td><td>250 + 145×18 = <b>₹2,860</b> (range ₹2,630–3,090; ₹5,720/t)</td><td>2,860 − 429 = <b>₹2,431</b> (₹16.8/km)</td></tr>
+<tr><td>Tata 407, return</td><td>(480 + 4,350) × 0.75 ≈ <b>₹3,623</b> (saves ≈ ₹1,208; ≈ 123 kg CO₂)</td><td>3,623 − 543 + 217 = <b>₹3,297</b></td></tr>
+<tr><td>Tata 407, shared, 1,000 kg</td><td>0.4 × 4,830 × 0.8 ≈ <b>₹1,546</b></td><td>1,546 − 232 + 62 = <b>₹1,376</b></td></tr>
+</table>
+<p><b>Distance:</b> there's no paid maps API yet. Known city pairs come from a table (e.g. Hyderabad–Warangal 145 km); unknown pairs use a <b>deterministic hash</b>, so the number is stable across calls and identical on client and server. Max 5,000 km.</p>
+<div class="box say">"Pricing lives in one service on the server, and the same formula is mirrored in the browser so the quote appears instantly, even if the API is slow. But when you book, the server <b>ignores</b> any price or distance from the client and recomputes both, then freezes a snapshot. The captain's payout is derived from that same fare, so both sides always agree."</div>
+
+<!-- ============================ 14 SECURITY ============================ -->
+<h1><span class="num">14</span>Security design</h1>
+<table>
+<tr><th>Threat</th><th>Defence</th></tr>
+<tr><td>OTP brute force / SMS bombing</td><td>6-digit <code>crypto.randomInt</code>, 5 attempts, 5-minute TTL, rate limits per IP+phone</td></tr>
+<tr><td>DB leak exposes codes</td><td>Only <b>HMAC-SHA256</b> hashes are stored (keyed with the server secret)</td></tr>
+<tr><td>Same code used twice concurrently</td><td>Atomic <code>findOneAndDelete</code> consumption</td></tr>
+<tr><td>Forged JWT</td><td>HS256 pinned; claims validated; production refuses to start with a weak or default secret</td></tr>
+<tr><td>Stolen token after logout</td><td><code>jti</code> revocation list (TTL) + live streams for that session closed</td></tr>
+<tr><td>DB down during auth check</td><td><b>Fail closed</b>: 503, never "let them in"</td></tr>
+<tr><td>Shipper calling captain APIs</td><td><code>requireRole</code> → 403</td></tr>
+<tr><td>Reading others' data (IDOR)</td><td>Every query is scoped by <code>shipperId</code>/<code>acceptedByCaptainId</code> from the token; strangers get 404</td></tr>
+<tr><td>Price/distance tampering</td><td>Server recomputes; client values ignored</td></tr>
+<tr><td>Fake delivery</td><td>Shipper-issued handover OTP: 10 min, 5 tries, 30 s cooldown, <code>timingSafeEqual</code></td></tr>
+<tr><td>IP spoofing behind the proxy</td><td><code>TRUST_PROXY=1</code> + nginx overwrites <code>X-Forwarded-For</code></td></tr>
+<tr><td>Shared carrier IPs (mobile India)</td><td>Signed-in rate limits key on the <b>account</b>, not the IP</td></tr>
+<tr><td>Caching private data</td><td><code>Cache-Control: no-store</code></td></tr>
+<tr><td>Data leakage in responses</td><td>Explicit view functions (<code>publicUser</code>, <code>shipperBookingView</code>)</td></tr>
+<tr><td>Cross-site calls, header attacks</td><td>CORS allow-list, <code>helmet</code>, 1 MB body limit</td></tr>
+<tr><td>Plain-HTTP cookie leakage</td><td>HTTPS everywhere; cookies <code>Secure</code>; API cookie <code>httpOnly</code></td></tr>
+<tr><td>Secrets in git</td><td><code>.env</code> only on the instance (<code>chmod 600</code>); password entered via hidden prompt; IAM role instead of access keys</td></tr>
+</table>
+<div class="box warn">
+<b>Demo login mode:</b> the AWS deployment uses <code>OTP_DELIVERY=screen</code>, so the code is shown on screen and <b>anyone can sign in as any number</b>. It's for demos with dummy data only. Real SMS needs a provider (e.g. AWS SNS, MSG91, Twilio) and Indian <b>DLT registration</b>. Say this proactively; it shows maturity.<br>
+Also: the frontends keep a copy of the token in a JS-readable cookie/localStorage, which is weaker against XSS than httpOnly-only.
+</div>
+
+<!-- ============================ 15 HARD PROBLEMS ============================ -->
+<h1><span class="num">15</span>Hard problems solved</h1>
+<p>These are the parts that impress interviewers most. Practise explaining each as <b>problem → naive approach → why it fails → my solution</b>.</p>
+
+<h3>1. Two captains accept the same load at the same time</h3>
+<p><b>Naive:</b> read the booking, check <code>status === "open"</code>, then save. <b>Fails:</b> both read "open" before either writes, so both accept (a race condition). <b>Solution:</b> one conditional atomic write:</p>
+<pre>Booking.findOneAndUpdate(
+  { bookingId, status: "open", truckTypeId: myTruck, loadWeightKg: { $lte: capacity } },
+  { $set: { status: "accepted", acceptedByCaptainId: me, captain: snapshot } })</pre>
+<p>MongoDB applies a single-document update atomically, so only one filter can still match. The loser gets <code>null</code> → 409.</p>
+
+<h3>2. One captain must not hold two active trips</h3>
+<p><b>Naive:</b> "count active trips, then accept": the same race from two tabs or two servers. <b>Solution:</b> a <b>partial unique index</b> on <code>acceptedByCaptainId</code> that only covers active bookings. The database itself rejects a second active trip (error 11000 → 409 <code>ACTIVE_TRIP_EXISTS</code>). When the trip ends, the booking leaves the index's filter automatically. The API refuses to accept at all (503) unless the index is confirmed installed.</p>
+
+<h3>3. A double-tap or retry creates duplicate bookings</h3>
+<p><b>Solution:</b> <b>idempotency</b>. The client generates <code>bookingId</code> once per draft, and the server does <code>$setOnInsert</code> keyed on <code>bookingId + shipperId + fingerprint</code> (a SHA-256 of the load details). A retry returns the same booking; the same ID with different details or a different owner → 409. A retry can never re-open or re-price an accepted booking.</p>
+
+<h3>4. Stale updates (old tab, slow response)</h3>
+<p>Every trip transition includes the <b>current</b> <code>tripStatus</code> in its filter (optimistic concurrency). On the client, <code>mergeBookings</code>/<code>latestTrip</code> never move a record backwards (newest <code>updatedAt</code> wins, else the later stage).</p>
+
+<h3>5. Proving pickup and delivery really happened</h3>
+<p>The shipper generates a handover code for the current stage. The captain must enter it. Verification takes three atomic steps: reserve an attempt → constant-time hash compare → transition only if the <i>same</i> challenge is still present. That stops brute force, replay and regeneration races.</p>
+
+<h3>6. Account switching leaks data</h3>
+<p><code>useSessionKey()</code> turns the token into a React <code>key</code>. A login, logout or account change (even in another tab, via the <code>storage</code> event) remounts the whole state tree and query cache, so account A's data is never shown to account B.</p>
+
+<h3>7. Timezone-correct earnings</h3>
+<p>Servers run in UTC, but captains think in IST. The aggregation groups with <code>$dateToString</code> using <code>timezone: "Asia/Kolkata"</code>, and week/month windows are computed in IST. Legacy trips without completion data are counted separately rather than guessed.</p>
+
+<h3>8. Zero-downtime-ish restarts</h3>
+<p>On <code>SIGINT</code>/<code>SIGTERM</code> the API closes SSE streams, stops accepting connections, finishes in-flight requests, disconnects MongoDB, and exits (with an 8 s cap). PM2's <code>kill_timeout</code> is 10 s.</p>
+
+<h3>9. Starting even when the DB is unreachable</h3>
+<p>HTTP starts immediately; MongoDB connects in the background with retry every 10 s. <code>/health</code> reports 503 until the DB is up, and <code>deploy.sh</code> waits for it.</p>
+
+<!-- ============================ 16 SSE ============================ -->
+<h1><span class="num">16</span>Live updates (Server-Sent Events)</h1>
+<h2>Server: <code>services/live-events.service.ts</code></h2>
+<ul>
+<li><b>Signals, not data:</b> events are only <code>{"type":"booking","id":"LM-…"}</code>, <code>{"type":"trip",…}</code> or <code>{"type":"offers"}</code>. Clients re-fetch through normal <b>owner-checked</b> endpoints, so the stream can never leak data.</li>
+<li><code>publishBookingChange</code> notifies the shipper, the assigned captain, and (if the job board changed) every connected captain.</li>
+<li>Limits: 5 streams per user, 2,000 per server, 64 KB write buffer (slow clients are dropped), streams end at token expiry or after 1 hour, a heartbeat <code>: ping</code> every 25 s, and <code>X-Accel-Buffering: no</code> for nginx.</li>
+</ul>
+<h2>Client: <code>lib/live.ts</code>, <code>lib/use-live-events.ts</code></h2>
+<ul>
+<li>Uses <code>fetch</code> streaming instead of <code>EventSource</code>, <b>because EventSource can't send an Authorization header</b>.</li>
+<li>Exponential backoff with jitter on reconnect: 1, 2, 4… up to 30 s, ±25%.</li>
+<li>After a reconnect it emits a local <code>resync</code> to reload everything (messages may have been missed).</li>
+<li>The stream closes when the tab is hidden or the page is left, because browsers allow ~6 HTTP/1.1 connections per host and idle streams would block API calls. The browser test found this bug.</li>
+<li>Polling stays as a slow fallback (30–60 s while live, 3–15 s when disconnected).</li>
+</ul>
+<div class="box say">"I chose SSE over WebSockets because updates only flow from server to client. Actions are normal REST calls. SSE is plain HTTP, so it works through nginx with buffering turned off, and it's simpler to secure. I made the events carry only IDs, so authorization stays in one place: the regular API."</div>
+
+<!-- ============================ 17 TESTING ============================ -->
+<h1><span class="num">17</span>Testing strategy</h1>
+<table>
+<tr><th>Layer</th><th>Command</th><th>What it uses</th><th>What it proves</th></tr>
+<tr><td>Backend unit/regression (<b>104 passing</b>)</td><td><code>cd server &amp;&amp; npm test</code></td><td>Node's built-in <code>node:test</code>, stubbed DB methods, local HTTP</td><td>Auth, tokens, ownership, pricing numbers, handover codes, earnings, rate limits, proxy hops, OTP delivery modes, health</td></tr>
+<tr><td>Integration</td><td><code>npm run test:integration</code></td><td>Temporary real MongoDB</td><td>Atomic accept and the active-trip index under real conditions</td></tr>
+<tr><td>Browser end-to-end</td><td><code>npm run test:browser</code></td><td>Real Mongo + API + Vite + Chrome via the DevTools Protocol (no Playwright dependency)</td><td>Full shipper journey; captain recovery after reloads, account switches, outages; exactly one SSE stream</td></tr>
+<tr><td>Frontend unit</td><td><code>npm test</code> in each frontend</td><td><code>node:test</code></td><td>Stream parsing, backoff, merge logic, earnings math</td></tr>
+</table>
+<p>Example regression tests: "a retry cannot reopen or reprice an accepted booking", "another shipper cannot read booking status", "overcapacity loads are rejected", "one captain's rate limit leaves another on the same IP untouched".</p>
+<p class="muted">I ran the backend suite on the latest commit while preparing this guide: 104 / 104 passed.</p>
+
+<!-- ============================ 18 AWS STEPS ============================ -->
+<h1><span class="num">18</span>AWS deployment step by step</h1>
+<p>This is how to explain the deployment from <code>deploy/aws-ec2/README.md</code> as a sequence.</p>
+<ol>
+<li><b>Billing safety first:</b> a zero-spend budget alert in AWS Budgets.</li>
+<li><b>MongoDB Atlas M0</b> on AWS in the <b>same region</b> (Sydney) to avoid cross-region latency. A DB user with read/write <i>and index creation</i> (the API installs indexes at startup). Network Access allows <b>only the Elastic IP</b>, never <code>0.0.0.0/0</code>.</li>
+<li><b>EC2:</b> key pair; Amazon Linux 2023 Arm; t4g.micro; security group 22 (my IP), 80, 443; 12 GB gp3; allocate and associate an <b>Elastic IP</b>.</li>
+<li><b>S3 + IAM:</b> a private encrypted bucket; role <code>loadmitra-ec2</code> with <code>CloudWatchAgentServerPolicy</code> plus an S3 object-level inline policy; attach it to the instance.</li>
+<li><b>One-time server setup</b> (<code>setup-ec2.sh</code>): 2 GB swap; install Node 22, nginx, CloudWatch agent, cronie; PM2 + logrotate; certbot via pip; <code>/opt/loadmitra</code>; PM2 systemd startup; certbot renew cron.</li>
+<li><b>Secrets:</b> create <code>/opt/loadmitra/server/.env</code> on the instance (<code>NODE_ENV=production</code>, <code>JWT_SECRET</code> from <code>openssl rand -hex 32</code>, <code>CORS_ORIGIN</code>, <code>TRUST_PROXY=1</code>, <code>OTP_DELIVERY=screen</code>), <code>chmod 600</code>, then <code>set-db-password.sh</code> writes the URL-encoded Atlas password from a hidden prompt (it never appears in shell history).</li>
+<li><b>Build locally</b> (<code>build.sh</code>), because 1 GB RAM is too little to build on the server: it compiles the API (<code>tsc</code>) and both portals (Nitro <code>node-server</code> preset with the public URLs baked in), fills the hostnames into the nginx template, and makes a tarball.</li>
+<li><b>Deploy</b> (<code>deploy.sh</code>): <code>scp</code> the bundle; replace code while keeping <code>.env</code>; <code>npm ci --omit=dev</code>; <code>pm2 startOrReload</code>; install the nginx site (first time); certbot <code>--nginx --redirect</code> (first time); load the CloudWatch config; poll <code>/health</code> until the DB is up; print the URLs.</li>
+<li><b>Monitoring:</b> log groups, LoadMitra metrics, two alarms to SNS email.</li>
+</ol>
+<div class="box say">"I deployed on a single Graviton EC2 instance to stay inside the free credits. nginx is the only public listener. It terminates Let's Encrypt TLS and routes three hostnames to three local Node processes managed by PM2. MongoDB is on Atlas in the same region, allow-listed to the Elastic IP. The instance has an IAM role, so there are no AWS keys anywhere, and the CloudWatch agent ships logs plus memory and disk metrics with alarms. Builds happen on my machine because the instance has 1 GB RAM, and a deploy script uploads, reloads PM2 and waits for the health check."</div>
+
+<!-- ============================ 19 REVIEW ============================ -->
+<h1><span class="num">19</span>Deployment review: what's good and what to improve</h1>
+<p>I reviewed the AWS commits (<code>4045cf8</code> "Harden the API and portals for production" and <code>3263cd3</code> "Add the AWS free-tier deployment kit") file by file. I didn't connect to the live instance, because its IP isn't in the repository.</p>
+<h2>What's done well</h2>
+<ul>
+<li>Only nginx is public; the apps bind to localhost; SSH is limited to your IP; Atlas is allow-listed to the Elastic IP, not <code>0.0.0.0/0</code>.</li>
+<li>The IAM instance role means no access keys; the S3 policy is least-privilege at object level; the bucket is private and encrypted.</li>
+<li>Secrets stay out of git: <code>.env</code> is <code>chmod 600</code> and the password goes in through a hidden prompt with URL encoding.</li>
+<li>Correct SSE proxying (<code>proxy_buffering off</code>, a 1-hour read timeout) and correct client-IP handling (<code>TRUST_PROXY=1</code> plus an overwritten <code>X-Forwarded-For</code>).</li>
+<li>Production fails safe: login returns 503 without SMS unless demo mode is explicitly enabled (and then a warning is logged); a weak JWT secret blocks boot.</li>
+<li>Operations: a health check that reports the DB, graceful shutdown with matching PM2 <code>kill_timeout</code>, memory caps, swap, log rotation, CloudWatch logs and metrics, cert auto-renewal, and <code>.gitattributes</code> forcing LF endings so the scripts run on Linux.</li>
+<li>Cost discipline: a budget alert, no load balancer or NAT, and a warning about idle Elastic IPs.</li>
+<li>All 104 backend tests pass on this commit.</li>
+</ul>
+<h2>Points to fix or be ready to discuss</h2>
+<table>
+<tr><th style="width:4%">#</th><th style="width:30%">Finding</th><th>Why it matters and what to do</th></tr>
+<tr><td>1</td><td><b>Demo login</b> (<code>OTP_DELIVERY=screen</code>)</td><td>Anyone can sign in as any number. It's clearly documented. Keep dummy data only, and plan the SMS adapter (AWS SNS / MSG91 + DLT).</td></tr>
+<tr><td>2</td><td><b>Free-tier wording vs instance type</b></td><td>The README's "legacy free tier" bullet lists t2/t3.micro, but the kit uses <b>t4g.micro</b>, which isn't part of the legacy 750-hour allowance. It's fine for your credit-based free plan; on a legacy account, pick t3.micro (x86) to stay free. Comments in <code>build.sh</code> and <code>ecosystem.config.cjs</code> still say "t3.micro".</td></tr>
+<tr><td>3</td><td><b>Deploy isn't atomic and has no rollback</b></td><td><code>deploy.sh</code> deletes the old code, then runs <code>npm ci</code>. If install fails mid-way, the app is down, and there's a brief outage on every deploy. Improvement: unpack into a versioned <code>releases/&lt;timestamp&gt;</code> folder, install there, then switch a <code>current</code> symlink and reload; keep the previous release for instant rollback.</td></tr>
+<tr><td>4</td><td><b>Single point of failure</b></td><td>One instance, one AZ, in-memory rate limits and SSE. That's acceptable for a demo; see §21 for how to scale.</td></tr>
+<tr><td>5</td><td><b>No database backups</b></td><td>Atlas M0 has no automated backups. Schedule <code>mongodump</code> to S3 (cron) or move to M10+ for real data.</td></tr>
+<tr><td>6</td><td><b>Manual deploys (no CI/CD)</b></td><td>A GitHub Actions pipeline could run tests → build → deploy (via SSH or AWS SSM) on each push to main.</td></tr>
+<tr><td>7</td><td><b>Secrets in a file</b></td><td>Fine at this scale. Next step: AWS Systems Manager Parameter Store / Secrets Manager read at boot through the instance role.</td></tr>
+<tr><td>8</td><td><b>SSH port open</b></td><td>Restricted to your IP, which is good. Even better: AWS Systems Manager Session Manager and close port 22.</td></tr>
+<tr><td>9</td><td><b>sslip.io hostnames</b></td><td>Fine for demos. For a product, buy a domain, use Route 53, and put the portals on e.g. <code>app.</code> / <code>captain.</code> / <code>api.</code>.</td></tr>
+<tr><td>10</td><td><b>Token copy in a JS-readable cookie</b></td><td>The browser keeps the JWT in a readable cookie/localStorage (XSS risk). Long-term: rely on the httpOnly cookie only, plus CSRF protection.</td></tr>
+<tr><td>11</td><td><b>Elastic IP cost note</b></td><td>Since 2024, AWS bills every public IPv4 address (even attached) at about USD 3.6/month. It's included in the README's USD 12–13 estimate and covered by credits, but worth knowing.</td></tr>
+</table>
+<div class="box tip">In interviews, raising your own trade-offs (single instance, demo OTP, no backups) and explaining the next step for each is a <b>strength</b>. It shows you understand production engineering, not just how to make it work.</div>
+
+<!-- ============================ 20 LIMITATIONS ============================ -->
+<h1><span class="num">20</span>Limitations and roadmap</h1>
+<table>
+<tr><th>Area</th><th>Today</th><th>Next step</th></tr>
+<tr><td>Login SMS</td><td>On-screen demo code</td><td>SMS adapter (SNS/MSG91), DLT templates</td></tr>
+<tr><td>Maps and distance</td><td>CSS map; table + hash distance</td><td>Google Maps / Mapbox / AWS Location: geocoding, routing, live GPS</td></tr>
+<tr><td>Captain KYC</td><td>Vehicle number format check; S3 bucket ready</td><td>Upload RC/licence to S3 with pre-signed URLs, admin review</td></tr>
+<tr><td>Payments</td><td>Settled offline by design</td><td>UPI via Razorpay, escrow, payouts</td></tr>
+<tr><td>Matching</td><td>All captains with the matching truck see the load</td><td>Distance-based dispatch, geospatial index (<code>2dsphere</code>)</td></tr>
+<tr><td>Chat, SOS, ratings, offers</td><td>UI only / partial</td><td>Persistent chat, emergency workflow, rating aggregates</td></tr>
+<tr><td>Pricing</td><td>Static rate card, surge hook = 1.0</td><td>Admin-editable PricingRule per region, dynamic surge</td></tr>
+<tr><td>Admin panel</td><td>None</td><td>Ops dashboard: disputes, KYC, pricing</td></tr>
+<tr><td>Mobile apps</td><td>Responsive web</td><td>React Native / PWA with push notifications</td></tr>
+</table>
+
+<!-- ============================ 21 SCALE ============================ -->
+<h1><span class="num">21</span>How to scale it</h1>
+<ol>
+<li><b>Move shared state out of memory:</b> rate limits → Redis (ElastiCache); SSE fan-out → Redis pub/sub so any instance can notify any client.</li>
+<li><b>Run several API instances</b> behind an <b>Application Load Balancer</b> across 2+ AZs, in an Auto Scaling group (or containerize with Docker and run on <b>ECS Fargate</b>). Raise ALB idle timeout for SSE.</li>
+<li><b>Serve portals separately:</b> Vercel or CloudFront + Lambda/ECS for SSR; static assets on CloudFront CDN.</li>
+<li><b>Database:</b> Atlas M10+ with backups, replica set and read preference; indexes are already designed for owner-scoped queries.</li>
+<li><b>CI/CD:</b> GitHub Actions → test → build image → push to ECR → deploy; infrastructure as code (Terraform/CDK).</li>
+<li><b>Observability:</b> structured JSON logs (pino), request IDs, metrics/tracing (CloudWatch, X-Ray or OpenTelemetry).</li>
+<li><b>Security:</b> WAF on the ALB, Secrets Manager, SSM Session Manager, domain + ACM certificates.</li>
+</ol>
+<div class="box say">"The design already pushes correctness into MongoDB with atomic updates and unique indexes, so it stays correct with many API instances. The only in-process pieces are the rate limiter and the SSE registry, and both are marked in the code to move to Redis when scaling horizontally."</div>
+
+<!-- ============================ 22 Q&A ============================ -->
+<h1><span class="num">22</span>Interview questions and model answers</h1>
+<p>Answer in your own words. These are model answers, not scripts to memorize.</p>
+
+<h2>A. Project and product</h2>
+<div class="qa"><div class="q">Tell me about your project.</div><div class="a">Use the 30-second pitch (§1), then offer: "Should I go deeper into the architecture, the concurrency problems, or the AWS deployment?"</div></div>
+<div class="qa"><div class="q">How did you get the idea?</div><div class="a">Use your own true story (see the "Make it yours" box in §2), then the three problems: empty return trips, small shippers overpaying, opaque prices.</div></div>
+<div class="qa"><div class="q">Who are the users and what problem does each have?</div><div class="a">Shippers want a reliable truck at a fair, transparent price. Captains want more paid trips and fewer empty kilometres. One platform with three modes serves both.</div></div>
+<div class="qa"><div class="q">What makes it different from existing apps?</div><div class="a">India-first: shared and return loads as first-class modes, a per-tonne price range (how traders think), 6 regional languages, and OTP-verified handover at pickup and drop for trust.</div></div>
+<div class="qa"><div class="q">What was your role?</div><div class="a">Describe honestly what you designed, built, tested and deployed. If you used AI tools or a scaffold (the frontends were scaffolded with Lovable), say so and explain what you reviewed, fixed and hardened yourself; the commit history shows the auth, booking and concurrency fixes.</div></div>
+<div class="qa"><div class="q">What would you do differently?</div><div class="a">Start with server-authoritative flows and tests from day one (the early version trusted client prices and accepted any OTP), plan for Redis earlier, add CI/CD, and pick Postgres or Mongo deliberately after modelling reporting needs.</div></div>
+
+<h2>B. Architecture</h2>
+<div class="qa"><div class="q">Why two frontends and one backend?</div><div class="a">Different users and devices, independent deploys and simpler apps; one API and database keep a single source of truth for each booking, which both sides watch.</div></div>
+<div class="qa"><div class="q">Monolith or microservices? Why?</div><div class="a">A modular monolith. One domain, small team, and atomic single-database operations. Microservices would add network calls and distributed transactions without benefit at this size. The layered structure makes later extraction possible.</div></div>
+<div class="qa"><div class="q">Explain the request flow in your backend.</div><div class="a">helmet/cors/json/cookies → route → rate limit → requireAuth (JWT + revocation) → requireRole → controller (Zod validation) → service (business logic) → model (Mongoose) → response; errors go through asyncHandler → errorHandler.</div></div>
+<div class="qa"><div class="q">How do the two portals communicate?</div><div class="a">They never talk directly. Both read and write the same booking through the API; SSE signals tell each side when to re-read.</div></div>
+<div class="qa"><div class="q">Why is <code>app.ts</code> separate from <code>index.ts</code>?</div><div class="a">So tests can build the Express app without listening on a port or connecting to a database.</div></div>
+
+<h2>C. Frontend</h2>
+<div class="qa"><div class="q">Why React? Why TanStack Start instead of Next.js?</div><div class="a">React for its ecosystem. TanStack Start for SSR plus fully type-safe routing and tight integration with TanStack Query. Next.js would be a valid alternative.</div></div>
+<div class="qa"><div class="q">What is SSR and hydration? Any problems you hit?</div><div class="a">The server sends ready HTML; React then attaches event handlers. Browser-only APIs (localStorage, window) must run in <code>useEffect</code>; otherwise server and client markup differ (hydration mismatch). I keep the session key stable during the first hydration so the tree doesn't remount and drop clicks.</div></div>
+<div class="qa"><div class="q">How do you manage state?</div><div class="a">Server state with TanStack Query (captain) or a Context + useReducer store with merge logic (shipper); UI and draft state in React state/context; preferences in cookies. No Redux needed.</div></div>
+<div class="qa"><div class="q">What is TanStack Query doing for you?</div><div class="a">Caching, deduplication, loading/error states, polling (<code>refetchInterval</code>), cancellation via AbortSignal, and invalidation when a live event arrives.</div></div>
+<div class="qa"><div class="q">How do you handle logout or switching accounts safely?</div><div class="a">The token becomes a React key; any change remounts the provider tree and clears the query cache. Cross-tab changes come through the <code>storage</code> event.</div></div>
+<div class="qa"><div class="q">How is multi-language support done?</div><div class="a">A small <code>t(key, vars)</code> with per-language dictionaries, falling back to English then the key; the choice is persisted in a cookie so SSR renders the right language.</div></div>
+<div class="qa"><div class="q">How do you show a price instantly if the API is slow?</div><div class="a">The same formula runs locally as <code>initialData</code>; the server estimate replaces it. The booking itself always uses the server's computation.</div></div>
+
+<h2>D. Backend and API</h2>
+<div class="qa"><div class="q">Why Express? Why Zod?</div><div class="a">Express is simple and has a mature middleware ecosystem. Zod validates untrusted input at runtime (TypeScript types vanish at runtime) and also validates env vars at boot.</div></div>
+<div class="qa"><div class="q">How do you handle errors in async routes?</div><div class="a">Express 4 doesn't forward rejected promises, so <code>asyncHandler</code> catches them and calls <code>next(err)</code>; a central handler returns 400 for bad JSON and a generic 500 otherwise, without leaking stack traces.</div></div>
+<div class="qa"><div class="q">What's the difference between 401 and 403? Why 404 for someone else's booking?</div><div class="a">401 = we don't know who you are; 403 = we know you but you aren't allowed. For other people's records we return 404 so we don't reveal that the ID exists.</div></div>
+<div class="qa"><div class="q">How does pagination work?</div><div class="a">Cursor-based: <code>?before=&lt;lastId&gt;</code>, sorted by <code>_id</code> descending, fetching limit+1 to know if there's a next page. It's stable when new bookings arrive, unlike page numbers.</div></div>
+<div class="qa"><div class="q">What is idempotency and where do you use it?</div><div class="a">Repeating a request has the same effect as doing it once. Booking creation uses a client-generated ID plus a fingerprint and <code>$setOnInsert</code>, so network retries don't duplicate or alter bookings.</div></div>
+<div class="qa"><div class="q">How does your rate limiter work, and its limitation?</div><div class="a">A fixed window per key in a Map: OTP routes keyed by IP+phone, signed-in routes by account (many Indian mobile users share carrier IPs). It returns 429 with Retry-After. The limitation: it's per-process, so multiple instances need Redis.</div></div>
+<div class="qa"><div class="q">What does TRUST_PROXY do?</div><div class="a">Behind nginx every request comes from 127.0.0.1. Setting Express <code>trust proxy</code> to 1 makes <code>req.ip</code> the real client from <code>X-Forwarded-For</code>, and nginx overwrites that header so clients can't spoof it.</div></div>
+<div class="qa"><div class="q">How does graceful shutdown work?</div><div class="a">On SIGTERM/SIGINT: close SSE streams, <code>server.close()</code> to finish in-flight requests, disconnect Mongo, exit; force exit after 8 s. PM2 waits 10 s.</div></div>
+
+<h2>E. Database</h2>
+<div class="qa"><div class="q">Why MongoDB instead of SQL?</div><div class="a">Bookings are nested documents read as a whole; atomic single-document updates cover the concurrency needs; Atlas has a free managed tier. Postgres would also work and would be better for complex reporting or multi-entity transactions.</div></div>
+<div class="qa"><div class="q">What indexes did you create and why?</div><div class="a">Unique identity (dialCode, phone, role); TTL for OTPs and revoked tokens; unique bookingId; the partial unique active-trip index; compound indexes for owner-scoped history and earnings (see §8).</div></div>
+<div class="qa"><div class="q">What is a partial index?</div><div class="a">An index that only includes documents matching a filter. Here, uniqueness applies only to active trips, so a captain can have many completed trips but only one active one.</div></div>
+<div class="qa"><div class="q">What is a TTL index?</div><div class="a">MongoDB deletes documents automatically after a date field passes. It's used for expired OTP challenges and revoked tokens.</div></div>
+<div class="qa"><div class="q">Did you use transactions?</div><div class="a">No. Every critical change touches one document, and MongoDB guarantees single-document atomicity. Conditional filters plus unique indexes give the needed guarantees without multi-document transactions.</div></div>
+<div class="qa"><div class="q">How are earnings calculated?</div><div class="a">One aggregation: match the captain's delivered trips → sort → <code>$facet</code> into per-day totals (grouped in IST), the 20 latest ledger rows, and a count of legacy trips without completion data.</div></div>
+<div class="qa"><div class="q">How did you migrate identity to include the country code safely?</div><div class="a">Back-fill <code>dialCode="+91"</code>, create the new unique index, then drop the old one. Uniqueness holds at every moment, and it's idempotent, so it runs on every boot.</div></div>
+
+<h2>F. Security</h2>
+<div class="qa"><div class="q">Walk me through your login flow.</div><div class="a">send-otp: validate phone → random 6-digit code → store its HMAC with a 5-minute TTL and 0 attempts. verify-otp: atomically increment attempts on an unexpired challenge (&lt;5) → compare hashes → register if new → atomically delete the challenge → sign a JWT (with jti) → httpOnly cookie + token in the body.</div></div>
+<div class="qa"><div class="q">Why hash OTPs? Why HMAC rather than plain SHA-256?</div><div class="a">If the DB leaks, codes can't be read. A 6-digit code has only a million possibilities, so a plain hash is trivially brute-forced; an HMAC needs the server secret.</div></div>
+<div class="qa"><div class="q">JWTs are stateless. How does logout work?</div><div class="a">Each token has a unique <code>jti</code>. Logout stores it in a revoked list with a TTL equal to the token's expiry; <code>requireAuth</code> checks it and fails closed (503) if the DB is unavailable. Live streams for that session are closed.</div></div>
+<div class="qa"><div class="q">How do you stop a client from paying less?</div><div class="a">The server ignores the client's price and distance, recomputes both from the catalogue and cities, validates truck capacity, and stores an immutable price snapshot.</div></div>
+<div class="qa"><div class="q">How do you prevent IDOR (accessing others' data)?</div><div class="a">Every query includes the owner ID taken from the verified token (<code>shipperId</code> or <code>acceptedByCaptainId</code>), never from the request body.</div></div>
+<div class="qa"><div class="q">What's timingSafeEqual and why use it?</div><div class="a">A comparison that takes the same time whether the values match early or late, so attackers can't learn a correct hash byte by byte from response timings.</div></div>
+<div class="qa"><div class="q">What security weaknesses remain?</div><div class="a">The demo OTP mode in the AWS deployment, the token copy in a JS-readable cookie (XSS), no KYC verification, in-memory limits. Each has a planned fix (§19, §20).</div></div>
+<div class="qa"><div class="q">What does helmet / CORS protect against?</div><div class="a">helmet: clickjacking, MIME sniffing and missing HSTS, via headers. CORS: browsers on other websites can't call the API with the user's credentials; only the two portal origins are allowed.</div></div>
+
+<h2>G. Concurrency and real-time</h2>
+<div class="qa"><div class="q">Two captains tap Accept at the same millisecond. What happens?</div><div class="a">Both send <code>findOneAndUpdate({status:"open", …})</code>. MongoDB applies them one at a time; the first flips it to accepted; the second's filter no longer matches → null → 409 "unavailable".</div></div>
+<div class="qa"><div class="q">How do you guarantee one active trip per captain across servers?</div><div class="a">A partial unique index in the database: the DB rejects the second active trip with a duplicate-key error, which becomes 409. It doesn't depend on application memory.</div></div>
+<div class="qa"><div class="q">Why SSE and not WebSockets or polling only?</div><div class="a">Updates are one-way, SSE is plain HTTP and proxy-friendly, and it needs no extra library. Polling alone is either slow or wasteful, so polling is kept only as a fallback.</div></div>
+<div class="qa"><div class="q">Why not use the browser's EventSource?</div><div class="a">It can't set an Authorization header. I use fetch streaming with my own parser, backoff and resync.</div></div>
+<div class="qa"><div class="q">What happens if the SSE connection drops?</div><div class="a">The client reconnects with exponential backoff and jitter, then triggers a resync to refetch everything; meanwhile polling speeds up to 3–15 s.</div></div>
+<div class="qa"><div class="q">Describe a tricky bug you found.</div><div class="a">The browser end-to-end test showed that after a few navigations every API call hung. Chrome kept previous pages' SSE streams open, using up the ~6 HTTP/1.1 connections per host. The fix: close the stream on <code>pagehide</code> and when the tab is hidden, reopen with a resync. A test now asserts exactly one stream is open.</div></div>
+
+<h2>H. AWS and DevOps</h2>
+<div class="qa"><div class="q">Explain your deployment architecture.</div><div class="a">Use the "How to say it" box in §18.</div></div>
+<div class="qa"><div class="q">Why EC2 and not Lambda, Beanstalk or ECS?</div><div class="a">Cost (one small instance inside the credits), long-lived SSE connections (a poor fit for Lambda), full control and learning value. ECS Fargate + ALB would be the next step for scaling.</div></div>
+<div class="qa"><div class="q">Why t4g (Graviton/Arm)?</div><div class="a">It's cheaper than t3 at the same size and Node runs unchanged on Arm. (On a legacy free-tier account t3.micro would be the free option.)</div></div>
+<div class="qa"><div class="q">What is a reverse proxy and why nginx?</div><div class="a">A server in front of your apps that receives public traffic and forwards it. nginx gives one public entry for three apps by hostname, TLS termination, redirects, and SSE-specific settings, and keeps Node off the public internet.</div></div>
+<div class="qa"><div class="q">How does HTTPS work in your setup? How are certificates renewed?</div><div class="a">certbot obtains Let's Encrypt certificates for the three sslip.io hostnames and configures nginx with an HTTP→HTTPS redirect; cron runs <code>certbot renew</code> twice a day and reloads nginx.</div></div>
+<div class="qa"><div class="q">What is sslip.io?</div><div class="a">A free wildcard DNS: a hostname that contains the IP resolves to that IP. You get valid HTTPS without buying a domain.</div></div>
+<div class="qa"><div class="q">Why PM2?</div><div class="a">It keeps the three Node apps alive, restarts on crash or memory overuse, restarts on reboot through systemd, reloads on deploy, and rotates logs.</div></div>
+<div class="qa"><div class="q">Why an IAM role instead of access keys?</div><div class="a">The instance gets short-lived credentials automatically, so there are no long-lived keys to leak or rotate, and permissions are least-privilege (CloudWatch agent plus specific S3 object actions).</div></div>
+<div class="qa"><div class="q">What do you monitor and how?</div><div class="a">The CloudWatch agent ships PM2 and nginx logs (14-day retention) and memory, disk and swap metrics; alarms on instance status checks and memory &gt;90% go to SNS email; <code>/health</code> reports DB connectivity.</div></div>
+<div class="qa"><div class="q">Why add swap, and why build locally?</div><div class="a">1 GB RAM is tight for three Node processes; swap absorbs spikes. Building React/TypeScript needs more memory than the box has, so builds run locally and only the compiled output is shipped.</div></div>
+<div class="qa"><div class="q">How do you handle secrets?</div><div class="a">They live only in <code>.env</code> on the instance (<code>chmod 600</code>), never in git; the DB password is written through a hidden prompt; JWT_SECRET comes from <code>openssl rand -hex 32</code>; AWS access is through the role. Next step: SSM Parameter Store / Secrets Manager.</div></div>
+<div class="qa"><div class="q">How would you make deployments safer?</div><div class="a">Versioned release folders with symlink switch and rollback, a CI pipeline running tests first, health-check gating, and eventually blue/green behind a load balancer.</div></div>
+<div class="qa"><div class="q">How much does it cost?</div><div class="a">About USD 12–13/month (t4g.micro, public IPv4, 12 GB gp3), covered by new-account credits; Atlas M0 is free. A zero-spend budget alert guards against surprises.</div></div>
+<div class="qa"><div class="q">Why is MongoDB in the same region as EC2?</div><div class="a">Every request makes several DB round trips; cross-region latency (100+ ms each) would make the app slow.</div></div>
+
+<h2>I. Testing and quality</h2>
+<div class="qa"><div class="q">How did you test it?</div><div class="a">104 backend regression tests with stubbed persistence, integration tests on a temporary real MongoDB for race conditions and indexes, browser end-to-end tests driving Chrome through the DevTools Protocol, and frontend unit tests, all with Node's built-in test runner.</div></div>
+<div class="qa"><div class="q">Why not Jest?</div><div class="a"><code>node:test</code> is built in, fast and needs no extra dependencies; it covered every need.</div></div>
+<div class="qa"><div class="q">How do you test a race condition?</div><div class="a">Against a real MongoDB in the integration suite: fire concurrent accepts and assert exactly one succeeds and the active-trip index rejects the others.</div></div>
+
+<h2>J. Behavioural and scaling</h2>
+<div class="qa"><div class="q">How would you scale to 1 lakh (100,000) users?</div><div class="a">§21: Redis for rate limits and SSE pub/sub, multiple API instances behind an ALB in an Auto Scaling group or ECS, CDN for portals, Atlas M10+ with backups, CI/CD and observability.</div></div>
+<div class="qa"><div class="q">What was the hardest part?</div><div class="a">Pick one from §15, e.g. guaranteeing one active trip per captain under concurrency, and tell it as problem → naive approach → why it fails → database-enforced solution → test.</div></div>
+<div class="qa"><div class="q">What did you learn?</div><div class="a">Never trust the client; push invariants into the database; design for failure (fail closed, retries, fallbacks); real browsers reveal bugs unit tests can't; and deployment and operations are part of the product.</div></div>
+<div class="qa"><div class="q">If you had one more month?</div><div class="a">Real SMS and maps, KYC uploads to S3, payments via UPI, CI/CD, and Redis for horizontal scaling.</div></div>
+
+<!-- ============================ 23 CHEAT SHEET ============================ -->
+<h1><span class="num">23</span>One-page cheat sheet</h1>
+<table>
+<tr><th style="width:26%">Topic</th><th>Remember this</th></tr>
+<tr><td>One-liner</td><td>Uber for trucks in India: full, shared and return loads, transparent per-tonne price, live tracking.</td></tr>
+<tr><td>Apps</td><td>Shipper :8080, Captain :8081 (React 19 + TanStack Start SSR), API :4000 (Express + TS), MongoDB Atlas.</td></tr>
+<tr><td>Bridge</td><td>The <code>bookings</code> collection; <code>status</code> (market) vs <code>tripStatus</code> (driving).</td></tr>
+<tr><td>Auth</td><td>Phone OTP (HMAC, 5 tries, 5 min, atomic consume) → JWT HS256 30 d with jti; revocation list; roles shipper/captain.</td></tr>
+<tr><td>Integrity</td><td>The server recomputes price and distance; owner-scoped queries; snapshots for price, captain and payout.</td></tr>
+<tr><td>Concurrency</td><td>Conditional <code>findOneAndUpdate</code>; partial unique index = 1 active trip; idempotent create with fingerprint.</td></tr>
+<tr><td>Trip</td><td>accepted → enroute_pickup → at_pickup → [OTP] picked → enroute_drop → [OTP] delivered; cancel only before pickup.</td></tr>
+<tr><td>Pricing</td><td>(base + km×rate); return ×0.75; shared share×0.8; range ±8%; captain net = fare − 15% + 6%/4%.</td></tr>
+<tr><td>Example</td><td>Tata Ace, 145 km, full = ₹2,860 → captain ₹2,431.</td></tr>
+<tr><td>Live</td><td>SSE signals (IDs only) + polling fallback; fetch streaming (auth header); backoff + jitter; resync; closes when hidden.</td></tr>
+<tr><td>Tests</td><td>104 backend + integration (real Mongo) + browser E2E (Chrome over CDP) + frontend unit.</td></tr>
+<tr><td>AWS</td><td>EC2 t4g.micro (Sydney) + Elastic IP + SG(22 mine, 80, 443) → nginx (TLS, Let's Encrypt, sslip.io, SSE no-buffer) → PM2 × 3 → Atlas M0 same region; IAM role → CloudWatch + S3; swap; logrotate; budget alert.</td></tr>
+<tr><td>Own trade-offs</td><td>Demo OTP, single instance, in-memory limits/SSE, no backups on M0, manual deploy without rollback.</td></tr>
+</table>
+
+<!-- ============================ 24 GLOSSARY ============================ -->
+<h1><span class="num">24</span>Glossary</h1>
+<table>
+<tr><th style="width:24%">Term</th><th>Meaning</th></tr>
+<tr><td>Atomic</td><td>All or nothing, with no one able to interleave in between</td></tr>
+<tr><td>AZ / Region</td><td>An AWS data-centre group / a geographic area (here ap-southeast-2, Sydney)</td></tr>
+<tr><td>CORS</td><td>A browser rule for which websites may call an API</td></tr>
+<tr><td>Cursor pagination</td><td>"Give me items before X" instead of page numbers</td></tr>
+<tr><td>DLT</td><td>India's mandatory registration for commercial SMS senders and templates</td></tr>
+<tr><td>Elastic IP</td><td>A static public IPv4 address in AWS</td></tr>
+<tr><td>Fail closed</td><td>Deny when uncertain (e.g. DB down during an auth check)</td></tr>
+<tr><td>HMAC</td><td>A keyed hash; can't be reversed or recomputed without the secret</td></tr>
+<tr><td>Hydration</td><td>React attaching interactivity to server-rendered HTML</td></tr>
+<tr><td>IAM role</td><td>An AWS identity with permissions, granting temporary credentials</td></tr>
+<tr><td>IDOR</td><td>Insecure Direct Object Reference: accessing others' records by ID</td></tr>
+<tr><td>Idempotent</td><td>Doing it twice = doing it once</td></tr>
+<tr><td>jti</td><td>A unique token ID inside a JWT, used for revocation</td></tr>
+<tr><td>JWT</td><td>A signed token proving identity on each request</td></tr>
+<tr><td>Nitro</td><td>The server build engine behind TanStack Start (presets: node-server, vercel…)</td></tr>
+<tr><td>Partial index</td><td>An index covering only documents that match a filter</td></tr>
+<tr><td>PM2</td><td>A Node.js process manager (restart, startup, logs)</td></tr>
+<tr><td>Reverse proxy</td><td>A server forwarding public requests to internal apps (nginx)</td></tr>
+<tr><td>Security group</td><td>An AWS virtual firewall for an instance</td></tr>
+<tr><td>SSE</td><td>Server-Sent Events: a one-way live stream over HTTP</td></tr>
+<tr><td>SSR</td><td>Server-side rendering</td></tr>
+<tr><td>TLS / HTTPS</td><td>Encryption for web traffic; certificates from Let's Encrypt</td></tr>
+<tr><td>TTL index</td><td>Auto-deletes documents after a time</td></tr>
+<tr><td>Zod</td><td>A runtime data-validation library</td></tr>
+</table>
+<p class="muted" style="margin-top:6mm">Source of truth: the code in the repository. File paths in this guide point to the exact implementation, so open them before an interview and walk through one or two functions out loud.</p>
+
+</body>
+</html>
